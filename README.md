@@ -52,7 +52,7 @@ git add -A && git commit -m "更新内容" && git push
 
 - 想边写边看：`npm run serve`（监听到丢文件会自动重建并刷新浏览器），它和 `npm run build` 做的事一样。
 - 想一条命令走完：`npm run deploy`（= 完整重建 → 提交 → 推送到 `x1shang/x1shang.top`，走本地代理 `127.0.0.1:10809`）。
-- **导航页（`我们都.是.gay`）不走这个流程**：它是工作区里的另一个仓库（`site/`），手写单文件站，改完直接 `git add -A && git commit && git push`，没有构建步骤。
+- **导航页（工作区里的另一个仓库 `site/`）不走这个流程**：手写单文件站，改完直接 `git add -A && git commit && git push`，没有构建步骤。
 - **不用手动碰**这些构建产物：`content.auto.js`、`feed.xml`、`atom.xml`、`sitemap.xml`、`articles/`、`assertions/`、`academic/`、`assets/photos/`（手改会被下次 build 覆盖）。
 - 访客数据（关于页的图 + 文章热度）是另一条线：`npm run stats`（或仓库 Secrets + `.github/workflows/stats.yml` 每天自动）→ 再 `npm run build` 才写进内容包。没配就是热度 0、图显示"数据还在积累"，不影响发布。
 

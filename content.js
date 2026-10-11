@@ -16,7 +16,7 @@ window.SITE = {
   tracks: [],      // { id, title, artist, src, date, lyrics }
   friends: [],     // { name, url, description, date }
 
-  // 作品清单不在这里：侧栏与首页的「作品」直接外链到导航页（我们都.是.gay），
+  // 作品清单不在这里：侧栏与首页的「作品」直接外链到站外导航页，
   // 磁贴入口与作品区（含星数快照）都在那边维护。原来的 repositories 快照已随作品页一起移除
   // （2026-10-11，git 历史里还找得到）。
 };

@@ -257,12 +257,31 @@
       ['#articles', '文章'], ['#assertions', '断言'], ['#academic', '学术'],
       ['#photography', '摄影'], ['#music', '音乐'], ['#friends', '友链'], ['#about', '关于'],
     ].map(([h, l]) => runLink(h, l));
-    shortcuts.splice(3, 0, `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品 ↗</a>`);
+    shortcuts.splice(3, 0, `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
     shortcuts.push('<a href="feed.xml" type="application/rss+xml">RSS</a>', '<a href="atom.xml" type="application/atom+xml">Atom</a>',
       `<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
 
+    /* 动态：全站最新的三条「非测试样例」更新（文章 / 断言 / 学术 / 摄影 / 音乐） */
+    const UPD_KIND = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐' };
+    const updates = [
+      ...C.articles.map((x) => ['article', x, `#articles/${encodeURIComponent(x.id)}`]),
+      ...C.assertions.map((x) => ['assertion', x, `#assertions/${encodeURIComponent(x.id)}`]),
+      ...C.papers.map((x) => ['paper', x, `#academic/${encodeURIComponent(x.id)}`]),
+      ...C.photos.map((x) => ['photo', x, `#photography/${encodeURIComponent(x.id)}`]),
+      ...C.tracks.map((x) => ['track', x, `#music/${encodeURIComponent(x.id)}`]),
+    ]
+      .filter(([, it]) => !it.test && fmt(it.date))
+      .sort((a, b) => fmt(b[1].date).localeCompare(fmt(a[1].date)))
+      .slice(0, 3);
+    const updateRow = ([kind, it, href]) =>
+      `${runLink(href, it.title || it.location || assertionLabel(it, 24) || '未命名')}<span class="meta">${UPD_KIND[kind]} · ${esc(fmt(it.date))}</span>`;
+
     const col1 = [
       cat('快捷入口', joinRun(shortcuts, '—'), { short: true }),
+      cat('动态', updates.length
+        ? joinRun(updates.map(updateRow), '—')
+        : '<span class="meta">还没有更新：新发布的内容会自动出现在这里。</span>',
+        { short: true, note: updates.length ? '最近三条 · 不含测试样例' : '' }),
       cat('学术', joinRun(papers.map((p) => runLink(`#academic/${encodeURIComponent(p.id)}`, p.title)), '论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行'),
         { note: papers.length ? `${papers.length} 篇` : '' }),
       cat('摄影', joinRun(photos.slice(0, 24).map((p) => runLink(`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || '照片')), '还没有照片：丢进 inbox/photos/'),
@@ -280,8 +299,8 @@
     ].join('');
 
     const col3 = [
-      cat('作品', `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页 · 我们都.是.gay ↗</a>`,
-        { note: '作品与磁贴入口都在导航页（站外）' }),
+      cat('作品', `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>`,
+        { note: '作品与磁贴入口都在站外的导航页' }),
       cat('索引与元信息', joinRun([runLink('#about', '关于本站'), `<a href="#search/%E7%89%A9%E7%90%86">检索「物理」</a>`], '—'),
         { short: true, note: '按 / 或 &gt; 聚焦底部命令行检索' }),
       cat('关于', `<span class="meta">${esc(S.intro || '')}</span>`, { short: true }),
@@ -357,7 +376,7 @@
 
   function worksPage() {
     return head('works', '作品')
-      + `<p class="note">作品已经搬到导航页：<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">我们都.是.gay ↗</a>（磁贴入口 + 作品区都在那边）。</p>`;
+      + `<p class="note">作品都在站外的导航页：<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>（磁贴入口 + 作品区都在那边）。</p>`;
   }
 
   function photographyPage(detail) {
@@ -627,7 +646,7 @@
   $('#year').textContent = new Date().getFullYear();
   $('#profile-github').href = `https://github.com/${encodeURIComponent(S.github)}`;
   $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
-    ? `<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${label} ↗</a>`
+    ? `<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`
     : `<a href="#${id}" data-page="${id}"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`)).join('');
   clock(); setInterval(clock, 60000);
   buildSearchIndex();

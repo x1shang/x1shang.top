@@ -1,6 +1,6 @@
 /* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */
 window.AUTO = {
- "generated": "2026-10-11T07:55:51.757Z",
+ "generated": "2026-10-11T11:21:40.276Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",
@@ -199,15 +199,27 @@ window.AUTO = {
    "source": "file",
    "test": true,
    "tags": []
+  },
+  {
+   "id": "xuemi",
+   "date": "2026-10-11",
+   "name": "北京雪迷气象站",
+   "url": "https://rmc.beijingxuemi.top",
+   "description": "为气象爱好者们提供的分析交流的平台",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": true,
+   "tags": []
   }
  ],
- "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活：文字丢进 `content/`，照片丢进 `inbox/photos/`，\n音乐丢进 `assets/music/`，跑一次构建就编入索引。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。",
+ "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。如果想联系作者，**请使用邮箱**",
  "stats": {
   "articles": 4,
   "assertions": 2,
   "papers": 1,
   "photos": 2,
   "tracks": 1,
-  "friends": 1
+  "friends": 2
  }
 };

@@ -82,7 +82,10 @@ export function slugify(name) {
     .replace(/^-|-$/g, '') || 'item';
 }
 
-const isoDay = (d) => new Date(d).toISOString().slice(0, 10);
+/** 排序 / 展示用的日期只认「文件头」：元信息里的 date → 文件名前缀 YYYY-MM-DD，都没有就留空（排在最后）。
+ *  绝不回退到文件的修改时间（mtime）：那是"什么时候上传/改过"，不是"这篇内容属于哪一天"。 */
+const pickDate = (metaDate, name) => String(metaDate || (String(name).match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || '').slice(0, 10);
+const warnNoDate = (label, file) => log(`  ⚠️ ${file} 没有 date（文件名也没有 YYYY-MM-DD 前缀）→ ${label}不带日期，会排在最后`);
 
 async function walk(dir, out = []) {
   let items;
@@ -110,9 +113,9 @@ async function collectText(kind, dir, seen) {
     const { data, body } = parseFrontMatter(raw);
     if (data.draft === true) { log(`  · 跳过草稿 ${rel(file)}`); continue; }
     if (kind === 'friends' && data.status === 'hidden') continue;
-    const st = await stat(file);
     const base = path.basename(file);
-    const date = String(data.date || (base.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || isoDay(st.mtime)).slice(0, 10);
+    const date = pickDate(data.date, base);
+    if (!date) warnNoDate('这条文字', rel(file));
     let id = String(data.id || slugify(base));
     let n = 2;
     while (seen.has(`${kind}:${id}`)) id = `${slugify(base)}-${n++}`;
@@ -182,13 +185,15 @@ async function collectMusic(dir) {
     if (existsSync(stem + '.lrc')) lyrics = await readFile(stem + '.lrc', 'utf8');
     const st = await stat(file);
     const name = path.basename(stem);
+    const trackDate = pickDate(meta.date, name);
+    if (!trackDate) warnNoDate('这首音乐', rel(file));
     let id = String(meta.id || slugify(name));
     let n = 2;
     while (seen.has(id)) id = `${slugify(name)}-${n++}`;
     seen.add(id);
     rows.push({
       id, src: rel(file), title: String(meta.title || name), artist: String(meta.artist || ''),
-      date: String(meta.date || isoDay(st.mtime)).slice(0, 10), lyrics: String(meta.lyrics || lyrics || ''),
+      date: trackDate, lyrics: String(meta.lyrics || lyrics || ''),
       tags: Array.isArray(meta.tags) ? meta.tags : [], test: meta.test === true,
       heat: Math.max(0, Number(meta.heat ?? meta.likes) || 0),
       netease: String(meta.netease || ''),
@@ -299,7 +304,8 @@ const feedItems = [
   ...articles.map((a) => ({ title: a.title, date: a.date, summary: a.summary, link: siteCfg.url + pathOf('articles', a.id) })),
   ...assertions.map((a) => ({ title: firstLine(a.body) || a.date, date: a.date, summary: a.body.slice(0, 200), link: siteCfg.url + pathOf('assertions', a.id) })),
   ...papers.map((p) => ({ title: p.title, date: p.date, summary: p.abstract, link: siteCfg.url + pathOf('papers', p.id) })),
-].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 40);
+].filter((i) => /^\d{4}-\d{2}-\d{2}$/.test(String(i.date || '')))   // 没日期的条目不进订阅源（pubDate 不能是空/非法值）
+  .sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 40);
 const xml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 const stamp = (d) => new Date(`${d}T00:00:00+08:00`).toISOString();
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
@@ -354,8 +360,7 @@ async function writeShell(kindKey, it) {
 <meta property="og:image" content="${xml(siteCfg.url)}/assets/og-cover.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="article:published_time" content="${xml(it.date)}">
-<meta name="twitter:card" content="summary_large_image">
+${it.date ? `<meta property="article:published_time" content="${xml(it.date)}">\n` : ''}<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${xml(title)}">
 <meta name="twitter:description" content="${xml(desc)}">
 <meta name="twitter:image" content="${xml(siteCfg.url)}/assets/og-cover.jpg">
@@ -390,7 +395,7 @@ const sitemapUrls = [
 await writeFile(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <!-- 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 产出。 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapUrls.map((u) => `  <url>\n    <loc>${xml(u.loc)}</loc>\n    <lastmod>${xml(u.lastmod)}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`).join('\n')}
+${sitemapUrls.map((u) => `  <url>\n    <loc>${xml(u.loc)}</loc>\n${u.lastmod ? `    <lastmod>${xml(u.lastmod)}</lastmod>\n` : ''}    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`).join('\n')}
 </urlset>
 `, 'utf8');
 

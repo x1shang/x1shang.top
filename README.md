@@ -12,8 +12,9 @@
 index.html style.css app.js render.js content.js   前端（render.js = Markdown/LaTeX/HTML 渲染器）
 content.auto.js    自动生成的内容包（window.AUTO），会被提交
 feed.xml atom.xml  自动生成的 RSS / Atom
-robots.txt sitemap.xml  给爬虫的（sitemap 目前只有首页，等文章预渲染后再补）
-stats.json         关于页访客图的数据快照（由 tools/fetch-stats.mjs 生成）
+robots.txt sitemap.xml  给爬虫的（sitemap 由构建生成，列出首页 + 每篇文字的真实路径）
+articles/ assertions/ academic/   预渲染产物：每篇文字一个真实路径的静态页（构建生成，别手改）
+stats.json         访客快照：日序列（关于页那张图）+ 按页总量（文章热度）
 content/           文字投递箱：articles/ assertions/ papers/ friends/ + about.md
 inbox/photos/      照片投递箱（gitignore，原始大图不进仓库，可建相册子目录）
 assets/photos/     照片产物：压缩后的 WebP + manifest.json（提交）
@@ -50,7 +51,7 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 
 文件开头可写 `---` 元信息（`title` `date` `summary` `tags` `heat` `test` `draft` …），细节见 [content/README.md](content/README.md)；照片元数据见 [inbox/photos/README.md](inbox/photos/README.md)。
 
-**排序**：先热度后时间。热度 = front matter 的 `heat`（照片是 sidecar 的 `heat`）+ 作品的 GitHub 星数快照（写死在 `content.js` 的 `repositories`，不再联网）。`heat` 只用于排序，页面上不显示。
+**排序**：先热度后时间。文章 / 断言 / 论文的热度 = **该页访客总量**（来自 `stats.json` 的 `pages` 表，构建期写进内容包的 `heat`，不联网）；照片 / 音乐 / 友链仍用 front matter 的 `heat`（照片是 sidecar 的 `heat`）。没有访客数据时热度一律 0，排序自然退化成按时间倒序。`heat` 只用于排序，页面上不显示。
 
 ## 渲染
 
@@ -62,7 +63,7 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 
 ## 全站检索
 
-页面底部常驻一条命令行（`> ` 开头）：按 `/` 或 `>` 聚焦，↑↓ 选择，Enter 打开，Esc 收起；检索范围包含标题、正文、摘要、标签、照片说明、音乐、友链、作品描述。支持前缀过滤：`文章: 关键词`、`摄影: 山`、`work: blog`（中英文前缀与 `kind:` 都可以）。检索状态会写进地址栏（`#search/关键词`），可分享。
+页面底部常驻一条命令行（`> ` 开头）：按 `/` 或 `>` 聚焦，↑↓ 选择，Enter 打开，Esc 收起；检索范围包含标题、正文、摘要、标签、照片说明、音乐、友链。支持前缀过滤：`文章: 关键词`、`摄影: 山`、`music: 山`（中英文前缀与 `kind:` 都可以）。检索状态会写进地址栏（`#search/关键词`），可分享。
 
 ## 音乐（含网易云评估）
 
@@ -87,12 +88,12 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 - 断言 2 则、学术 1 篇、友链 1 条
 - 照片 2 张（`inbox/photos/test-sample-01.jpg` 带 sidecar；`inbox/photos/2026-test-album/test-sample-02.png` 验证相册与格式转换）
 - 音乐 1 首（`assets/music/test-sample.wav` + `.lrc` + `.md`）
-- 作品区：8 个仓库的静态清单（与导航页作品区一致）
 
 ## 分享卡片 / 爬虫 / 访客统计（2026-10-11 加）
 
 - **OG / Twitter Card**：写在 `index.html` 的静态 `<head>` 里（抓取方不执行 JS，靠 JS 注入没用），封面是 `assets/og-cover.jpg`（1200×630）。**每篇文章各自的卡片要等文章预渲染成真实路径** `/articles/<slug>/` 之后才能有 —— 哈希路由的 `#` 后面爬虫不看。
-- **`robots.txt` / `sitemap.xml`**：sitemap 目前只有首页一条，原因同上；预渲染落地后应改由 `tools/build-content.mjs` 生成，别手改。
+- **预渲染（每篇文字一个真实路径）**：每次 `npm run build` 都会重建 `articles/<id>/`、`assertions/<id>/`、`academic/<id>/` —— 拿 `index.html` 当模板，换掉 `<!-- build:head:* -->` 之间的头部（该页自己的标题 / description / canonical / OG）并把正文渲染进 `<main>`；相对引用自动补成 `../../`，所以 http 与本机双击 `file://` 都能打开。带着 JS 访问时 `app.js` 会接管同一个页面（URL 不跳转），没有 JS 或爬虫看到的则是静态正文。
+- **`robots.txt` / `sitemap.xml`**：sitemap 由 `tools/build-content.mjs` 生成（首页 + 全部预渲染页），**别手改**。
 - **关于页的访客统计图**：只读站内的 `stats.json`（访客的浏览器不会为这张图请求任何统计服务），数据由 `tools/fetch-stats.mjs` 从 GoatCounter 抓：
 
   ```sh
@@ -105,7 +106,7 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 
 ## 部署（GitHub Pages 等静态托管）
 
-把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `robots.txt` `sitemap.xml` `stats.json` `content/` `assets/`（含 `assets/photos/*.webp` 与 `assets/og-cover.jpg`）。`inbox/` 不提交（已在 `.gitignore`）。
+把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `robots.txt` `sitemap.xml` `stats.json` `articles/` `assertions/` `academic/` `content/` `assets/`（含 `assets/photos/*.webp` 与 `assets/og-cover.jpg`）。`inbox/` 不提交（已在 `.gitignore`）。
 
 - 推之前先 `npm run build`，让 `content.auto.js` 带上最新文字与照片
 - 路由用 `#`，放域名根或子目录都行，不需要重写规则

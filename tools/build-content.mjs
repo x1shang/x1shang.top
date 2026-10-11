@@ -22,7 +22,7 @@
  *
  * 排序用的"热度"来自 front matter 的 heat:（旧字段 likes: 兼容）与作品的星数快照，纯静态、不联网。
  */
-import { readdir, readFile, stat, writeFile, mkdir } from 'node:fs/promises';
+import { readdir, readFile, stat, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
@@ -246,6 +246,22 @@ try {
   siteCfg = { name: pick('name') || siteCfg.name, url: (pick('url') || siteCfg.url).replace(/\/$/, ''), github: pick('github') || siteCfg.github, since: pick('since') || siteCfg.since };
 } catch { /* 用默认值 */ }
 
+/* 热度：文章 / 断言 / 论文 = 该页「访客总量」；照片 / 音乐 / 友链仍用 front matter 的 heat。
+   访客数据由 tools/fetch-stats.mjs 抓进 stats.json 的 pages 表（键 = 预渲染的真实路径）。 */
+const URL_KIND = { articles: 'articles', assertions: 'assertions', papers: 'academic' };
+const stats = await readJson(path.join(ROOT, 'stats.json'), {});
+const pageVisits = stats.pages && typeof stats.pages === 'object' ? stats.pages : {};
+const pathOf = (kindKey, id) => `/${URL_KIND[kindKey]}/${encodeURIComponent(id)}/`;
+for (const [kindKey, list] of [['articles', articles], ['assertions', assertions], ['papers', papers]]) {
+  for (const it of list) {
+    it.visits = Math.max(0, Number(pageVisits[pathOf(kindKey, it.id)]) || 0);
+    it.heat = it.visits;   // 热度只认访客总量；没有数据时是 0，于是退化成按时间排
+  }
+}
+if (!Object.keys(pageVisits).length) {
+  log('ℹ️  stats.json 里还没有按页访客数据（pages）：文章热度一律 0 → 排序退化成按时间。跑 `npm run stats` 可补齐。');
+}
+
 const allDates = [articles, assertions, papers, photos].flat().map((x) => x.date).filter(Boolean).sort();
 const AUTO = {
   generated: new Date().toISOString(),
@@ -265,9 +281,9 @@ await writeFile(path.join(ROOT, 'content.auto.js'),
 
 /* 订阅源 */
 const feedItems = [
-  ...articles.map((a) => ({ title: a.title, date: a.date, summary: a.summary, link: `${siteCfg.url}/#articles/${encodeURIComponent(a.id)}` })),
-  ...assertions.map((a) => ({ title: firstLine(a.body) || a.date, date: a.date, summary: a.body.slice(0, 200), link: `${siteCfg.url}/#assertions/${encodeURIComponent(a.id)}` })),
-  ...papers.map((p) => ({ title: p.title, date: p.date, summary: p.abstract, link: `${siteCfg.url}/#academic/${encodeURIComponent(p.id)}` })),
+  ...articles.map((a) => ({ title: a.title, date: a.date, summary: a.summary, link: siteCfg.url + pathOf('articles', a.id) })),
+  ...assertions.map((a) => ({ title: firstLine(a.body) || a.date, date: a.date, summary: a.body.slice(0, 200), link: siteCfg.url + pathOf('assertions', a.id) })),
+  ...papers.map((p) => ({ title: p.title, date: p.date, summary: p.abstract, link: siteCfg.url + pathOf('papers', p.id) })),
 ].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 40);
 const xml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 const stamp = (d) => new Date(`${d}T00:00:00+08:00`).toISOString();
@@ -289,5 +305,81 @@ ${feedItems.map((i) => `<entry><title>${xml(i.title)}</title><link href="${xml(i
 await writeFile(path.join(ROOT, 'feed.xml'), rss, 'utf8');
 await writeFile(path.join(ROOT, 'atom.xml'), atom, 'utf8');
 
+/* ------------------------------------------------- 预渲染：给文字类内容一个真实路径
+   为什么：哈希路由（#articles/x）爬虫不认、每篇没有自己的分享卡片，访问统计也会全记在 / 上。
+   做法：拿 index.html 当模板，整段替换 <!-- build:head:start -->…<!-- build:head:end --> 之间的
+        头部（标题 / description / canonical / og / twitter）与该页正文，输出到
+        articles/<id>/index.html（断言、学术同理）；相对引用改成 ../../，
+        于是 http 与本机 file:// 双击都能打开。站内交互仍由 app.js 接管，URL 不跳转。
+*/
+if (!globalThis.Render) {
+  try { await import(new URL('../render.js', import.meta.url).href); } catch { /* 渲染器加载失败就用纯文本兜底 */ }
+}
+const Render = globalThis.Render;
+const HEAD_BLOCK = /<!-- build:head:start[\s\S]*?<!-- build:head:end -->/;
+
+const template = await readFile(path.join(ROOT, 'index.html'), 'utf8');
+if (!HEAD_BLOCK.test(template)) log('⚠️  index.html 里找不到 build:head 标记：预渲染页会沿用整站卡片。');
+
+async function writeShell(kindKey, it) {
+  const urlPath = pathOf(kindKey, it.id);
+  const title = String(it.title || firstLine(it.body) || it.id).slice(0, 80);
+  const desc = String(it.summary || it.abstract || firstLine(it.body) || '').replace(/\s+/g, ' ').slice(0, 160);
+  const abs = siteCfg.url + urlPath;
+  const head = `<!-- build:head:start（由 tools/build-content.mjs 为预渲染页生成，勿手改） -->
+<meta name="description" content="${xml(desc)}">
+<title>${xml(title)} · x1shang</title>
+<link rel="canonical" href="${xml(abs)}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="x1shang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="${xml(title)}">
+<meta property="og:description" content="${xml(desc)}">
+<meta property="og:url" content="${xml(abs)}">
+<meta property="og:image" content="${xml(siteCfg.url)}/assets/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="${xml(it.date)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${xml(title)}">
+<meta name="twitter:description" content="${xml(desc)}">
+<meta name="twitter:image" content="${xml(siteCfg.url)}/assets/og-cover.jpg">
+<!-- build:head:end -->`;
+  const bodyHtml = Render
+    ? Render.renderFile({ format: it.format, body: it.body })
+    : `<pre>${xml(it.body)}</pre>`;
+  const main = `<article class="prose" data-prerendered="${xml(urlPath)}">${it.title ? `<h1>${xml(it.title)}</h1>` : ''}${bodyHtml}</article>`;
+  let html = template.replace(HEAD_BLOCK, head);
+  html = html.replace('<body>', '<body class="reading">');
+  html = html.replace('<main id="main" tabindex="-1"></main>', `<main id="main" tabindex="-1">${main}</main>`);
+  // 子目录页面：相对引用补上 ../../，这样 http 与 file:// 都能找到站点根目录的资源
+  html = html.replace(/(\s(?:src|href)=")(?!https?:|data:|mailto:|tel:|javascript:|#|\/\/|\/)([^"]*)(")/g, '$1../../$2$3');
+  const dir = path.join(ROOT, URL_KIND[kindKey], it.id);
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, 'index.html'), html, 'utf8');
+  return { urlPath, lastmod: it.date, kindKey };
+}
+
+// 每次重建都先清空这三棵生成目录，避免删掉的文章留下僵尸页
+for (const dir of Object.values(URL_KIND)) await rm(path.join(ROOT, dir), { recursive: true, force: true });
+const shells = [];
+for (const [kindKey, list] of [['articles', articles], ['assertions', assertions], ['papers', papers]]) {
+  for (const it of list) shells.push(await writeShell(kindKey, it));
+}
+
+/* sitemap：首页 + 全部预渲染页（自动生成，别手改） */
+const sitemapUrls = [
+  { loc: `${siteCfg.url}/`, lastmod: AUTO.recent, changefreq: 'weekly', priority: '1.0' },
+  ...shells.map((s) => ({ loc: siteCfg.url + s.urlPath, lastmod: s.lastmod, changefreq: 'monthly', priority: s.kindKey === 'assertions' ? '0.6' : '0.8' })),
+];
+await writeFile(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+<!-- 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 产出。 -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls.map((u) => `  <url>\n    <loc>${xml(u.loc)}</loc>\n    <lastmod>${xml(u.lastmod)}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`).join('\n')}
+</urlset>
+`, 'utf8');
+
 log(`✅ content.auto.js：文章 ${articles.length} · 断言 ${assertions.length} · 学术 ${papers.length} · 摄影 ${photos.length} · 音乐 ${tracks.length} · 友链 ${friends.length}` +
   (about ? ' · 关于页来自 content/about.md' : '') + `（最近更新 ${AUTO.recent}）`);
+log(`✅ 预渲染 ${shells.length} 个真实路径页（articles/ · assertions/ · academic/）+ sitemap.xml（${sitemapUrls.length} 条）` +
+  (Render ? '' : '（⚠️ 渲染器没加载上，正文以纯文本兜底）'));

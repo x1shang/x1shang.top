@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f2f4f6">
+<!-- build:head:start（构建期预渲染时，这一段会被整段替换成该页自己的标题 / description / canonical / 分享卡片） -->
 <meta name="description" content="x1shang 的个人空间：学术、文章、思考、代码、摄影与音乐。">
 <title>x1shang — 山与回响</title>
 <link rel="canonical" href="https://x1shang.top/">
@@ -23,6 +24,7 @@
 <meta name="twitter:title" content="x1shang — 山与回响">
 <meta name="twitter:description" content="学术、文章、思考、代码、摄影与音乐。">
 <meta name="twitter:image" content="https://x1shang.top/assets/og-cover.jpg">
+<!-- build:head:end -->
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="alternate" type="application/rss+xml" title="RSS" href="feed.xml">
@@ -85,6 +87,9 @@
 <script src="content.auto.js"></script>
 <script src="render.js"></script>
 <script src="app.js"></script>
+<!-- GoatCounter：文章 / 断言 / 论文的「热度」= 访客总量，就是靠它按真实路径记账的。
+     去 goatcounter.com 注册一个免费站点，把短代码填到下面；不填的话热度恒为 0（排序退化成按时间）。 -->
+<script data-goatcounter="https://REPLACE_WITH_GOATCOUNTER_CODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- Cloudflare Web Analytics（只看流量，无 cookie）：把下面的 REPLACE_WITH_CF_BEACON_TOKEN
      换成 Cloudflare 后台 → Web Analytics → Add a site（hostname 填 x1shang.top）给的 token。
      没换之前不影响页面，只是不会记录数据。 -->

@@ -124,6 +124,45 @@ console.log('\n■ 分享卡片与统计');
   }
 }
 
+console.log('\n■ 预渲染与热度');
+{
+  let auto = null;
+  try {
+    const raw = readFileSync(path.join(ROOT, 'content.auto.js'), 'utf8');
+    auto = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
+  } catch { /* 上面的"内容包"一节已经报过 */ }
+  const idxHtml = readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  if (/REPLACE_WITH_GOATCOUNTER_CODE/.test(idxHtml)) warn('GoatCounter 短代码还是占位符（文章热度依赖它按真实路径记账）');
+  else ok('GoatCounter 短代码已填');
+
+  if (auto) {
+    const sitemap = existsSync(path.join(ROOT, 'sitemap.xml')) ? readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
+    let shells = 0, missing = 0, absent = 0;
+    for (const [key, dir] of [['articles', 'articles'], ['assertions', 'assertions'], ['papers', 'academic']]) {
+      for (const it of auto[key] || []) {
+        const rel = `${dir}/${it.id}/index.html`;
+        if (existsSync(path.join(ROOT, rel))) shells++;
+        else { missing++; no(`预渲染页缺失：${rel}（跑一次 npm run build）`); }
+        if (!sitemap.includes(`/${dir}/${encodeURIComponent(it.id)}/`)) { absent++; no(`sitemap.xml 里没有 /${dir}/${it.id}/`); }
+      }
+    }
+    if (shells && !missing) ok(`预渲染页齐全：${shells} 个（articles/ · assertions/ · academic/）`);
+    if (shells && !absent) ok('sitemap.xml 覆盖了全部预渲染页');
+    const first = (auto.articles || [])[0];
+    if (first) {
+      const shell = path.join(ROOT, 'articles', first.id, 'index.html');
+      if (existsSync(shell)) {
+        const html = readFileSync(shell, 'utf8');
+        if (/property="og:title"/.test(html) && /rel="canonical"/.test(html) && /data-prerendered/.test(html)) ok('预渲染页带自己的分享卡片与正文');
+        else no('预渲染页缺 OG / canonical / 正文');
+      }
+    }
+    const heats = [...(auto.articles || []), ...(auto.assertions || []), ...(auto.papers || [])].map((x) => Number(x.heat) || 0);
+    if (heats.some((h) => h > 0)) ok(`文字热度取自访客总量（最高 ${Math.max(...heats)}）`);
+    else warn('文字热度目前全是 0（还没有按页访客数据）→ 排序退化成按时间；跑 npm run stats 可补齐');
+  }
+}
+
 console.log('\n■ 静态性（不应再有后端接口与运行期数据）');
 for (const f of ['api.js']) {
   if (existsSync(path.join(ROOT, f))) no(`${f} 还在，但站点已经是纯静态`);

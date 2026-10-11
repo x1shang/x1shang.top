@@ -56,12 +56,18 @@
 
   const sections = [
     ['home', '主页', 'Home'], ['academic', '学术', 'Academic'], ['articles', '文章', 'Articles'],
-    ['assertions', '断言', 'Thoughts'], ['works', '作品', 'Projects'], ['photography', '摄影', 'Photography'],
+    ['assertions', '断言', 'Thoughts'], ['photography', '摄影', 'Photography'],
     ['music', '音乐', 'Music'], ['friends', '友链', 'Friends'], ['about', '关于', 'About'],
+  ];
+  /** 作品不再由本站承载：侧栏「作品」直接外链到导航页（磁贴 + 作品区都在那边） */
+  const WORKS_URL = 'https://xn--vnqp08bwj8a.xn--0iv.gay/';
+  const NAV = [
+    ['home', '主页'], ['academic', '学术'], ['articles', '文章'], ['assertions', '断言'],
+    ['__works', '作品'], ['photography', '摄影'], ['music', '音乐'], ['friends', '友链'], ['about', '关于'],
   ];
   const descriptions = {
     academic: '论文、研究，与尚未解答的问题。', articles: '给值得展开的想法，留一整页的空间。',
-    assertions: '短一点的文字，未必轻一点。', works: '用代码，把想法变成可以触碰的东西。',
+    assertions: '短一点的文字，未必轻一点。',
     photography: '快门落下时，留住片刻的光。', music: '让旋律继续，让思绪慢下来。',
     friends: '互联网很大，很高兴与你相遇。', about: '这座小站的记录与刻度。',
   };
@@ -80,7 +86,6 @@
     photos: normalize('photo', A.photos, S.photos),
     tracks: normalize('track', A.tracks, S.tracks),
     friends: normalize('friend', A.friends, S.friends),
-    works: normalize('work', (S.repositories || []).map((r, i) => ({ id: `w${i}`, ...r })), []),
     about: A.about || S.about || '',
     generated: A.generated || '',
     count: (A.stats && Object.values(A.stats).reduce((a, b) => a + b, 0)) || 0,
@@ -88,8 +93,12 @@
   const newestDate = () => [C.articles, C.assertions, C.papers, C.photos, C.tracks].flat()
     .map((x) => fmt(x.date)).filter(Boolean).sort().pop() || fmt(A.recent) || fmt(new Date());
 
-  /** 热度：front matter 的 heat（或旧字段 likes）+ 作品的 GitHub 星数快照；同热度按时间倒序 */
-  const heatOf = (it) => (Number(it.stars) || 0) + (Number(it.heat) || 0);
+  /**
+   * 热度：文章 / 断言 / 论文用「访客总量」（构建期由 tools/fetch-stats.mjs 抓进 stats.json，
+   * 再由 tools/build-content.mjs 写进内容包的 heat 字段，不联网）；照片 / 音乐 / 友链用 front matter 的
+   * heat（旧字段 likes 兼容）。同热度按时间倒序。
+   */
+  const heatOf = (it) => Number(it.heat) || 0;
   const byHeatThenTime = (a, b) => (heatOf(b) - heatOf(a)) || String(b.date || '').localeCompare(String(a.date || '')) || String(a.title || a.name || '').localeCompare(String(b.title || b.name || ''), 'zh');
 
   /* ------------------------------------------------------------------ 检索索引 */
@@ -112,14 +121,13 @@
     for (const p of C.photos) push('photo', '摄影', p, `#photography/${encodeURIComponent(p.id)}`);
     for (const t of C.tracks) push('track', '音乐', t, `#music/${encodeURIComponent(t.id)}`, t.artist || '');
     for (const f of C.friends) push('friend', '友链', f, '#friends', f.url || '');
-    for (const w of C.works) push('work', '作品', { ...w, title: w.name, description: w.description }, w.html_url || '#works');
-    searchIndex.push({ kind: 'page', label: '页面', route: '#about', title: '关于本站', date: '', text: '站点说明 建站天数 内容数量 订阅 RSS Atom' });
+    searchIndex.push({ kind: 'page', label: '页面', route: '#about', title: '关于本站', date: '', text: '站点说明 建站天数 内容数量 订阅 RSS Atom 访客' });
   }
 
-  const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐', friend: '友链', work: '作品', page: '页面' };
+  const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐', friend: '友链', page: '页面' };
   function search(raw) {
     let q = String(raw || '').trim(), filter = '';
-    const m = q.match(/^(?:([a-z]+)|(文章|断言|学术|论文|摄影|照片|音乐|友链|作品|页面))[:：]\s*(.*)$/);
+    const m = q.match(/^(?:([a-z]+)|(文章|断言|学术|论文|摄影|照片|音乐|友链|页面))[:：]\s*(.*)$/);
     if (m) {
       const key = m[1] || Object.keys(KIND_PREFIX).find((k) => KIND_PREFIX[k] === m[2]);
       if (KIND_PREFIX[key]) { filter = key; q = m[3].trim(); }
@@ -166,7 +174,7 @@
       dock.cursor = hits.length ? 0 : -1;
       if (!q.trim()) { dock.results.hidden = true; return; }
       dock.results.hidden = false;
-      const prefix = (q.match(/^((?:[a-z]+|文章|断言|学术|论文|摄影|照片|音乐|友链|作品|页面)[:：])/i) || [])[1] || '';
+      const prefix = (q.match(/^((?:[a-z]+|文章|断言|学术|论文|摄影|照片|音乐|友链|页面)[:：])/i) || [])[1] || '';
       dock.results.innerHTML = hits.length
         ? `<div class="dock-hits" role="listbox">${hits.map((h, i) => `<button class="dock-hit" role="option" data-hit="${i}" aria-selected="${i === dock.cursor}">
             <span class="n">${String(i + 1).padStart(3, '0')}</span><span class="kind">${esc(h.label)}</span>
@@ -243,13 +251,13 @@
     const photos = [...C.photos].sort(byHeatThenTime);
     const tracks = [...C.tracks].sort(byHeatThenTime);
     const friends = [...C.friends].sort(byHeatThenTime);
-    const works = [...C.works].sort(byHeatThenTime);
     const cat = (title, rows, opts = {}) => `<section class="idx-cat${opts.short ? ' short' : ''}"><h3>${esc(title)}</h3><p class="idx-run">${rows}</p>${opts.note ? `<p class="idx-sub">${opts.note}</p>` : ''}${opts.more ? `<p class="idx-more">${opts.more}</p>` : ''}</section>`;
 
     const shortcuts = [
-      ['#articles', '文章'], ['#assertions', '断言'], ['#academic', '学术'], ['#works', '作品'],
+      ['#articles', '文章'], ['#assertions', '断言'], ['#academic', '学术'],
       ['#photography', '摄影'], ['#music', '音乐'], ['#friends', '友链'], ['#about', '关于'],
     ].map(([h, l]) => runLink(h, l));
+    shortcuts.splice(3, 0, `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品 ↗</a>`);
     shortcuts.push('<a href="feed.xml" type="application/rss+xml">RSS</a>', '<a href="atom.xml" type="application/atom+xml">Atom</a>',
       `<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
 
@@ -272,8 +280,8 @@
     ].join('');
 
     const col3 = [
-      cat('作品', joinRun(works.map((w) => `<a href="${safe(w.html_url)}" target="_blank" rel="noopener noreferrer">${esc(w.name)}</a>`), '还没有作品'),
-        { note: `github.com/${esc(S.github)}`, more: '<a href="#works">作品区 →</a>' }),
+      cat('作品', `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页 · 我们都.是.gay ↗</a>`,
+        { note: '作品与磁贴入口都在导航页（站外）' }),
       cat('索引与元信息', joinRun([runLink('#about', '关于本站'), `<a href="#search/%E7%89%A9%E7%90%86">检索「物理」</a>`], '—'),
         { short: true, note: '按 / 或 &gt; 聚焦底部命令行检索' }),
       cat('关于', `<span class="meta">${esc(S.intro || '')}</span>`, { short: true }),
@@ -348,13 +356,8 @@
   }
 
   function worksPage() {
-    const list = [...C.works].sort(byHeatThenTime);
-    const rows = list.length
-      ? idxList(list, (w) => `<a href="${safe(w.html_url)}" target="_blank" rel="noopener noreferrer">${esc(w.name)} ↗</a>${testBadge(w)}`,
-        { sub: (w) => esc(w.description || '') })
-      : empty('作品区待补', '在 content.js 的 repositories 里写入链接即可。');
-    return head('works', '作品') + rows
-      + '<p class="note">这里是静态清单（与导航页作品区一致），不再联网读取 GitHub；星数是写入时的快照，只用于排序。</p>';
+    return head('works', '作品')
+      + `<p class="note">作品已经搬到导航页：<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">我们都.是.gay ↗</a>（磁贴入口 + 作品区都在那边）。</p>`;
   }
 
   function photographyPage(detail) {
@@ -388,7 +391,7 @@
 
   function aboutPage() {
     const days = Math.max(1, Math.floor((Date.now() - new Date(`${S.since}T00:00:00+08:00`)) / 86400000) + 1);
-    const stats = [[days, '建站天数'], [C.articles.length + C.assertions.length + C.papers.length, '文字记录'], [C.photos.length, '摄影作品'], [C.tracks.length, '音乐'], [C.friends.length, '友链'], [C.works.length, '作品']];
+    const stats = [[days, '建站天数'], [C.articles.length + C.assertions.length + C.papers.length, '文字记录'], [C.photos.length, '摄影作品'], [C.tracks.length, '音乐'], [C.friends.length, '友链']];
     return head('about', '关于')
       + `<div class="stats">${stats.map(([n, label]) => `<div class="stat glass"><strong>${n}</strong><span>${label}</span></div>`).join('')}</div>`
       + (C.about ? `<article class="prose" style="margin-top:32px">${R.renderFile({ format: 'md', body: C.about })}</article>` : '')
@@ -447,10 +450,35 @@
 
   /* ------------------------------------------------------------------ 渲染调度 */
   let currentPage = 'home';
+
+  /**
+   * 预渲染的真实路径 → 站内路由：/articles/<id>/ 这类地址（爬虫、分享、搜索结果来的）
+   * 也能落到对应文章；本地双击 articles/<id>/index.html 同样认得（file:// 也能用）。
+   */
+  const DETAIL_KIND = { articles: 1, assertions: 1, academic: 1 };
+  function routeFromPath() {
+    const m = location.pathname.match(/\/(articles|assertions|academic)\/([^/]+)\/(?:index\.html)?$/);
+    if (!m) return '';
+    try { return `${m[1]}/${decodeURIComponent(m[2])}`; } catch { return `${m[1]}/${m[2]}`; }
+  }
+
+  /**
+   * 访客统计补报：GoatCounter 按 location.pathname 记账，哈希路由（#articles/x）原本全算在 / 上。
+   * 因此站内跳转到文章 / 断言 / 论文时手工补一条真实路径的 pageview；直接从真实路径进来的
+   * 那一次由 count.js 自己记，不重复补报。
+   */
+  function trackVisit(route, detail) {
+    const gc = window.goatcounter;
+    if (!gc || typeof gc.count !== 'function' || !detail || !DETAIL_KIND[route]) return;
+    try { gc.count({ path: `/${route}/${encodeURIComponent(detail)}/` }); } catch { /* 统计失败不影响阅读 */ }
+  }
+
   function render() {
-    const raw = location.hash.slice(1);
+    const fromPath = routeFromPath();
+    const raw = location.hash.slice(1) || fromPath;
     const [route, ...rest] = raw.split('/');
     let detail = ''; try { detail = decodeURIComponent(rest.join('/')); } catch { detail = rest.join('/'); }
+    if (detail && !(fromPath && fromPath === raw)) trackVisit(route, detail);
     const isSection = sections.some((x) => x[0] === route);
     currentPage = isSection ? route : 'home';
     const reading = (currentPage === 'articles' && detail) || (currentPage === 'academic' && detail) || (currentPage === 'assertions' && detail);
@@ -469,7 +497,6 @@
     else if (currentPage === 'academic') body = detail ? academicDetail(detail) : academicList();
     else if (currentPage === 'articles') body = detail ? articlesDetail(detail) : articlesList();
     else if (currentPage === 'assertions') body = detail ? assertionDetail(detail) : assertionsList();
-    else if (currentPage === 'works') body = worksPage();
     else if (currentPage === 'photography') body = photographyPage(detail);
     else if (currentPage === 'music') body = musicPage(detail);
     else if (currentPage === 'friends') body = friendsPage();
@@ -599,7 +626,9 @@
   /* ------------------------------------------------------------------ 启动 */
   $('#year').textContent = new Date().getFullYear();
   $('#profile-github').href = `https://github.com/${encodeURIComponent(S.github)}`;
-  $('#navigation').innerHTML = sections.map(([id, label], i) => `<a href="#${id}" data-page="${id}"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`).join('');
+  $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
+    ? `<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${label} ↗</a>`
+    : `<a href="#${id}" data-page="${id}"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`)).join('');
   clock(); setInterval(clock, 60000);
   buildSearchIndex();
   alignMountain();

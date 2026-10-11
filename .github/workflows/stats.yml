@@ -1,8 +1,9 @@
 name: stats
 
-# 每天刷新一次 stats.json（关于页最下方那张访客图的数据源）。
+# 每天刷新一次 stats.json（关于页最下方那张访客图 + 文章热度都靠它）。
 # 需要两个仓库 secret：GOATCOUNTER_SITE（站点短代码，如 x1shang）与 GOATCOUNTER_TOKEN。
 # 没配 secret 时脚本会打印“跳过”并正常退出，不会产生提交。
+# 抓完会重建内容包与预渲染页，并把文章热度一起提交。
 # 注：GitHub 会在仓库连续 60 天没有活动后暂停定时任务，随便 push 一次即可恢复。
 
 on:
@@ -27,20 +28,23 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 抓取访客统计
+      - name: 抓取访客统计（含按页总量）
         env:
           GOATCOUNTER_SITE: ${{ secrets.GOATCOUNTER_SITE }}
           GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
         run: node tools/fetch-stats.mjs
 
+      - name: 重建内容包（把访客量写成文章热度）+ 预渲染页 + sitemap
+        run: node tools/build-content.mjs
+
       - name: 有变化就提交
         run: |
-          if git diff --quiet -- stats.json; then
-            echo "stats.json 没有变化"
+          if git diff --quiet -- stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic; then
+            echo "没有变化"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stats.json
-          git commit -m "chore(stats): 刷新访客统计 $(date -u +%Y-%m-%d)"
+          git add stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic
+          git commit -m "chore(stats): 刷新访客统计与文章热度 $(date -u +%Y-%m-%d)"
           git push

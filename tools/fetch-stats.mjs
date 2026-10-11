@@ -19,7 +19,7 @@
  * 输出：{ source, site, updated, days, total, allTime, series: [{ d:'YYYY-MM-DD', n:number }] }
  * 口径：GoatCounter 的 daily / count 都是「访客数」（它的 count_unique 与 count 相同）。
  */
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const args = process.argv.slice(2);
@@ -98,6 +98,50 @@ async function fetchAllTime() {
   }
 }
 
+/**
+ * 按页访客总量 —— 文章 / 断言 / 论文的「热度」就用它（键 = 预渲染的真实路径）。
+ * 页面清单从 content.auto.js 里读（构建产物），所以顺序是：先 npm run build，再 npm run stats。
+ */
+const KIND_DIR = { articles: 'articles', assertions: 'assertions', papers: 'academic' };
+async function knownPaths() {
+  try {
+    const raw = await readFile(new URL('../content.auto.js', import.meta.url), 'utf8');
+    const auto = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
+    const out = [];
+    for (const [key, dir] of Object.entries(KIND_DIR)) {
+      for (const it of auto[key] || []) if (it && it.id) out.push(`/${dir}/${encodeURIComponent(it.id)}/`);
+    }
+    return out;
+  } catch {
+    console.log('[stats] 读不到 content.auto.js，跳过按页统计（先跑一次 npm run build）。');
+    return [];
+  }
+}
+
+/** 有 token：一次 API 调用就能拿到所有路径的历史总量（limit=100 够个人站用） */
+async function apiPages() {
+  const url = `${BASE}/api/v0/stats/hits?start=2000-01-01T00:00:00Z&end=${encodeURIComponent(new Date().toISOString())}&limit=100`;
+  const data = await getJson(url, { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` });
+  const out = {};
+  for (const hit of data.hits ?? []) if (hit.path) out[hit.path] = num(hit.count);
+  return out;
+}
+
+/** 没 token：逐页问公开计数端点（需要后台打开 “Allow adding visitor counts on your website”） */
+async function counterPages() {
+  const out = {};
+  for (const p of await knownPaths()) {
+    try {
+      const data = await getJson(`${BASE}/counter/${encodeURIComponent(p)}.json`);
+      out[p] = num(data.count);
+    } catch {
+      out[p] = 0;
+    }
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  return out;
+}
+
 /** 模式 3：演示数据（固定种子，看起来像真的但完全是假的） */
 function demo() {
   let seed = 20261011;
@@ -111,9 +155,13 @@ function demo() {
 
 let source;
 let series;
+let pages = {};
 if (DEMO) {
   source = 'demo';
   series = demo();
+  let seed = 424242;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  for (const p of await knownPaths()) pages[p] = Math.round(rnd() * 40);
 } else if (!SITE) {
   console.log('[stats] 跳过：没有配置 GOATCOUNTER_SITE（也没给 --demo）。');
   console.log('        用法见 tools/fetch-stats.mjs 顶部注释；关于页那张图会一直显示“数据还在积累”。');
@@ -121,10 +169,12 @@ if (DEMO) {
 } else if (TOKEN) {
   source = 'goatcounter-api';
   series = await fromApi();
+  pages = await apiPages();
 } else {
   source = 'goatcounter-counter';
-  console.log(`[stats] 没给 token，走公开计数端点逐日取 ${DAYS} 天（较慢）…`);
+  console.log(`[stats] 没给 token，走公开计数端点逐日取 ${DAYS} 天 + 逐页取总量（较慢）…`);
   series = await fromCounter();
+  pages = await counterPages();
 }
 
 const total = series.reduce((s, x) => s + x.n, 0);
@@ -137,7 +187,10 @@ const payload = {
   total,
   allTime,
   series,
+  pages,   // 按页访客总量：'/articles/<id>/' → 次数（文章热度用它）
 };
 await writeFile(OUT, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+const withData = Object.values(pages).filter((n) => n > 0).length;
 console.log(`✅ 已写入 ${OUT}：source=${source}，近 ${DAYS} 天 ${total} 位访客` + (allTime === null ? '' : `，累计 ${allTime}`));
+console.log(`   按页数据：${Object.keys(pages).length} 页（其中 ${withData} 页有访客）—— 跑一次 npm run build 让文章热度生效。`);
 if (DEMO) console.log('⚠️  这是演示数据，别提交（git checkout -- stats.json 可以还原）。');

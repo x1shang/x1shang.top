@@ -192,8 +192,16 @@ const payload = {
   series,
   pages,   // 按页访客总量：'/articles/<id>/' → 次数（文章热度用它）
 };
-await writeFile(OUT, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+const next = JSON.stringify(payload, null, 2) + '\n';
 const withData = Object.values(pages).filter((n) => n > 0).length;
-console.log(`✅ 已写入 ${OUT}：source=${source}，近 ${DAYS} 天 ${total} 位访客` + (allTime === null ? '' : `，累计 ${allTime}`));
-console.log(`   按页数据：${Object.keys(pages).length} 页（其中 ${withData} 页有访客）—— 跑一次 npm run build 让文章热度生效。`);
+// 数据没变就不动文件（updated 是每次都变的，不参与比较）——免得住低流量站点每天白提交一次
+const stable = (s) => JSON.stringify(JSON.parse(s || '{}', (k, v) => (k === 'updated' ? '' : v)));
+const prev = await readFile(OUT, 'utf8').catch(() => '');
+if (prev && stable(prev) === stable(next)) {
+  console.log('[stats] 数据与上次一致，保持原文件不动（不会产生提交）。');
+} else {
+  await writeFile(OUT, next, 'utf8');
+  console.log(`✅ 已写入 ${OUT}：source=${source}，近 ${DAYS} 天 ${total} 位访客` + (allTime === null ? '' : `，累计 ${allTime}`));
+  console.log(`   按页数据：${Object.keys(pages).length} 页（其中 ${withData} 页有访客）—— 跑一次 npm run build 让文章热度生效。`);
+}
 if (DEMO) console.log('⚠️  这是演示数据，别提交（git checkout -- stats.json 可以还原）。');

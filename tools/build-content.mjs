@@ -276,8 +276,18 @@ const AUTO = {
 
 const payload = JSON.stringify(AUTO, null, 1).replace(/</g, '\\u003c').replace(/\u2028|\u2029/g, (c) => (c === '\u2028' ? '\\u2028' : '\\u2029'));
 await mkdir(ROOT, { recursive: true });
-await writeFile(path.join(ROOT, 'content.auto.js'),
-  `/* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */\nwindow.AUTO = ${payload};\n`, 'utf8');
+const autoFile = path.join(ROOT, 'content.auto.js');
+const nextAuto = `/* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */\nwindow.AUTO = ${payload};\n`;
+// 除了 generated 时间戳没有任何变化时保持原文件：否则每次构建（尤其是每天定时的 stats 任务）都会产生无意义的 diff 与提交
+const stripGen = (s) => {
+  try { return JSON.stringify(JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1)), (k, v) => (k === 'generated' ? '' : v)); } catch { return ''; }
+};
+const prevAuto = await readFile(autoFile, 'utf8').catch(() => '');
+if (prevAuto && stripGen(prevAuto) === stripGen(nextAuto)) {
+  log('· content.auto.js 无实质变化，保持原文件（不动 generated 时间）');
+} else {
+  await writeFile(autoFile, nextAuto, 'utf8');
+}
 
 /* 订阅源 */
 const feedItems = [

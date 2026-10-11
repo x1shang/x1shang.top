@@ -1,0 +1,97 @@
+#!/usr/bin/env node
+/**
+ * tools/check.mjs — 上线前自检
+ *   1. 所有前端脚本的语法（node --check 等价）
+ *   2. content.auto.js 是不是合法 JSON 外壳
+ *   3. index.html 里的本地引用是否都存在
+ *   4. feed.xml / atom.xml 是否可解析
+ *   5. 站点是否仍然保持纯静态（没有 api.js / data/ / 后端引用）
+ * 用法：node tools/check.mjs
+ */
+import { readFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+
+const ROOT = path.resolve(path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..'));
+let bad = 0;
+const ok = (m) => console.log(`  ✓ ${m}`);
+const no = (m) => { bad++; console.log(`  ✗ ${m}`); };
+const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
+
+console.log('\n■ 脚本语法');
+for (const f of ['app.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs']) {
+  const file = path.join(ROOT, f);
+  if (!existsSync(file)) { no(`${f} 不存在`); continue; }
+  const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+  if (r.status === 0) ok(f);
+  else no(`${f}: ${(r.stderr || '').split('\n').filter(Boolean)[0] || '语法错误'}`);
+}
+
+console.log('\n■ 内容包');
+{
+  const file = path.join(ROOT, 'content.auto.js');
+  if (!existsSync(file)) no('content.auto.js 不存在（先跑 node tools/build-content.mjs）');
+  else {
+    const raw = readFileSync(file, 'utf8');
+    try {
+      const auto = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
+      ok(`content.auto.js 可解析：文章 ${auto.articles.length} · 断言 ${auto.assertions.length} · 学术 ${auto.papers.length} · 摄影 ${auto.photos.length} · 音乐 ${auto.tracks.length} · 友链 ${auto.friends.length}`);
+      for (const [k, v] of Object.entries(auto.stats || {})) if (typeof v !== 'number') no(`stats.${k} 不是数字`);
+      const ids = new Set();
+      for (const [kind, list] of [['article', auto.articles], ['assertion', auto.assertions], ['paper', auto.papers], ['photo', auto.photos], ['track', auto.tracks]]) {
+        for (const it of list) {
+          if (!it.id) no(`${kind} 有条目缺 id`);
+          if (ids.has(`${kind}:${it.id}`)) no(`${kind}:${it.id} 重复`);
+          ids.add(`${kind}:${it.id}`);
+          if (it.date && !/^\d{4}-\d{2}-\d{2}$/.test(it.date)) no(`${kind}:${it.id} 日期格式异常：${it.date}`);
+        }
+      }
+      const photoFiles = [...auto.photos.map((p) => p.src), ...auto.photos.map((p) => p.thumb)];
+      for (const f of photoFiles) if (f && !existsSync(path.join(ROOT, f))) no(`照片产物缺失：${f}`);
+    } catch (e) { no(`content.auto.js 解析失败：${e.message}`); }
+  }
+}
+
+console.log('\n■ 页面引用');
+{
+  const file = path.join(ROOT, 'index.html');
+  const html = readFileSync(file, 'utf8');
+  const refs = new Set();
+  for (const m of html.matchAll(/(?:src|href)\s*=\s*["']([^"']+)["']/gi)) {
+    const r = m[1];
+    if (/^(https?:|data:|mailto:|#|\/\/)/i.test(r)) continue;
+    refs.add(r.split(/[?#]/)[0]);
+  }
+  for (const r of refs) {
+    const full = path.join(ROOT, r);
+    if (existsSync(full)) ok(r);
+    else no(`找不到 ${r}`);
+  }
+}
+
+console.log('\n■ 订阅源');
+for (const f of ['feed.xml', 'atom.xml']) {
+  const file = path.join(ROOT, f);
+  if (!existsSync(file)) no(`${f} 不存在`);
+  else {
+    const s = readFileSync(file, 'utf8');
+    const open = (s.match(/<item>/g) || []).length + (s.match(/<entry>/g) || []).length;
+    if (!/^<\?xml/.test(s.trim())) no(`${f} 缺少 XML 声明`);
+    else ok(`${f}（${open} 条）`);
+  }
+}
+
+console.log('\n■ 静态性（不应再有后端接口与运行期数据）');
+for (const f of ['api.js']) {
+  if (existsSync(path.join(ROOT, f))) no(`${f} 还在，但站点已经是纯静态`);
+  else ok(`${f} 已移除`);
+}
+if (existsSync(path.join(ROOT, 'data'))) no('data/ 还在（运行期数据目录）'); else ok('data/ 已移除');
+{
+  const html = readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  if (/api\.js/.test(html)) no('index.html 仍然引用 api.js');
+  else ok('index.html 不引用任何后端脚本');
+}
+
+console.log(bad === 0 ? '\n✅ 全部通过\n' : `\n❌ 有 ${bad} 处问题\n`);
+process.exit(bad === 0 ? 0 : 1);

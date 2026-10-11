@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>x1shang</title><link>https://x1shang.top</link>
+<description>x1shang 的文字与记录</description>
+<lastBuildDate>2026-10-10T16:00:00.000Z</lastBuildDate>
+<item><title>纯 HTML 文章测试（测试样例）</title><link>https://x1shang.top/#articles/test-html</link><guid>https://x1shang.top/#articles/test-html</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>直接把 .html 文件丢进 content/articles/，整页照原样渲染。</description></item>
+<item><title>标记语言渲染测试（测试样例）</title><link>https://x1shang.top/#articles/test-markdown</link><guid>https://x1shang.top/#articles/test-markdown</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。</description></item>
+<item><title>断言（测试样例）：一个文件就是一则短句，正文可用 Markdown 与 $公式$。这一则在 front matter 里写了</title><link>https://x1shang.top/#assertions/test-assertion</link><guid>https://x1shang.top/#assertions/test-assertion</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>断言（测试样例）：一个文件就是一则短句，正文可用 Markdown 与 $公式$。这一则在 front matter 里写了
+`heat: 3`，用来检查「先热度、后时间」的排序是否生效——它应该排在下面那则之前。</description></item>
+<item><title>学术条目测试样例：一个不太严肃的小问题</title><link>https://x1shang.top/#academic/test-paper</link><guid>https://x1shang.top/#academic/test-paper</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>问题</description></item>
+<item><title>第二则断言（测试样例，没有写 heat）：热度为 0，所以应该排在上一则之后。</title><link>https://x1shang.top/#assertions/test-assertion-2</link><guid>https://x1shang.top/#assertions/test-assertion-2</guid><pubDate>2026-10-09T16:00:00.000Z</pubDate><description>第二则断言（测试样例，没有写 heat）：热度为 0，所以应该排在上一则之后。
+断言也可以按 `#assertions/&lt;id&gt;` 单独打开（检索结果就是这么跳的）。</description></item>
+<item><title>纯文本文章测试（测试样例）</title><link>https://x1shang.top/#articles/test-plain</link><guid>https://x1shang.top/#articles/test-plain</guid><pubDate>2026-10-08T16:00:00.000Z</pubDate><description>.txt 文件按等宽字体、保留换行地展示，不做 Markdown 解析。</description></item>
+<item><title>LaTeX 文件测试（测试样例）</title><link>https://x1shang.top/#articles/test-latex</link><guid>https://x1shang.top/#articles/test-latex</guid><pubDate>2026-10-07T16:00:00.000Z</pubDate><description>.tex 文件会剥掉导言区，正文交给 KaTeX 排版。</description></item>
+</channel></rss>

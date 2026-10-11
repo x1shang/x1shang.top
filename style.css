@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   x1shang — 雪山与云海（纯静态）
+   配色：云的颜色（近白微灰）＋链接保留天空蓝；
+   下拉之后的正文区仿 okmij.org 的 Index：三栏密集链接索引；
+   "呈现文本的页面"（文章 / 断言 / 论文正文）走简约阅读版式。
+   ============================================================ */
+:root{
+  color-scheme:light;
+  --ink:#28323a;
+  --muted:#7f878f;
+  --faint:#98a0a7;
+  /* 链接：首页照片晴空的天蓝色（HSV 222°/33%/98%）压暗到正文可读 */
+  --link:#2f6fb5;
+  --link-hover:#4a90d9;
+  /* 云的颜色：近白微灰，用作底色、分隔与高亮 */
+  --cloud:#f4f5f7;
+  --cloud-2:#eceff3;
+  --cloud-line:#dcdfe3;
+  --line:rgba(120,130,140,.20);
+  --line-strong:rgba(120,130,140,.36);
+  --glass:rgba(255,255,255,.43);
+  --dock-h:46px;
+  --mono:ui-monospace,'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:32px}
+body{
+  margin:0;background:var(--cloud);color:var(--ink);
+  font:15px/1.8 'Manrope','Microsoft YaHei',sans-serif;
+  background-image:radial-gradient(ellipse at 72% 30%,#ffffff,transparent 62%);
+  padding-bottom:var(--dock-h);
+}
+a{color:var(--link);text-decoration:none}
+a:hover{color:var(--link-hover);text-decoration:underline;text-underline-offset:5px}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:inherit}
+button:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:2px solid var(--link);outline-offset:4px}
+[hidden]{display:none!important}
+code{font-family:var(--mono);font-size:.88em;background:var(--cloud-2);border:1px solid var(--cloud-line);border-radius:5px;padding:.05em .34em}
+kbd{font-family:var(--mono);font-size:.82em;background:#fff;border:1px solid var(--cloud-line);border-bottom-width:2px;border-radius:5px;padding:.05em .35em}
+.skip{position:fixed;left:20px;top:-60px;z-index:60;background:white;padding:10px}
+.skip:focus{top:10px}
+.glass{background:linear-gradient(125deg,rgba(255,255,255,.66),rgba(255,255,255,.26));border:1px solid rgba(255,255,255,.72);box-shadow:inset 0 1px 1px #fff9,0 16px 50px #3a404612;backdrop-filter:blur(22px) saturate(120%);-webkit-backdrop-filter:blur(22px) saturate(120%)}
+
+/* ---------------------------------------------------------- 首页大图 */
+.hero{height:min(900px,100svh);min-height:640px;position:relative;overflow:hidden;background:#dfe4ea}
+.hero:before{content:'';position:absolute;inset:0;z-index:3;background:rgba(255,255,255,.09);pointer-events:none} /* 云气：压一点蓝，别太浓 */
+.landscape{position:absolute;inset:0}
+.mountain,.foreground{position:absolute;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.landscape h1{position:absolute;z-index:1;top:8%;left:50%;transform:translateX(-50%);margin:0;color:#f7fafd;font-size:clamp(100px,19.8vw,310px);font-weight:800;letter-spacing:-.075em;line-height:1.3}
+.foreground{z-index:2;clip-path:url(#unused)} /* 山脊裁切由 app.js 的 alignMountain() 生成 polygon */
+.hero:after{content:'';position:absolute;inset:78% 0 0;background:linear-gradient(transparent,rgba(244,245,247,.5));pointer-events:none;z-index:3}
+.hero-top{position:absolute;inset:26px 4% auto;display:flex;align-items:center;justify-content:space-between;z-index:4;color:#fff;font-size:10px;letter-spacing:3px}
+.hero-top a{color:white}
+.wordmark{font-size:24px;font-weight:800;letter-spacing:-2px}
+.explore{letter-spacing:1px}
+.identity{position:absolute;right:6%;bottom:9%;z-index:5;width:340px;padding:25px 30px;border-radius:22px}
+.card-label{display:flex;justify-content:space-between;letter-spacing:2px;font-size:9px;color:#647077}
+.identity strong{display:flex;align-items:center;gap:12px;font-size:32px;letter-spacing:-1.4px;margin-top:9px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#7aa8ad;box-shadow:0 0 0 4px #b5d3d244}
+.identity .bio{font-size:12px;color:#4f5a62;margin:10px 0 6px;line-height:1.75}
+.identity .mail{margin:0 0 18px}
+.identity .mail a{font-size:11.5px;color:#44515a;font-family:var(--mono)}
+.card-links{display:flex;align-items:center;gap:22px;border-top:1px solid #ffffff70;padding-top:14px;font-size:11px}
+.card-links a{display:inline-flex;align-items:center;gap:7px;color:#4a565f}
+.card-links a:hover{color:var(--link);text-decoration:none}
+.card-links svg{width:18px;height:18px;display:block}
+.hero-caption{position:absolute;z-index:4;bottom:13%;left:6%;font-size:16px;letter-spacing:3px;color:white;text-shadow:0 1px 14px #3f464d}
+.hero-caption span{display:block;font-size:8px;letter-spacing:2px;margin-top:10px}
+.scroll-cue{position:absolute;bottom:25px;left:50%;z-index:5;color:white;font-size:25px}
+
+/* ---------------------------------------------------------- 骨架 / 侧栏 */
+.site-layout{max-width:1270px;margin:auto;padding:90px 55px 100px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:65px;min-height:780px}
+.sidebar{align-self:start;position:sticky;top:45px}
+.site-name{font-size:24px;color:var(--ink);font-weight:800;letter-spacing:-1px}
+.site-name span{display:block;font-size:8px;letter-spacing:1.4px;font-weight:400;color:var(--muted);margin-top:5px}
+nav{display:flex;flex-direction:column;gap:13px;margin-top:43px}
+nav a{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:16px}
+nav a span{font-size:9px;opacity:.55}
+nav a.active{color:var(--ink);font-weight:700}
+nav a.active:after{content:'';height:4px;width:4px;background:var(--link);border-radius:50%;margin-left:5px}
+.sidebar-bottom{font-size:10px;color:var(--faint);margin-top:50px}
+.sidebar-bottom span{display:block;font-size:9px}
+main{min-width:0}
+/* 主区域靠 JS 聚焦以便读屏与键盘，但不该出现焦点方框（跳转链接已提供可见焦点） */
+main:focus,main:focus-visible{outline:none}
+
+/* ---------------------------------------------------------- 通用块 */
+.eyebrow{font-size:9px;letter-spacing:2.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
+.page-title{font-size:40px;font-weight:500;letter-spacing:-1.4px;line-height:1.4;margin:18px 0}
+.lead{font-size:13px;color:#7c848b;max-width:560px;line-height:2.1;margin-bottom:32px}
+.section-line{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:20px;gap:14px}
+.section-line h2{font-size:14px;font-weight:500;margin:0}
+.section-line span,.section-line a{font-size:10px}
+.empty{padding:45px 25px;border:1px dashed var(--cloud-line);border-radius:16px;text-align:center;color:var(--muted);font-size:13px}
+.empty b{display:block;color:#5f676e;font-weight:400;font-size:18px;margin-bottom:10px}
+.meta{font-size:10px;color:#8f979e}
+.note{font-size:11px;color:var(--muted);border-left:2px solid var(--cloud-line);padding:2px 0 2px 12px;margin:18px 0}
+.badge{display:inline-block;font-size:9px;letter-spacing:1px;padding:1px 7px;border-radius:99px;border:1px solid var(--cloud-line);background:var(--cloud);color:#6b747c;margin-left:8px;vertical-align:2px;font-weight:600}
+.tag{font-size:9.5px;color:#818a92;border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-right:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stat{padding:20px;border-radius:14px}
+.stat strong{font-size:28px;font-weight:400;display:block}
+.stat span{font-size:11px;color:var(--muted)}
+.row{padding:23px 0;border-bottom:1px solid var(--line)}
+.row h3{font-size:18px;font-weight:500;margin:0 0 8px}
+.row p{font-size:13px;color:#7b838a;margin:5px 0}
+
+/* ---------------------------------------------------------- 索引页（仿 okmij.org Index） */
+.idx-head{text-align:center;margin:6px auto 46px;max-width:760px}
+.idx-title{font-size:clamp(38px,6vw,58px);font-weight:600;letter-spacing:-1.6px;line-height:1.1;margin:0 0 22px}
+.idx-note{font-size:13.5px;color:#5d656c;line-height:1.95;margin:0 auto 20px;max-width:620px}
+.idx-recent{font-size:13px;color:var(--ink);margin:0}
+.idx-recent b{font-weight:700}
+.idx-recent .sep{color:var(--faint);margin:0 8px}
+.idx-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:44px;align-items:start}
+.idx-col{min-width:0;padding-right:34px}
+.idx-col+.idx-col{border-left:1px solid var(--line-strong);padding-left:34px}
+.idx-cat{margin:0 0 30px}
+.idx-cat h3{font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:-.2px}
+.idx-cat.short h3{font-style:italic;font-weight:600;color:#3f474e}
+.idx-run{font-size:13.5px;line-height:2.05;color:#4f575e;margin:0;overflow-wrap:break-word}
+.idx-run .dot{color:#c6cbd1;margin:0 6px;font-weight:700}
+.idx-run a.on{font-weight:600}
+.idx-sub{font-size:11px;color:var(--faint);font-style:italic;margin:6px 0 0}
+.idx-more{font-size:11px;margin:8px 0 0}
+.idx-foot{margin-top:44px;border-top:1px solid var(--line);padding-top:20px;font-size:11px;color:#98a0a7}
+
+/* 板块列表：密集索引行（热度在前，时间在后） */
+.idx-list{list-style:none;margin:0;padding:0}
+.idx-item{display:flex;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.idx-item .rank{font-family:var(--mono);font-size:10.5px;color:var(--faint);min-width:26px}
+.idx-item .tt{font-size:15.5px;font-weight:500;min-width:0;flex:0 1 auto}
+.idx-item .tt a{color:var(--link)}
+.idx-item .sub{font-size:11.5px;color:var(--muted);flex:1 1 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idx-item .date{font-size:10.5px;color:var(--faint);font-family:var(--mono);margin-left:auto;white-space:nowrap}
+/* 测试样例：与页面同色，只用角标提示（不再铺渐变蓝） */
+
+/* ---------------------------------------------------------- 简约阅读页 */
+body.reading{background:var(--cloud);background-image:none}
+body.reading .pointer-light{display:none}
+body.reading .site-layout{max-width:1080px;padding-top:64px;grid-template-columns:150px minmax(0,1fr);gap:52px}
+body.reading .site-name{font-size:19px}
+.reading-head{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:34px}
+.reading-head h1{font-size:clamp(26px,3.4vw,36px);font-weight:600;letter-spacing:-1px;line-height:1.35;margin:12px 0 12px}
+.reading-meta{font-size:11px;color:var(--faint);font-family:var(--mono);display:flex;gap:14px;flex-wrap:wrap}
+.backlink{font-size:11px;color:var(--muted)}
+.prose{font-size:16px;line-height:1.95;max-width:72ch;color:#242c33}
+.prose>*:first-child{margin-top:0}
+.prose p{margin:0 0 1.25em}
+.prose h1,.prose h2,.prose h3,.prose h4{line-height:1.4;letter-spacing:-.4px;font-weight:600;margin:1.9em 0 .7em}
+.prose h2{font-size:21px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+.prose h3{font-size:17.5px}
+.prose h4{font-size:15.5px;color:#3f474e}
+.prose ul,.prose ol{margin:0 0 1.25em;padding-left:1.4em}
+.prose li{margin:.35em 0}
+.prose li>ul,.prose li>ol{margin:.35em 0}
+.prose blockquote{margin:1.4em 0;padding:2px 0 2px 16px;border-left:2px solid var(--cloud-line);color:#5f676e;font-size:15px}
+.prose pre{background:var(--cloud-2);border:1px solid var(--cloud-line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.7;margin:1.4em 0}
+.prose pre code{background:none;border:0;padding:0;font-size:13px}
+.prose img{max-width:100%;border-radius:10px;display:block;margin:1.5em auto}
+.prose hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+.prose table{border-collapse:collapse;width:100%;font-size:14px;margin:1.5em 0}
+.prose th,.prose td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+.prose th{background:var(--cloud-2);font-weight:600}
+.prose a{border-bottom:1px solid var(--cloud-line)}
+.prose .math-block{margin:1.5em 0;text-align:center;overflow-x:auto}
+.prose .math-inline{white-space:nowrap}
+.prose .math-fallback{font-family:var(--mono);font-size:13px;color:#434b52;background:var(--cloud-2);border:1px dashed var(--cloud-line);border-radius:8px;padding:2px 6px;display:inline-block}
+.prose .katex{font-size:1.03em}
+.prose .katex-error{color:#b03a3a!important;background:#fdf1f1;border-radius:4px;padding:0 3px}
+.prose .contains-task-list{padding-left:1.2em}
+.prose .task-list-item{list-style:none;margin-left:-1.2em}
+.prose .tex-center{text-align:center}
+.prose .tex-cite{color:var(--muted);font-size:.92em}
+.prose .tex-footnote{font-size:.86em;color:var(--muted);vertical-align:super}
+.prose figcaption{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px}
+
+/* ---------------------------------------------------------- 摄影 */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.photo{border:0;background:none;padding:0;text-align:left}
+.photo .shot{border:0;background:none;padding:0;display:block;width:100%}
+.photo img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block;background:var(--cloud-2)}
+.photo .cap{display:flex;align-items:baseline;gap:8px;font-size:12px;margin-top:9px;flex-wrap:wrap}
+.photo .cap .date{font-family:var(--mono);font-size:10px;color:var(--faint);margin-left:auto}
+dialog{border:1px solid #ffffff80;background:var(--cloud);border-radius:15px;max-width:92vw;max-height:92vh;padding:18px}
+dialog::backdrop{background:#1e2530b3;backdrop-filter:blur(12px)}
+dialog img{display:block;max-height:74vh;max-width:100%;margin:auto;border-radius:8px;background:var(--cloud-2)}
+dialog button{float:right;border:0;background:none;font-size:24px}
+dialog figure{margin:0}
+dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
+
+/* ---------------------------------------------------------- 音乐 */
+.track{display:flex;align-items:center;gap:20px;width:100%;background:none;border:0;padding:0;text-align:left}
+.track strong{font-weight:500}
+.track small{display:block;color:var(--muted)}
+.track .track-play{margin-left:auto;color:var(--link);font-size:11px}
+.lyrics{position:relative;max-height:280px;overflow:auto;text-align:center;scroll-behavior:smooth;margin:30px 0;mask-image:linear-gradient(transparent,#000 15%,#000 85%,transparent);padding:70px 0}
+.lyric{padding:8px;color:#98a0a7;transition:color .3s,transform .3s}
+.lyric.current{color:var(--link);transform:scale(1.04)}
+.player{position:fixed;z-index:35;bottom:calc(var(--dock-h) + 14px);left:50%;transform:translateX(-50%);width:min(670px,calc(100% - 30px));border-radius:18px;padding:12px 18px;display:flex;gap:16px;align-items:center}
+.player button{border:0;background:none;font-size:20px}
+.player-copy{min-width:100px;max-width:190px;flex:1}
+.player-copy strong,.player-copy span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px}
+.player-copy span{font-size:10px;color:var(--muted)}
+#time{font-size:9px;color:var(--muted);font-family:var(--mono)}
+#seek{width:100px;accent-color:var(--link)}
+
+/* ---------------------------------------------------------- 底部命令行检索 */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(248,250,251,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line-strong)}
+.dock-line{display:flex;align-items:center;gap:9px;padding:0 16px;height:var(--dock-h);max-width:1270px;margin:0 auto}
+.dock-prompt{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--link)}
+.dock input#dock-input{flex:1;min-width:0;border:0;background:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--ink);caret-color:var(--link)}
+.dock input#dock-input::placeholder{color:#9fa6ac}
+.dock-hint{font-size:10px;color:var(--faint);font-family:var(--mono);white-space:nowrap}
+.dock-results{max-height:min(56vh,520px);overflow:auto;border-top:1px solid var(--line);background:rgba(255,255,255,.82)}
+.dock-hits{max-width:1270px;margin:0 auto;padding:6px 0 10px}
+.dock-hit{display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:6px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:#3b434a}
+.dock-hit:hover{background:#f2f5f8}
+.dock-hit[aria-selected="true"]{background:var(--cloud-2);box-shadow:inset 3px 0 0 var(--link)}
+.dock-hit .n{color:#a8aeb4;min-width:30px}
+.dock-hit .kind{color:var(--link);min-width:56px}
+.dock-hit .tt{color:var(--ink);font-weight:600;white-space:nowrap}
+.dock-hit .snip{color:#7f878f;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock-hit mark{background:rgba(200,205,212,.72);color:inherit;border-radius:3px}
+.dock-hit .date{color:#a8aeb4}
+.dock-empty{padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--muted);max-width:1270px;margin:0 auto}
+
+/* ---------------------------------------------------------- 页脚 / 光效 */
+footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8c949b;font-size:10px}
+.pointer-light{position:fixed;inset:0;pointer-events:none;z-index:10;background:radial-gradient(380px circle at var(--x,-1000px) var(--y,-1000px),#ffffff2e,transparent 80%)}
+
+/* ---------------------------------------------------------- 响应式 */
+@media(min-width:1600px){.hero{max-height:1000px}.landscape h1{top:2%}}
+@media(max-width:1080px){.idx-columns{grid-template-columns:repeat(2,minmax(0,1fr))}.idx-col:nth-child(3){border-left:0;padding-left:0;grid-column:1/-1;border-top:1px solid var(--line-strong);padding-top:26px;margin-top:6px}}
+@media(max-width:760px){
+  .hero{min-height:690px;height:94svh}
+  .landscape h1{font-size:25vw;top:19%}
+  .identity{right:6%;bottom:10%;width:280px;padding:20px 24px}
+  .identity strong{font-size:28px}
+  .hero-caption{display:none}
+  .hero-top{inset:20px 6% auto}
+  .hero-top>span{font-size:7px}
+  .site-layout{padding:40px 24px 60px;display:block}
+  body.reading .site-layout{padding-top:36px}
+  .sidebar{position:static}
+  .site-name{font-size:22px}
+  nav{flex-direction:row;flex-wrap:wrap;gap:15px 22px;margin:24px 0 35px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  nav a span,nav a.active:after,.sidebar-bottom{display:none}
+  .page-title{font-size:32px}
+  .idx-columns{grid-template-columns:minmax(0,1fr)}
+  .idx-col,.idx-col+.idx-col{border-left:0;padding-left:0;padding-right:0}
+  .idx-col+.idx-col{border-top:1px solid var(--line-strong);padding-top:24px;margin-top:24px}
+  .idx-head{margin-bottom:30px}
+  .idx-item{flex-wrap:wrap}
+  .idx-item .sub{flex-basis:100%;white-space:normal}
+  .idx-item .date{margin-left:0}
+  .prose{font-size:15.5px}
+  .dock-hint{display:none}
+  .player{gap:9px}
+  #seek{width:60px}
+  #time{display:none}
+  .stats{gap:8px}
+  .stat{padding:12px}
+  .stat strong{font-size:23px}
+  footer{margin:0 24px;padding-bottom:60px;gap:20px}
+  footer>span:nth-child(2){display:none}
+}
+@media(prefers-reduced-motion:reduce){html,.lyrics{scroll-behavior:auto}*{transition:none!important}.pointer-light{display:none}}
+@media(pointer:coarse){.pointer-light{display:none}}

@@ -1,0 +1,13 @@
+{
+  "name": "x1shang-site",
+  "version": "0.2.0",
+  "private": true,
+  "description": "x1shang 的个人站点：三栏密集索引首页 + 底部命令行全站检索 + 自动加载的文本/照片/音乐 + 点赞与审核式留言友链",
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "build": "node tools/build-content.mjs --photos",
+    "text": "node tools/build-content.mjs",
+    "photos": "python tools/build-photos.py --inbox inbox/photos --out assets/photos --manifest assets/photos/manifest.json",
+    "check": "node tools/check.mjs"
+  }
+}

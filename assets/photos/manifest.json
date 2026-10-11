@@ -1,0 +1,54 @@
+{
+  "generated": "2026-10-11T04:02:26.211Z",
+  "inbox": "inbox/photos",
+  "out": "assets/photos",
+  "photos": [
+    {
+      "id": "photo-2026-test-album-test-sample-02",
+      "source": "2026-test-album/test-sample-02.png",
+      "src": "assets/photos/test-sample-02-7dbb45c6.webp",
+      "thumb": "assets/photos/test-sample-02-7dbb45c6.thumb.webp",
+      "width": 1920,
+      "height": 1280,
+      "thumbWidth": 900,
+      "thumbHeight": 600,
+      "bytes": 70164,
+      "sha256": "7dbb45c681ae0af662df88a8e2f8437e5d5a79d83b1aa87e56e830fce9d9b636",
+      "title": "相册测试样例",
+      "date": "2026-10-11",
+      "location": "合成图 · 测试相册",
+      "tags": [
+        "测试样例",
+        "合成图"
+      ],
+      "album": "2026-test-album",
+      "caption": "这张是合成的 PNG（带透明通道），用来验证：PNG → WebP 转换、透明区合成白底、\n子目录当相册、以及 sidecar 元数据（标题 / 地点 / 标签）。",
+      "heat": 0,
+      "mtime": "2026-10-11T02:50:37.677Z"
+    },
+    {
+      "id": "photo-test-sample-01",
+      "source": "test-sample-01.jpg",
+      "src": "assets/photos/test-sample-01-5fb1ce84.webp",
+      "thumb": "assets/photos/test-sample-01-5fb1ce84.thumb.webp",
+      "width": 1607,
+      "height": 1080,
+      "thumbWidth": 900,
+      "thumbHeight": 605,
+      "bytes": 90148,
+      "sha256": "5fb1ce849ba69f2fece207ac0888a3669cdf1e5afba4c6f1efdb09fbf1b8e449",
+      "title": "雪山测试样例",
+      "date": "2026-10-11",
+      "location": "川西 · 四姑娘山",
+      "tags": [
+        "测试样例",
+        "风景",
+        "雪山"
+      ],
+      "album": "",
+      "caption": "这是照片测试样例：原始文件躺在 `inbox/photos/`（已 gitignore），\n页面上的 WebP 由流水线自动生成。",
+      "heat": 4,
+      "mtime": "2026-10-11T02:50:37.650Z"
+    }
+  ]
+}

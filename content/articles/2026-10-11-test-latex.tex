@@ -1,0 +1,30 @@
+---
+title: LaTeX 文件测试（测试样例）
+date: 2026-10-08
+summary: .tex 文件会剥掉导言区，正文交给 KaTeX 排版。
+tags: [测试样例, LaTeX]
+likes: 0
+test: true
+---
+
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+
+\section{一个最小例子}
+
+考虑 $n$ 个点的完全图，其边数为
+\[
+\binom{n}{2} = \frac{n(n-1)}{2}.
+\]
+
+\subsection{为什么值得单独测}
+
+因为 \textbf{LaTeX} 文件的正文里既有 \emph{正文}，也有公式：
+
+\[
+\sum_{k=0}^{\infty} \frac{x^k}{k!} = e^{x}, \qquad
+\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}.
+\]
+
+\end{document}

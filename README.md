@@ -1,0 +1,98 @@
+# x1shang
+
+以雪山与云海为首页的个人空间。**纯静态**：HTML / CSS / JavaScript，没有后端、没有打包步骤、没有 npm 依赖（构建只用 Node 内置模块 + Python 的 Pillow）。
+
+预览：[首页索引](preview-home.webp) · [简约阅读页（含 KaTeX 公式）](preview-reading.webp) · [底部命令行检索](preview-search.webp) · [摄影板块](preview-photography.webp)
+
+下拉之后的正文区仿 [okmij.org/ftp](https://okmij.org/ftp/) 的 Index：三栏密集链接索引、字体仍是站内的 Manrope、超链接用首页照片晴空的天蓝色（`#2f6fb5`，hover `#4a90d9`）；页面底色是云的颜色（近白微灰 `#f4f5f7`，条目不再铺渐变蓝）。**呈现文本的页面（文章 / 断言 / 论文正文）走简约阅读版式**：单栏、无玻璃面板、`72ch` 行宽。
+
+## 目录结构
+
+```
+index.html style.css app.js render.js content.js   前端（render.js = Markdown/LaTeX/HTML 渲染器）
+content.auto.js    自动生成的内容包（window.AUTO），会被提交
+feed.xml atom.xml  自动生成的 RSS / Atom
+content/           文字投递箱：articles/ assertions/ papers/ friends/ + about.md
+inbox/photos/      照片投递箱（gitignore，原始大图不进仓库，可建相册子目录）
+assets/photos/     照片产物：压缩后的 WebP + manifest.json（提交）
+assets/music/      音乐：音频 + 同名 .lrc 歌词 + 同名 .md/.json 元数据
+tools/             serve.mjs（本地预览 + 自动重建）· build-content.mjs（内容包）· build-photos.py（照片）· check.mjs（自检）
+```
+
+## 快速开始
+
+```sh
+npm run serve        # 本地预览：http://127.0.0.1:8080/
+                     # 监听 content/ · inbox/photos/ · assets/music/，拖文件进来即重建并自动刷新
+npm run build        # 只重建：内容包 + 照片流水线
+npm run check        # 自检：语法 / 内容包 / 页面引用 / 订阅源 / "是否还是纯静态"
+```
+
+直接双击 `index.html` 也能看（链接与照片都走相对路径，`file://` 下正常）；想用别的静态服务器也行，`python -m http.server 8080`。
+
+## 往里丢文件就行
+
+| 目录 | 板块 | 扩展名 |
+| --- | --- | --- |
+| `content/articles/` | 文章 | `.md` `.html` `.tex` `.txt` |
+| `content/assertions/` | 断言（一文件一则短句） | 同上 |
+| `content/papers/` | 学术 | 同上 |
+| `content/friends/` | 友链（写文件即显示） | `.md` |
+| `content/about.md` | 关于页正文 | `.md` |
+| `inbox/photos/` | 摄影 | jpg/png/webp/bmp/tif/avif… |
+| `assets/music/` | 音乐 | mp3/wav/m4a/ogg/flac |
+
+文件开头可写 `---` 元信息（`title` `date` `summary` `tags` `heat` `test` `draft` …），细节见 [content/README.md](content/README.md)；照片元数据见 [inbox/photos/README.md](inbox/photos/README.md)。
+
+**排序**：先热度后时间。热度 = front matter 的 `heat`（照片是 sidecar 的 `heat`）+ 作品的 GitHub 星数快照（写死在 `content.js` 的 `repositories`，不再联网）。`heat` 只用于排序，页面上不显示。
+
+## 渲染
+
+- `.md` → Markdown（GFM 子集：标题/列表/任务列表/表格/代码块/引用/图片/自动链接），可混写 HTML 与 `$公式$`
+- `.html` → 原始 HTML（照原样渲染，但会清掉 `<script>`/`<iframe>`/`on*=` 等）
+- `.tex` → LaTeX 文档：剥掉导言区，`\section`/`\textbf`/`itemize` 等转成 HTML 结构，公式交给 KaTeX
+- `.txt` → 等宽纯文本，保留缩进
+- 数学：KaTeX 按 **jsdelivr → unpkg → bootcdn** 依次懒加载（每个 3 秒超时，CSS 与 JS 同源），全部失败时原文仍然可见（`.math-fallback`），不会白屏
+
+## 全站检索
+
+页面底部常驻一条命令行（`> ` 开头）：按 `/` 或 `>` 聚焦，↑↓ 选择，Enter 打开，Esc 收起；检索范围包含标题、正文、摘要、标签、照片说明、音乐、友链、作品描述。支持前缀过滤：`文章: 关键词`、`摄影: 山`、`work: blog`（中英文前缀与 `kind:` 都可以）。检索状态会写进地址栏（`#search/关键词`），可分享。
+
+## 音乐（含网易云评估）
+
+自己放文件最省心：音频丢进 `assets/music/`，同名 `.lrc` 自动当歌词（播放器支持切歌、进度拖动、歌词同步滚动、刷新后重新播放）。
+
+关于「从网易云导入歌单」，实测结论（2026-10-11 在本机验证）：
+
+| 能力 | 结论 |
+| --- | --- |
+| 歌单元数据（曲目 / 歌手 / 专辑 / 封面） | ✅ 公开歌单可用：`music.163.com/api/v6/playlist/detail?id=<歌单ID>` 返回 200 JSON，无需登录；可以做成构建时快照 |
+| 歌词 | ✅ 可用：`music.163.com/api/song/lyric?id=<歌曲ID>&lv=1&kv=1&tv=-1` 返回 200 LRC；但它没有 CORS 头，**只能构建时抓**，不能在浏览器里实时取 |
+| 音频直链播放 | ❌ 已失效：`music.163.com/song/media/outer/url?id=<ID>.mp3` 现在 302 到 `music.163.com/404`（返回 107 KB 的 HTML 错误页），参考系（我站）与空 Referer 都一样；VIP / 独家曲目本来也不给直链 |
+| 官方外链播放器 | ⚠️ 可用但不理想：`music.163.com/outchain/player?type=2&id=<ID>&auto=0&height=66` 返回 200，可以 iframe 嵌进静态页播放，但播放发生在网易云自己的 iframe 里——**拿不到播放进度，所以自己的歌词同步、进度条、切歌都用不了**，且 VIP 曲目只能试听 |
+
+所以：想要"我们这套播放器 + 同步歌词"的体验，请把音频文件给我（丢进 `assets/music/` 即可）；如果你接受"每首一个网易云官方小播放器 + 静态歌词（不同步）"，告诉我歌单链接，我按歌单快照 + 官方 iframe 的方式接。
+
+## 测试样例
+
+每个板块都有一件带「测试样例」角标的样例，检查完删对应文件即可：
+
+- 文章 4 篇（Markdown+LaTeX+HTML 混排 / 纯 HTML / `.tex` / 纯文本）
+- 断言 2 则、学术 1 篇、友链 1 条
+- 照片 2 张（`inbox/photos/test-sample-01.jpg` 带 sidecar；`inbox/photos/2026-test-album/test-sample-02.png` 验证相册与格式转换）
+- 音乐 1 首（`assets/music/test-sample.wav` + `.lrc` + `.md`）
+- 作品区：8 个仓库的静态清单（与导航页作品区一致）
+
+## 部署（GitHub Pages 等静态托管）
+
+把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `content/` `assets/`（含 `assets/photos/*.webp`）。`inbox/` 不提交（已在 `.gitignore`）。
+
+- 推之前先 `npm run build`，让 `content.auto.js` 带上最新文字与照片
+- 路由用 `#`，放域名根或子目录都行，不需要重写规则
+
+## 已知边界
+
+- 照片：GIF/多帧图只取首帧；`.heic` 需要 Pillow 带 libheif（本机无）；`.avif` 取决于 Pillow 版本；原始照片目录不进仓库，换机器要重新投递原图
+- 照片的 `id` 只跟源文件路径走（稳定），产物文件名带内容哈希（缓存失效），重新编码不影响排序
+- 音乐播放需要由访客点击开始；外部音乐链接可能因跨域或防盗链无法播放
+- KaTeX / Google Fonts 走 CDN，离线时分别回退到原始 TeX 文本与系统字体

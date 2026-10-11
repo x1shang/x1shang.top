@@ -121,6 +121,10 @@ git add -A && git commit -m "更新内容" && git push
   ```
 
   想长期自动刷新：把 `GOATCOUNTER_SITE` / `GOATCOUNTER_TOKEN` 加进仓库 Secrets，`.github/workflows/stats.yml` 每天跑一次并提交（GitHub 会在仓库连续 60 天无活动后暂停定时任务，随便 push 一次就恢复）。证书/token 这类要你亲自去后台做的事，记在根目录 `todo.md`。
+
+  ⚠️ **国内网络注意**：GoatCounter 的静态资源在 `*.zgo.at` 上，而这个域在国内被 **DNS 污染**（`static.zgo.at` / `gc.zgo.at` 都解析不出来）。两个后果：
+  1. 后台页面里 **Token 列的 `show` 按钮点了没反应**（那按钮靠 `static.zgo.at/backend.js`）——token 其实就写在 HTML 里：在该页按 `Ctrl+U` 查看源代码，搜 `data-show`，引号里那串就是。
+  2. 官方文档给的计数脚本 `//gc.zgo.at/count.js` 在国内访客那里也加载不出来。所以本站 `index.html` 里用的是 **`//static.goatcounter.com/count.js`**（同一个脚本的可达镜像，2026-10-11 实测 200）；别再改回 `gc.zgo.at`。
 - **Cloudflare Web Analytics**（可选，给自己看趋势、无 cookie）：`index.html` 末尾已插好官方 beacon，token 还是占位符 `REPLACE_WITH_CF_BEACON_TOKEN`，去 CF 后台 → Web Analytics → Add a site 建好再替换。
 
 ## 部署（GitHub Pages 等静态托管）

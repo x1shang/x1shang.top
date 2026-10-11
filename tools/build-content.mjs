@@ -84,6 +84,17 @@ export function slugify(name) {
 
 const isoDay = (d) => new Date(d).toISOString().slice(0, 10);
 
+/**
+ * 补齐非补零日期：`2026-9-15` → `2026-09-15`。必须补，有两个原因：
+ *   1) `new Date('2026-9-15T00:00:00+08:00')` 在 V8 里是 Invalid Date，
+ *      RSS/Atom 的 stamp() 会抛 RangeError，直接中断构建（feed/sitemap 都写不出来）；
+ *   2) 日期是拿字符串排序的，不补零时 `2026-11-4` 会排到 `2026-2-21` 前面。
+ */
+const normDate = (s) => {
+  const m = String(s ?? '').trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : '';
+};
+
 async function walk(dir, out = []) {
   let items;
   try { items = await readdir(dir, { withFileTypes: true }); } catch { return out; }
@@ -112,7 +123,7 @@ async function collectText(kind, dir, seen) {
     if (kind === 'friends' && data.status === 'hidden') continue;
     const st = await stat(file);
     const base = path.basename(file);
-    const date = String(data.date || (base.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || isoDay(st.mtime)).slice(0, 10);
+    const date = normDate(data.date) || String((base.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || isoDay(st.mtime)).slice(0, 10);
     let id = String(data.id || slugify(base));
     let n = 2;
     while (seen.has(`${kind}:${id}`)) id = `${slugify(base)}-${n++}`;
@@ -188,7 +199,7 @@ async function collectMusic(dir) {
     seen.add(id);
     rows.push({
       id, src: rel(file), title: String(meta.title || name), artist: String(meta.artist || ''),
-      date: String(meta.date || isoDay(st.mtime)).slice(0, 10), lyrics: String(meta.lyrics || lyrics || ''),
+      date: normDate(meta.date) || isoDay(st.mtime), lyrics: String(meta.lyrics || lyrics || ''),
       tags: Array.isArray(meta.tags) ? meta.tags : [], test: meta.test === true,
       heat: Math.max(0, Number(meta.heat ?? meta.likes) || 0),
       netease: String(meta.netease || ''),
@@ -301,7 +312,10 @@ const feedItems = [
   ...papers.map((p) => ({ title: p.title, date: p.date, summary: p.abstract, link: siteCfg.url + pathOf('papers', p.id) })),
 ].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 40);
 const xml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
-const stamp = (d) => new Date(`${d}T00:00:00+08:00`).toISOString();
+const stamp = (d) => {
+  const t = new Date(`${normDate(d) || '1970-01-01'}T00:00:00+08:00`);
+  return (Number.isNaN(t.getTime()) ? new Date() : t).toISOString();   // 日期再离谱也不中断构建
+};
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
 <title>${xml(siteCfg.name)}</title><link>${xml(siteCfg.url)}</link>

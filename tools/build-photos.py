@@ -16,6 +16,9 @@
   * 剪枝：源文件被删除 → 清单条目与其产物一并删除。
   * src/thumb 保留调用时 --out 前缀原样（正斜杠），站内 <img src> 可直接用。
   * 不写 EXIF 到产物（顺带丢掉 GPS 等隐私信息）。
+  * 水印：主图与缩略图左下角自动加「© <照片年份> x1shang」灰色小字；年份取自清单里的
+    照片日期（sidecar > EXIF 拍摄日期 > 文件修改时间）。改了水印样式/尺寸后把
+    WATERMARK_VERSION +1，旧产物会因版本不符自动失效重做，不需要手动 --force。
 """
 
 from __future__ import annotations
@@ -38,7 +41,7 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 try:
-    from PIL import Image, ImageOps
+    from PIL import Image, ImageDraw, ImageFont, ImageOps
     from PIL import UnidentifiedImageError
 except ImportError:  # 致命：没有 Pillow
     print("❌ 缺少 Pillow：本脚本依赖 Pillow（Pillow >= 9），请先安装再运行。", file=sys.stderr)
@@ -67,8 +70,26 @@ META_KEYS = ("title", "date", "location", "tags", "album", "caption", "heat")
 # 清单条目的固定键顺序（保证重复构建文本一致，方便 git diff）
 CANON_KEYS = (
     "id", "source", "src", "thumb", "width", "height",
-    "thumbWidth", "thumbHeight", "bytes", "sha256",
+    "thumbWidth", "thumbHeight", "bytes", "sha256", "wm",
     "title", "date", "location", "tags", "album", "caption", "heat", "mtime",
+)
+
+# 水印：主图与缩略图左下角「© <年份> x1shang」。
+# 改了文案 / 字号比例 / 颜色就把 WATERMARK_VERSION +1：清单里记着 wm，
+# 版本对不上的旧产物会被判为过期并自动重做（不必手动 --force）。
+WATERMARK_VERSION = 1
+WATERMARK_TEMPLATE = "© {year} x1shang"
+WATERMARK_GRAY = (150, 150, 150)
+WATERMARK_SHADOW_RGBA = (0, 0, 0, 110)
+WATERMARK_WIDTH_RATIO = 0.018        # 字号 ≈ 图宽的 1.8%
+WATERMARK_MARGIN_RATIO = 1.1         # 边距 ≈ 字号的 1.1 倍
+WATERMARK_FONTS = (                  # 按顺序取第一个存在的；都要能画 ©
+    "C:/Windows/Fonts/msyh.ttc",
+    "C:/Windows/Fonts/segoeui.ttf",
+    "C:/Windows/Fonts/arial.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
 )
 
 
@@ -319,6 +340,55 @@ def read_sidecar(src_path: Path) -> dict:
     return {}
 
 
+# --- 水印 -------------------------------------------------------------------
+
+_watermark_fonts: dict[int, object] = {}
+
+
+def load_watermark_font(size: int):
+    """取一个能画 © 的字体；一个都找不到就退回 Pillow 内置字体（不致命，只是难看点）。"""
+    cached = _watermark_fonts.get(size)
+    if cached is not None:
+        return cached
+    font = None
+    for candidate in WATERMARK_FONTS:
+        if os.path.isfile(candidate):
+            try:
+                font = ImageFont.truetype(candidate, size)
+                break
+            except OSError:
+                continue
+    if font is None:
+        try:
+            font = ImageFont.load_default(size)          # Pillow >= 10.1
+        except TypeError:                                # pragma: no cover - 老 Pillow
+            font = ImageFont.load_default()
+    _watermark_fonts[size] = font
+    return font
+
+
+def add_watermark(im: "Image.Image", year: str) -> "Image.Image":
+    """左下角画灰色小字「© <year> x1shang」，垫一层很淡的阴影，浅色天空上也看得清。"""
+    if not year or not str(year).isdigit():
+        return im
+    text = WATERMARK_TEMPLATE.format(year=year)
+    font = load_watermark_font(max(11, round(im.width * WATERMARK_WIDTH_RATIO)))
+    if hasattr(font, "size"):
+        margin = max(6, round(font.size * WATERMARK_MARGIN_RATIO))
+    else:                                                # 内置位图字体没有 size
+        margin = max(6, round(im.width * 0.012))
+
+    layer = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    box = draw.textbbox((0, 0), text, font=font)
+    x = margin - box[0]
+    y = im.height - margin - box[3]                      # 让文字实际底部离下边缘 margin
+    offset = max(1, round(im.width * 0.0012))
+    draw.text((x + offset, y + offset), text, font=font, fill=WATERMARK_SHADOW_RGBA)
+    draw.text((x, y), text, font=font, fill=WATERMARK_GRAY + (255,))
+    return Image.alpha_composite(im.convert("RGBA"), layer).convert("RGB")
+
+
 # --- 编码 -------------------------------------------------------------------
 
 def _atomic_save(im: "Image.Image", dest: Path, **kwargs) -> None:
@@ -344,8 +414,9 @@ def encode_images(
     max_w: int,
     thumb_w: int,
     quality: int,
+    watermark_year: str = "",
 ) -> dict:
-    """打开 → 修正方向 → 合成白底 RGB → 缩到 max_w → 写主图与缩略图。"""
+    """打开 → 修正方向 → 合成白底 RGB → 缩到 max_w → 写主图与缩略图（都带水印）。"""
     with Image.open(src_path) as im0:
         # 超大图先让 JPEG 解码器降采样，避免一次性占满内存
         if im0.width * im0.height > BIG_PIXELS:
@@ -359,13 +430,16 @@ def encode_images(
         if im.width > max_w:  # 只按宽度约束，绝不放大
             new_h = max(1, round(im.height * max_w / im.width))
             im = im.resize((max_w, new_h), Image.Resampling.LANCZOS)
-        main_size = im.size
 
+        main = add_watermark(im, watermark_year) if watermark_year else im
+        main_size = main.size
         main_path = out_dir / f"{base_name}.webp"
-        _atomic_save(im, main_path, quality=quality, method=6)
+        _atomic_save(main, main_path, quality=quality, method=6)
 
         thumb = im.copy()
         thumb.thumbnail((thumb_w, 1 << 20), Image.Resampling.LANCZOS)
+        if watermark_year:   # 缩略图按自己的宽度重新定字号，不然会糊成一团
+            thumb = add_watermark(thumb, watermark_year)
         thumb_size = thumb.size
         thumb_path = out_dir / f"{base_name}.thumb.webp"
         _atomic_save(thumb, thumb_path, quality=THUMB_QUALITY, method=6)
@@ -543,27 +617,32 @@ def main(argv: list[str] | None = None) -> int:
         src_out = f"{out_prefix}/{base_name}.webp"
         thumb_out = f"{out_prefix}/{base_name}.thumb.webp"
 
-        # ---- 幂等：sha 未变且产物齐全 → 跳过（不重新编码，但元数据照常刷新）----
-        if prev is not None and not args.force and prev.get("sha256") == digest and products_exist(prev, out_dir):
+        # 元数据先算出来：水印要用的年份就是这里定下的「照片日期」（sidecar > EXIF > mtime）
+        meta = collect_meta(src_path, rel, stat.st_mtime, probe_exif_date(src_path), read_sidecar(src_path))
+
+        # ---- 幂等：sha 未变、水印版本一致且产物齐全 → 跳过（不重新编码，但元数据照常刷新）----
+        if (prev is not None and not args.force
+                and prev.get("sha256") == digest
+                and prev.get("wm") == WATERMARK_VERSION
+                and products_exist(prev, out_dir)):
             entry = dict(prev)
             entry["id"] = pid
             entry["src"] = src_out
             entry["thumb"] = thumb_out
             entry["source"] = source
             entry["mtime"] = iso_utc(stat.st_mtime)
+            entry["wm"] = WATERMARK_VERSION
             for key in META_KEYS:
                 entry.pop(key, None)
-            entry.update(collect_meta(
-                src_path, rel, stat.st_mtime,
-                probe_exif_date(src_path), read_sidecar(src_path),
-            ))
+            entry.update(meta)
             entries.append(entry)
             skipped += 1
             continue
 
         # ---- 实际编码 ----
         try:
-            info = encode_images(src_path, out_dir, base_name, args.max_w, args.thumb_w, args.quality)
+            info = encode_images(src_path, out_dir, base_name, args.max_w, args.thumb_w, args.quality,
+                                 str(meta.get("date", ""))[:4])
         except (UnidentifiedImageError, OSError, ValueError, MemoryError) as exc:
             warn(f"无法处理，跳过：{source}（{type(exc).__name__}: {exc}）")
             failed += 1
@@ -571,7 +650,7 @@ def main(argv: list[str] | None = None) -> int:
                 entries.append(prev)
             continue
 
-        date_hint = info.pop("_date_hint", None)
+        info.pop("_date_hint", None)
         entry = {
             "id": pid,
             "source": source,
@@ -583,9 +662,10 @@ def main(argv: list[str] | None = None) -> int:
             "thumbHeight": info["thumbHeight"],
             "bytes": info["bytes"],
             "sha256": digest,
+            "wm": WATERMARK_VERSION,
             "mtime": iso_utc(stat.st_mtime),
         }
-        entry.update(collect_meta(src_path, rel, stat.st_mtime, date_hint, read_sidecar(src_path)))
+        entry.update(meta)
         entries.append(entry)
         processed += 1
 

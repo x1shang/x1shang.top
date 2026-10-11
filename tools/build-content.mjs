@@ -132,12 +132,20 @@ async function collectText(kind, dir, seen) {
     const heading = (body.match(/^#\s+(.+)$/m) || [])[1];
     // 断言一般没有标题，正文本身就是标题：不要在构建期造一个 slug 标题出来
     const title = String(data.title || heading || (kind === 'assertions' ? '' : slugify(base).replace(/-/g, ' '))).trim();
+    // 正文开头的 `# 标题` 会和页面外壳注入的 <h1> 重复（标题会显示两遍）。
+    // 仅在它与 title 完全一致时删掉；不一致时保留作者原意（如「回甘（二稿）」正文写的是「回甘」）。
+    const bodyRaw = body.trim();
+    const dupH1 = bodyRaw.match(/^#\s+(.+?)\s*(?:\r?\n|$)/);
+    const bodyOut = dupH1 && dupH1[1].trim() === title
+      ? bodyRaw.slice(dupH1[0].length).trimStart()
+      : bodyRaw;
+
     const common = {
       id, date, format, file: rel(file), title,
       tags: Array.isArray(data.tags) ? data.tags : [],
       test: data.test === true,
       heat: Math.max(0, Number(data.heat ?? data.likes) || 0),
-      body: body.trim(),
+      body: bodyOut,
     };
     if (kind === 'articles') {
       rows.push({ ...common, summary: String(data.summary || data.description || firstLine(body)) });

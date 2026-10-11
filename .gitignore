@@ -9,3 +9,7 @@ inbox/photos/*
 Thumbs.db
 desktop.ini
 node_modules/
+
+# Python 字节码缓存（tools/build-photos.py 被 import / py_compile 时会生成）
+__pycache__/
+*.pyc

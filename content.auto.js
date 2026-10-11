@@ -1,6 +1,6 @@
 /* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */
 window.AUTO = {
- "generated": "2026-10-11T11:21:40.276Z",
+ "generated": "2026-10-11T11:27:29.344Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",
@@ -209,11 +209,11 @@ window.AUTO = {
    "avatar": "",
    "status": "approved",
    "source": "file",
-   "test": true,
+   "test": false,
    "tags": []
   }
  ],
- "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。如果想联系作者，**请使用邮箱**",
+ "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。如果想联系作者，欢迎发邮件：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。",
  "stats": {
   "articles": 4,
   "assertions": 2,

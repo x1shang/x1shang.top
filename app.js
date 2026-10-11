@@ -396,7 +396,53 @@
           <p>整站是纯静态的 HTML / CSS / JavaScript：文字丢进 <code>content/</code>（文章 / 断言 / 学术 / 友链）、照片丢进 <code>inbox/photos/</code>、音乐丢进 <code>assets/music/</code>，跑一次构建就编入索引。照片目录已被 gitignore，只有压缩后的 WebP 会进仓库。</p>
           <p>页面底部常驻一条命令行检索：按 <kbd>/</kbd> 或 <kbd>&gt;</kbd> 聚焦，↑↓ 选择，Enter 打开。文章、断言与论文正文用简约阅读版式，公式由 KaTeX 渲染。</p>
         </article>
-        <article class="row"><h3>订阅与统计</h3><p><a href="feed.xml">RSS</a> · <a href="atom.xml">Atom</a> · 内容数量来自站内数据，建站天数按设定日期计算，未接入访问量统计。</p></article>`;
+        <article class="row"><h3>订阅与统计</h3><p><a href="feed.xml">RSS</a> · <a href="atom.xml">Atom</a> · 内容数量来自站内数据，建站天数按设定日期计算。</p></article>
+        <article class="row"><h3>访客</h3>
+          <div class="visits" id="visits" data-state="loading"><p class="note">正在读取访客数据…</p></div>
+          <p class="note">图表只读站内的静态快照 <code>stats.json</code>（由 <code>tools/fetch-stats.mjs</code> 刷新）；访客的浏览器不会为这张图请求任何统计服务。</p>
+        </article>`;
+  }
+
+  /** 关于页最下方：访客量图（只读同目录的 stats.json；拿不到就安静降级，不留破图） */
+  async function hydrateVisits() {
+    const box = document.getElementById('visits');
+    if (!box) return;
+    let data = null;
+    try {
+      const res = await fetch('stats.json', { cache: 'no-store' });
+      if (res.ok) data = await res.json();
+    } catch { /* file:// 或断网：保持安静 */ }
+    const raw = data && Array.isArray(data.series) ? data.series : [];
+    const series = raw.filter((x) => x && typeof x.n === 'number' && x.d).slice(-30);
+    if (!series.length) {
+      box.dataset.state = 'empty';
+      box.innerHTML = raw.length || data
+        ? '<p class="note">统计刚上线，数据还在积累。</p>'
+        : '<p class="note">还没有统计数据（本地 <code>file://</code> 预览下不显示）。</p>';
+      return;
+    }
+    const W = 640, H = 170, T = 12, B = 26, L = 6, R = 6;
+    const max = Math.max(1, ...series.map((x) => x.n));
+    const bw = (W - L - R) / series.length;
+    const bars = series.map((x, i) => {
+      const h = Math.round((H - T - B) * (x.n / max));
+      const bx = L + i * bw + bw * 0.18, by = H - B - h;
+      return `<rect class="vb" x="${bx.toFixed(1)}" y="${by}" width="${Math.max(1.2, bw * 0.64).toFixed(1)}" height="${Math.max(1, h)}" rx="1.6"><title>${esc(x.d)}：${x.n} 位访客</title></rect>`;
+    }).join('');
+    const total = Number(data.total || series.reduce((s, x) => s + x.n, 0));
+    const updated = data.updated ? String(data.updated).slice(0, 10) : '';
+    const first = series[0].d, last = series[series.length - 1].d;
+    box.dataset.state = 'ready';
+    box.innerHTML = `
+      <p class="visits-total"><strong>${total}</strong><span>近 ${series.length} 天访客</span>${data.allTime ? `<span class="visits-all">累计 ${data.allTime}</span>` : ''}</p>
+      <svg class="visits-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="近 ${series.length} 天每日访客数">
+        <line class="vaxis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"></line>
+        <text class="vmax" x="${L}" y="${T - 1}">${max}</text>
+        ${bars}
+        <text class="vlabel" x="${L}" y="${H - 8}">${esc(first)}</text>
+        <text class="vlabel" x="${W - R}" y="${H - 8}" text-anchor="end">${esc(last)}</text>
+      </svg>
+      ${updated ? `<p class="note">更新于 ${esc(updated)}${data.site ? ` · 数据源 <a href="${safe(data.site)}" target="_blank" rel="noopener noreferrer">GoatCounter</a>` : ''}</p>` : ''}`;
   }
 
   /* ------------------------------------------------------------------ 渲染调度 */
@@ -432,6 +478,7 @@
 
     $('#main').innerHTML = body;
     if (R.math) { try { R.math($('#main')); } catch { /* 公式渲染失败不影响阅读 */ } }
+    if (currentPage === 'about') hydrateVisits();
     if (currentPage === 'music') {
       renderLyrics(); updateTime();
       if (detail) {

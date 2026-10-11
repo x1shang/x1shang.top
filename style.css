@@ -271,3 +271,15 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 }
 @media(prefers-reduced-motion:reduce){html,.lyrics{scroll-behavior:auto}*{transition:none!important}.pointer-light{display:none}}
 @media(pointer:coarse){.pointer-light{display:none}}
+
+/* ---------------------------------------------------------- 关于页：访客量图 */
+.visits{margin-top:6px}
+.visits-total{margin:0 0 10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.visits-total strong{font-size:26px;letter-spacing:-.6px;line-height:1}
+.visits-total span{color:var(--muted);font-size:12.5px}
+.visits-total .visits-all{color:var(--faint)}
+.visits-chart{display:block;width:100%;height:auto;max-height:200px}
+.visits-chart .vb{fill:var(--link);opacity:.72}
+.visits-chart .vb:hover{opacity:1}
+.visits-chart .vaxis{stroke:var(--line-strong);stroke-width:1}
+.visits-chart .vmax,.visits-chart .vlabel{fill:var(--faint);font:10px var(--mono)}

@@ -16,10 +16,11 @@ const ROOT = path.resolve(path.join(path.dirname(new URL(import.meta.url).pathna
 let bad = 0;
 const ok = (m) => console.log(`  ✓ ${m}`);
 const no = (m) => { bad++; console.log(`  ✗ ${m}`); };
+const warn = (m) => console.log(`  ! ${m}`);
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
 
 console.log('\n■ 脚本语法');
-for (const f of ['app.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs']) {
+for (const f of ['app.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs', 'tools/fetch-stats.mjs', 'tools/build-index.mjs', 'tools/check-site.mjs', 'tools/check-layout.mjs']) {
   const file = path.join(ROOT, f);
   if (!existsSync(file)) { no(`${f} 不存在`); continue; }
   const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -78,6 +79,48 @@ for (const f of ['feed.xml', 'atom.xml']) {
     const open = (s.match(/<item>/g) || []).length + (s.match(/<entry>/g) || []).length;
     if (!/^<\?xml/.test(s.trim())) no(`${f} 缺少 XML 声明`);
     else ok(`${f}（${open} 条）`);
+  }
+}
+
+console.log('\n■ 分享卡片与统计');
+{
+  const html = readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const wanted = [
+    ['og:type', /property="og:type"/], ['og:site_name', /property="og:site_name"/], ['og:title', /property="og:title"/],
+    ['og:description', /property="og:description"/], ['og:url', /property="og:url"/], ['og:image', /property="og:image"/],
+    ['og:image:width', /property="og:image:width"/], ['og:image:height', /property="og:image:height"/],
+    ['twitter:card', /name="twitter:card"/], ['canonical', /rel="canonical"/],
+  ];
+  for (const [name, re] of wanted) { if (re.test(html)) ok(`index.html 有 ${name}`); else no(`index.html 缺 ${name}`); }
+  const og = html.match(/property="og:image" content="([^"]+)"/);
+  if (og) {
+    const local = og[1].replace(/^https?:\/\/x1shang\.top\//, '');
+    if (existsSync(path.join(ROOT, local))) ok(`og:image 指向的文件在仓库里（${local}）`);
+    else no(`og:image 指向的 ${local} 不在仓库里`);
+  }
+  if (/REPLACE_WITH_CF_BEACON_TOKEN/.test(html)) warn('Cloudflare Web Analytics 的 token 还是占位符（去后台 Add a site 后替换，见 index.html 注释）');
+  else ok('Cloudflare Web Analytics token 已填');
+
+  for (const f of ['robots.txt', 'sitemap.xml']) {
+    if (existsSync(path.join(ROOT, f))) ok(`${f} 存在`); else no(`${f} 不存在`);
+  }
+  const rbFile = path.join(ROOT, 'robots.txt');
+  const rb = existsSync(rbFile) ? readFileSync(rbFile, 'utf8') : '';
+  if (/Sitemap:\s*https:\/\/x1shang\.top\/sitemap\.xml/.test(rb)) ok('robots.txt 里指向了 sitemap.xml');
+  else no('robots.txt 没有指向 sitemap.xml 的 Sitemap 行');
+  const sfFile = path.join(ROOT, 'sitemap.xml');
+  if (existsSync(sfFile) && /<urlset/.test(readFileSync(sfFile, 'utf8'))) ok('sitemap.xml 结构正常');
+  else no('sitemap.xml 缺失或结构异常');
+
+  const statsFile = path.join(ROOT, 'stats.json');
+  if (!existsSync(statsFile)) no('stats.json 不存在（关于页的访客图靠它）');
+  else {
+    try {
+      const s = JSON.parse(readFileSync(statsFile, 'utf8'));
+      if (!Array.isArray(s.series)) no('stats.json 缺 series 数组');
+      else if (!s.series.length) warn(`stats.json 可解析，但还没有数据（source=${s.source}）——跑 npm run stats 或配 GitHub secret`);
+      else ok(`stats.json 可解析（source=${s.source}，${s.series.length} 天数据）`);
+    } catch (e) { no(`stats.json 解析失败：${e.message}`); }
   }
 }
 

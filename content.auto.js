@@ -1,6 +1,6 @@
 /* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */
 window.AUTO = {
- "generated": "2026-10-11T04:02:26.236Z",
+ "generated": "2026-10-11T06:33:42.342Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",

@@ -2,12 +2,18 @@
   "name": "x1shang-site",
   "version": "0.2.0",
   "private": true,
-  "description": "x1shang 的个人站点：三栏密集索引首页 + 底部命令行全站检索 + 自动加载的文本/照片/音乐 + 点赞与审核式留言友链",
+  "description": "x1shang 的个人站点（纯静态，无后端）：三栏密集索引首页 + 底部命令行全站检索 + 拖文件即发布的文本/照片/音乐",
   "scripts": {
     "serve": "node tools/serve.mjs",
     "build": "node tools/build-content.mjs --photos",
     "text": "node tools/build-content.mjs",
     "photos": "python tools/build-photos.py --inbox inbox/photos --out assets/photos --manifest assets/photos/manifest.json",
-    "check": "node tools/check.mjs"
+    "check": "node tools/check.mjs",
+    "stats": "node tools/fetch-stats.mjs",
+    "index": "node tools/build-index.mjs",
+    "check:site": "node tools/check-site.mjs",
+    "layout": "node tools/check-layout.mjs",
+    "https": "node tools/enable-https.cjs",
+    "deploy": "pwsh -File tools/deploy-x1shang.ps1"
   }
 }

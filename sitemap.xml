@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  个人站目前是哈希路由（#articles/<slug> 之类），而 # 后面的内容爬虫不认，
+  所以这里只有首页一条。等文章预渲染成真实路径（/articles/<slug>/）之后，
+  这个文件应该由 tools/build-content.mjs 自动生成，不要再手改。
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://x1shang.top/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

@@ -12,11 +12,15 @@
 index.html style.css app.js render.js content.js   前端（render.js = Markdown/LaTeX/HTML 渲染器）
 content.auto.js    自动生成的内容包（window.AUTO），会被提交
 feed.xml atom.xml  自动生成的 RSS / Atom
+robots.txt sitemap.xml  给爬虫的（sitemap 目前只有首页，等文章预渲染后再补）
+stats.json         关于页访客图的数据快照（由 tools/fetch-stats.mjs 生成）
 content/           文字投递箱：articles/ assertions/ papers/ friends/ + about.md
 inbox/photos/      照片投递箱（gitignore，原始大图不进仓库，可建相册子目录）
 assets/photos/     照片产物：压缩后的 WebP + manifest.json（提交）
 assets/music/      音乐：音频 + 同名 .lrc 歌词 + 同名 .md/.json 元数据
-tools/             serve.mjs（本地预览 + 自动重建）· build-content.mjs（内容包）· build-photos.py（照片）· check.mjs（自检）
+assets/og-cover.jpg  分享卡片封面（1200×630，别改比例）
+.github/workflows/  stats.yml：每天定时刷新 stats.json
+tools/             serve / build-content / build-photos / check / fetch-stats + 运维脚本（详见 tools/README.md）
 ```
 
 ## 快速开始
@@ -25,7 +29,9 @@ tools/             serve.mjs（本地预览 + 自动重建）· build-content.mj
 npm run serve        # 本地预览：http://127.0.0.1:8080/
                      # 监听 content/ · inbox/photos/ · assets/music/，拖文件进来即重建并自动刷新
 npm run build        # 只重建：内容包 + 照片流水线
-npm run check        # 自检：语法 / 内容包 / 页面引用 / 订阅源 / "是否还是纯静态"
+npm run check        # 自检：语法 / 内容包 / 页面引用 / 订阅源 / 纯静态性 / 分享卡片 / robots / sitemap / stats
+npm run stats        # 抓访客量写 stats.json（--demo 可先看图表长什么样；需要 GOATCOUNTER_SITE）
+npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在 tools/，见 tools/README.md）
 ```
 
 直接双击 `index.html` 也能看（链接与照片都走相对路径，`file://` 下正常）；想用别的静态服务器也行，`python -m http.server 8080`。
@@ -83,9 +89,23 @@ npm run check        # 自检：语法 / 内容包 / 页面引用 / 订阅源 / 
 - 音乐 1 首（`assets/music/test-sample.wav` + `.lrc` + `.md`）
 - 作品区：8 个仓库的静态清单（与导航页作品区一致）
 
+## 分享卡片 / 爬虫 / 访客统计（2026-10-11 加）
+
+- **OG / Twitter Card**：写在 `index.html` 的静态 `<head>` 里（抓取方不执行 JS，靠 JS 注入没用），封面是 `assets/og-cover.jpg`（1200×630）。**每篇文章各自的卡片要等文章预渲染成真实路径** `/articles/<slug>/` 之后才能有 —— 哈希路由的 `#` 后面爬虫不看。
+- **`robots.txt` / `sitemap.xml`**：sitemap 目前只有首页一条，原因同上；预渲染落地后应改由 `tools/build-content.mjs` 生成，别手改。
+- **关于页的访客统计图**：只读站内的 `stats.json`（访客的浏览器不会为这张图请求任何统计服务），数据由 `tools/fetch-stats.mjs` 从 GoatCounter 抓：
+
+  ```sh
+  $env:GOATCOUNTER_SITE='x1shang'; $env:GOATCOUNTER_TOKEN='...'; npm run stats
+  node tools/fetch-stats.mjs --demo        # 没账号也想先看图表长什么样
+  ```
+
+  想长期自动刷新：把 `GOATCOUNTER_SITE` / `GOATCOUNTER_TOKEN` 加进仓库 Secrets，`.github/workflows/stats.yml` 每天跑一次并提交（GitHub 会在仓库连续 60 天无活动后暂停定时任务，随便 push 一次就恢复）。证书/token 这类要你亲自去后台做的事，记在根目录 `todo.md`。
+- **Cloudflare Web Analytics**（可选，给自己看趋势、无 cookie）：`index.html` 末尾已插好官方 beacon，token 还是占位符 `REPLACE_WITH_CF_BEACON_TOKEN`，去 CF 后台 → Web Analytics → Add a site 建好再替换。
+
 ## 部署（GitHub Pages 等静态托管）
 
-把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `content/` `assets/`（含 `assets/photos/*.webp`）。`inbox/` 不提交（已在 `.gitignore`）。
+把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `robots.txt` `sitemap.xml` `stats.json` `content/` `assets/`（含 `assets/photos/*.webp` 与 `assets/og-cover.jpg`）。`inbox/` 不提交（已在 `.gitignore`）。
 
 - 推之前先 `npm run build`，让 `content.auto.js` 带上最新文字与照片
 - 路由用 `#`，放域名根或子目录都行，不需要重写规则

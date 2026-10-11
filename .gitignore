@@ -9,5 +9,3 @@ inbox/photos/*
 Thumbs.db
 desktop.ini
 node_modules/
-__pycache__/
-*.pyc

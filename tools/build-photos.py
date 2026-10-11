@@ -639,22 +639,14 @@ def collect_meta(
     date_hint: str | None,
     sidecar: dict,
 ) -> dict:
-    """组装 title / date / location / tags / album / caption / heat（sidecar 优先）。
-
-    date 只认「文件头」：sidecar 的 date → EXIF 拍摄时间；都没有就留空。
-    mtime 仅由调用方记进清单（`mtime` 字段，供排查用），不参与排序。
-    """
+    """组装 title / date / location / tags / album / caption / heat（sidecar 优先）。"""
     parent = rel.parent.as_posix()
     location = "" if parent in (".", "") else parent
     album = rel.parts[0] if len(rel.parts) > 1 else ""
 
     title = norm_scalar(sidecar.get("title")) or src_path.stem
-    # 日期只认「文件头」：sidecar 的 date → 照片自带的 EXIF 拍摄时间（也写在文件头里）；
-    # 都没有就留空（排在最后），不回退到文件的修改时间（mtime）——那是上传/改动时间，不是拍摄/归属时间
-    fallback_date = date_hint or ""
+    fallback_date = date_hint or datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
     date = norm_date(sidecar.get("date"), fallback_date)
-    if not date:
-        warn(f"{rel.as_posix()} 没有 date（sidecar 没写、也没有 EXIF 拍摄时间）→ 这张照片不带日期，会排在最后")
     meta_location = norm_scalar(sidecar.get("location"))
     if meta_location:
         location = meta_location

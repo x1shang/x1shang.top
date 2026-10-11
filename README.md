@@ -37,6 +37,25 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 
 直接双击 `index.html` 也能看（链接与照片都走相对路径，`file://` 下正常）；想用别的静态服务器也行，`python -m http.server 8080`。
 
+## 发布流程（完整流程就这三步）
+
+```sh
+# 1) 丢文件（工作区 → 仓库文件夹，拖进去就行）
+#    content/articles|assertions|papers|friends/*.md|.html|.tex|.txt
+#    inbox/photos/*.jpg        ← 原图不入库，压缩后的 WebP 进 assets/photos/
+#    assets/music/*.mp3        ← 同名 .lrc 自动当歌词
+# 2) 重建
+npm run build                  # = content.auto.js + feed/atom + sitemap + 预渲染页 + 照片流水线
+# 3) 提交并推送（GitHub Pages 一分钟内自动刷新）
+git add -A && git commit -m "更新内容" && git push
+```
+
+- 想边写边看：`npm run serve`（监听到丢文件会自动重建并刷新浏览器），它和 `npm run build` 做的事一样。
+- 想一条命令走完：`npm run deploy`（= 完整重建 → 提交 → 推送到 `x1shang/x1shang.top`，走本地代理 `127.0.0.1:10809`）。
+- **导航页（`我们都.是.gay`）不走这个流程**：它是工作区里的另一个仓库（`site/`），手写单文件站，改完直接 `git add -A && git commit && git push`，没有构建步骤。
+- **不用手动碰**这些构建产物：`content.auto.js`、`feed.xml`、`atom.xml`、`sitemap.xml`、`articles/`、`assertions/`、`academic/`、`assets/photos/`（手改会被下次 build 覆盖）。
+- 访客数据（关于页的图 + 文章热度）是另一条线：`npm run stats`（或仓库 Secrets + `.github/workflows/stats.yml` 每天自动）→ 再 `npm run build` 才写进内容包。没配就是热度 0、图显示"数据还在积累"，不影响发布。
+
 ## 往里丢文件就行
 
 | 目录 | 板块 | 扩展名 |

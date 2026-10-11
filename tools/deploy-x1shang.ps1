@@ -14,8 +14,9 @@ $env:GIT_TERMINAL_PROMPT = '0'
 
 Push-Location $repo
 try {
-  # 1) 重新生成内容包（如需照片，另跑 npm run photos）
-  node tools/build-content.mjs
+  # 1) 完整重建：内容包 + 照片流水线 + 预渲染页 + sitemap + feed
+  #    （没装 Python/Pillow 时脚本会提示并跳过照片，其余照常生成）
+  node tools/build-content.mjs --photos
 
   # 2) 有改动就提交
   $dirty = (git status --porcelain)

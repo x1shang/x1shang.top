@@ -252,9 +252,14 @@ const URL_KIND = { articles: 'articles', assertions: 'assertions', papers: 'acad
 const stats = await readJson(path.join(ROOT, 'stats.json'), {});
 const pageVisits = stats.pages && typeof stats.pages === 'object' ? stats.pages : {};
 const pathOf = (kindKey, id) => `/${URL_KIND[kindKey]}/${encodeURIComponent(id)}/`;
+/** 查访客数：GoatCounter 会把路径结尾的斜杠去掉（存成 /articles/foo），所以两种写法都认 */
+const visitsOf = (kindKey, id) => {
+  const p = pathOf(kindKey, id);
+  return Math.max(0, Number(pageVisits[p] ?? pageVisits[p.replace(/\/$/, '')]) || 0);
+};
 for (const [kindKey, list] of [['articles', articles], ['assertions', assertions], ['papers', papers]]) {
   for (const it of list) {
-    it.visits = Math.max(0, Number(pageVisits[pathOf(kindKey, it.id)]) || 0);
+    it.visits = visitsOf(kindKey, it.id);
     it.heat = it.visits;   // 热度只认访客总量；没有数据时是 0，于是退化成按时间排
   }
 }

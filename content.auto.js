@@ -1,6 +1,6 @@
 /* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */
 window.AUTO = {
- "generated": "2026-10-11T07:48:23.518Z",
+ "generated": "2026-10-11T07:55:51.757Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",
@@ -37,10 +37,10 @@ window.AUTO = {
     "Markdown"
    ],
    "test": true,
-   "heat": 0,
+   "heat": 1,
    "body": "这一篇是**测试样例**：它故意把 Markdown、LaTeX、HTML 混在一起，用来检查渲染管线。删掉\n`content/articles/2026-10-11-test-markdown.md` 这篇文章就会消失。\n\n## 一、Markdown 基础\n\n**粗体**、*斜体*、~~删除线~~、行内代码 `const answer = 42`，以及一个[站外链接](https://okmij.org/ftp/)（样式参考的就是这一页的 Index）。\n\n无序列表：\n\n- 第一项\n- 第二项\n  - 嵌套项\n  - 另一个嵌套项\n- 第三项\n\n有序列表：\n\n1. 先做这个\n2. 再做那个\n3. 最后检查\n\n任务列表：\n\n- [x] 把文件拖进 `content/articles/`\n- [x] 让它出现在索引里\n- [ ] 检查完把自己的文章也丢进来\n\n> 引用块：排序 = 先热度（front matter 的 `heat`，作品用星数快照），后时间。\n\n表格：\n\n| 板块 | 投递目录 | 格式 |\n| --- | --- | --- |\n| 文章 | `content/articles/` | md / html / tex / txt |\n| 断言 | `content/assertions/` | 同上 |\n| 学术 | `content/papers/` | 同上 |\n| 照片 | `inbox/photos/`（gitignore） | jpg / png / webp / heic |\n| 音乐 | `assets/music/` | mp3 / wav / m4a / flac |\n\n代码块：\n\n```js\n// 代码块内容会被转义，不会被当成 HTML\nconst ridge = (x) => 606 - x * 0.2;\nconsole.log(`\u003c/script> 这种文本也不会破坏页面`);\n```\n\n## 二、LaTeX\n\n行内公式：质能方程 $E = mc^2$，求和 $\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$，矩阵\n$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$。\n\n独立公式：\n\n$$\n\\int_{-\\infty}^{\\infty} e^{-x^2}\\,\\mathrm{d}x = \\sqrt{\\pi}\n$$\n\n$$\n\\hat{H}\\psi = -\\frac{\\hbar^2}{2m}\\nabla^2\\psi + V\\psi = E\\psi\n$$\n\n## 三、原始 HTML\n\n下面这段是直接写进 Markdown 的 HTML，应该照原样渲染：\n\n\u003cdiv style=\"border:1px solid #b9cdf2;border-radius:10px;padding:12px 14px;background:#f2f7ff\">\n  \u003cb>HTML 块\u003c/b>：可以放任意布局，\u003cmark>高亮\u003c/mark>、\u003ccode>代码\u003c/code>、自定义颜色都行。\n\u003c/div>\n\n\u003cdetails>\n  \u003csummary>点开看折叠内容\u003c/summary>\n  折叠里也是一段 HTML，用来验证 \u003ccode>&lt;details&gt;\u003c/code> 能正常用。\n\u003c/details>\n\n\u003cscript>window.__xss_probe = 1;\u003c/script>\n\u003cp>上面那行 \u003ccode>&lt;script&gt;\u003c/code> 会被清洗掉（打开控制台输入 \u003ccode>window.__xss_probe\u003c/code> 应该是 \u003ccode>undefined\u003c/code>）。\u003c/p>\n\n## 四、图片\n\n![首页那张雪山](assets/mountain.jpg)\n\n渲染到这里说明 Markdown、LaTeX、HTML、图片、代码块都通了。",
    "summary": "一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。",
-   "visits": 0
+   "visits": 1
   },
   {
    "id": "test-plain",
@@ -176,7 +176,7 @@ window.AUTO = {
    "title": "测试样例 · 四秒琶音",
    "artist": "x1shang（合成音，仅作检查用）",
    "date": "2026-10-11",
-   "lyrics": "[00:00.00]（测试样例 · 四秒琶音）\n[00:00.80]第一个音落下\n[00:01.30]像雪线之上的风\n[00:02.00]第二个音跟着走\n[00:02.60]把想法轻轻托起\n[00:03.20]播放器、歌词、进度条都在工作\n",
+   "lyrics": "[00:00.00]（测试样例 · 四秒琶音）\r\n[00:00.80]第一个音落下\r\n[00:01.30]像雪线之上的风\r\n[00:02.00]第二个音跟着走\r\n[00:02.60]把想法轻轻托起\r\n[00:03.20]播放器、歌词、进度条都在工作\r\n",
    "tags": [
     "测试样例",
     "音乐"

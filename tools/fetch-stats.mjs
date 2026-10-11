@@ -127,17 +127,21 @@ async function apiPages() {
   return { pages: out, total: num(data.total) || null };
 }
 
-/** 没 token：逐页问公开计数端点（需要后台打开 “Allow adding visitor counts on your website”） */
+/** 没 token：逐页问公开计数端点（需要后台打开 “Allow adding visitor counts on your website”）
+ *  注意 GoatCounter 存的路径会把结尾斜杠去掉（/articles/foo），所以两种写法都试一次。 */
 async function counterPages() {
   const out = {};
   for (const p of await knownPaths()) {
-    try {
-      const data = await getJson(`${BASE}/counter/${encodeURIComponent(p)}.json`);
-      out[p] = num(data.count);
-    } catch {
-      out[p] = 0;
+    for (const cand of [p, p.replace(/\/$/, '')]) {
+      try {
+        const data = await getJson(`${BASE}/counter/${encodeURIComponent(cand)}.json`);
+        out[p] = num(data.count);
+        break;
+      } catch {
+        if (cand === p.replace(/\/$/, '')) out[p] = 0;
+      }
+      await new Promise((r) => setTimeout(r, 120));
     }
-    await new Promise((r) => setTimeout(r, 120));
   }
   return out;
 }

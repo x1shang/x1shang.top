@@ -118,13 +118,13 @@ async function knownPaths() {
   }
 }
 
-/** 有 token：一次 API 调用就能拿到所有路径的历史总量（limit=100 够个人站用） */
+/** 有 token：一次 API 调用就能拿到所有路径的历史总量（limit=100 够个人站用）；顺便带回站点总访客 */
 async function apiPages() {
   const url = `${BASE}/api/v0/stats/hits?start=2000-01-01T00:00:00Z&end=${encodeURIComponent(new Date().toISOString())}&limit=100`;
   const data = await getJson(url, { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` });
   const out = {};
   for (const hit of data.hits ?? []) if (hit.path) out[hit.path] = num(hit.count);
-  return out;
+  return { pages: out, total: num(data.total) || null };
 }
 
 /** 没 token：逐页问公开计数端点（需要后台打开 “Allow adding visitor counts on your website”） */
@@ -156,6 +156,7 @@ function demo() {
 let source;
 let series;
 let pages = {};
+let allTimeFromApi = null;
 if (DEMO) {
   source = 'demo';
   series = demo();
@@ -169,7 +170,9 @@ if (DEMO) {
 } else if (TOKEN) {
   source = 'goatcounter-api';
   series = await fromApi();
-  pages = await apiPages();
+  const r = await apiPages();
+  pages = r.pages;
+  allTimeFromApi = r.total;
 } else {
   source = 'goatcounter-counter';
   console.log(`[stats] 没给 token，走公开计数端点逐日取 ${DAYS} 天 + 逐页取总量（较慢）…`);
@@ -178,7 +181,7 @@ if (DEMO) {
 }
 
 const total = series.reduce((s, x) => s + x.n, 0);
-const allTime = DEMO ? total : await fetchAllTime();
+const allTime = DEMO ? total : (allTimeFromApi ?? await fetchAllTime());
 const payload = {
   source,
   site: BASE ? `${BASE}/` : '',

@@ -60,7 +60,7 @@
     ['music', '音乐', 'Music'], ['friends', '友链', 'Friends'], ['about', '关于', 'About'],
   ];
   /** 作品不再由本站承载：侧栏「作品」直接外链到导航页（磁贴 + 作品区都在那边） */
-  const WORKS_URL = 'https://xn--vnqp08bwj8a.xn--0iv.gay/';
+  const WORKS_URL = 'https://navi.x1shang.top/';
   const NAV = [
     ['home', '主页'], ['academic', '学术'], ['articles', '文章'], ['assertions', '断言'],
     ['__works', '作品'], ['photography', '摄影'], ['music', '音乐'], ['friends', '友链'], ['about', '关于'],

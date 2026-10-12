@@ -22,8 +22,8 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // 默认目标 = 工作区里的导航页仓库（x1shang/tools/../../site）
 const SITE = path.resolve(process.argv[2] ?? process.env.SITE_DIR ?? path.join(HERE, '..', '..', 'site'));
-const TITLE = process.env.SITE_TITLE ?? '我们都.是.gay';
-const HOST = process.env.SITE_HOST ?? 'xn--vnqp08bwj8a.xn--0iv.gay';
+const TITLE = process.env.SITE_TITLE ?? 'x1shang 的导航页';
+const HOST = process.env.SITE_HOST ?? 'navi.x1shang.top';
 const OUT = process.env.SITE_OUT ?? 'all.html';
 const SKIP = new Set(['index.html', '404.html', OUT.toLowerCase()]);
 

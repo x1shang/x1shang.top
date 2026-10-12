@@ -14,6 +14,8 @@
  *   content/friends/**    友链（站长手写，直接算已通过）
  *   content/about.md      关于页正文
  *   assets/music/**       音乐     .mp3 .wav .m4a .ogg .opus .flac（同名 .lrc 作歌词，.md/.json 作元数据）
+ *   assets/music/**       网易云曲目  只写 netease: <歌曲ID> 的 .md/.json（没有同名音频文件的那种）；
+ *                                   元数据 / 歌词 / 有没有直链由 tools/fetch-netease.mjs 在构建期抓一次
  *   assets/photos/manifest.json    照片流水线产物
  *
  * 输出：
@@ -26,6 +28,7 @@ import { readdir, readFile, stat, writeFile, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { resolveNetease, outerUrl, isSongId } from './fetch-netease.mjs';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const argv = process.argv.slice(2);
@@ -218,6 +221,62 @@ async function collectMusic(dir) {
   return rows;
 }
 
+/* ------------------------------------------------- 网易云曲目（只写 ID，不用下载音频）
+   放进 assets/music/ 的 .md/.json，只要 front matter 里有 `netease: <歌曲ID>` 且**没有同名音频文件**，
+   就当成一首站外曲目：元数据 / 歌词 / 能不能直链由 tools/fetch-netease.mjs 在构建期抓一次（缓存进仓库），
+   播放时浏览器直接走网易云公开外链（<audio> 不需要 CORS，302 的 http 目标浏览器会自动升级成 https）。
+   想换成自己的音频：把 .mp3 放进来、删掉 netease 那行即可。 */
+async function collectNetease(dir, taken) {
+  let files = [];
+  try { files = (await walk(dir)).filter((f) => /\.(md|markdown|json|txt)$/i.test(f)); } catch { return []; }
+  const entries = [];
+  for (const file of files.sort()) {
+    const ext = path.extname(file);
+    const stem = file.slice(0, -ext.length);
+    if ([...AUDIO_EXT].some((a) => existsSync(stem + a))) continue;   // 这是某首歌的 sidecar，交给 collectMusic
+    const raw = await readFile(file, 'utf8');
+    const meta = ext.toLowerCase() === '.json' ? await readJson(file, {}) : parseFrontMatter(raw).data;
+    const neteaseId = String(meta.netease || '').trim();
+    if (!isSongId(neteaseId)) continue;
+    entries.push({ file, stem, meta, neteaseId });
+  }
+  if (!entries.length) return [];
+
+  const { songs } = await resolveNetease(entries.map((e) => e.neteaseId), { log });
+  const rows = [];
+  for (const { file, stem, meta, neteaseId } of entries) {
+    const snap = songs.get(neteaseId) || {};
+    const name = path.basename(stem);
+    const st = await stat(file);
+    let id = String(meta.id || slugify(name));
+    let n = 2;
+    while (taken.has(id)) id = `${slugify(name)}-${n++}`;
+    taken.add(id);
+    // 直链是构建期探测的；front matter 里写 playable: true/false 可以手动覆盖
+    const playable = typeof meta.playable === 'boolean' ? meta.playable : snap.playable !== false;
+    rows.push({
+      id,
+      src: playable ? outerUrl(neteaseId) : '',
+      title: String(meta.title || snap.title || name),
+      artist: String(meta.artist || snap.artist || ''),
+      album: String(snap.album || ''),
+      cover: String(meta.cover || snap.cover || ''),
+      date: normDate(meta.date) || isoDay(st.mtime),
+      lyrics: String(meta.lyrics || snap.lrc || ''),
+      tags: Array.isArray(meta.tags) ? meta.tags : [],
+      test: meta.test === true,
+      heat: Math.max(0, Number(meta.heat ?? meta.likes) || 0),
+      netease: neteaseId,
+      remote: true,
+      playable,
+      bytes: 0,
+    });
+  }
+  const blocked = rows.filter((r) => r.playable === false).length;
+  if (blocked) log(`   ↳ 其中 ${blocked} 首网易云不给直链（VIP / 独家 / 无版权），页面上标成「无直链」`);
+  return rows;
+}
+
 /* ------------------------------------------------------------------ 主流程 */
 
 if (WITH_PHOTOS) runPhotos();
@@ -238,7 +297,9 @@ const articles = await collectText('articles', path.join(ROOT, 'content/articles
 const assertions = await collectText('assertions', path.join(ROOT, 'content/assertions'), seenIds);
 const papers = await collectText('papers', path.join(ROOT, 'content/papers'), seenIds);
 const friendsFile = await collectText('friends', path.join(ROOT, 'content/friends'), seenIds);
-const tracks = await collectMusic(path.join(ROOT, 'assets/music'));
+const localTracks = await collectMusic(path.join(ROOT, 'assets/music'));
+const remoteTracks = await collectNetease(path.join(ROOT, 'assets/music'), new Set(localTracks.map((t) => t.id)));
+const tracks = [...localTracks, ...remoteTracks].sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
 let about = '';
 const aboutFile = path.join(ROOT, 'content/about.md');

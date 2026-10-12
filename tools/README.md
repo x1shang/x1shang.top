@@ -16,6 +16,8 @@
 | `build-photos.py` | 照片流水线（Pillow）：EXIF 摆正、剥元数据、缩到 2000px、转 WebP + 缩略图 | `npm run photos` |
 | `check.mjs` | 个人站自检：语法 / 内容包 / 页面引用 / 订阅源 / 纯静态性 / OG / robots / sitemap / stats | `npm run check` |
 | `fetch-stats.mjs` | 抓访客量写 `stats.json`（关于页最下方那张图的数据源） | `npm run stats`（需 `GOATCOUNTER_SITE`，见脚本头注释） |
+| `fetch-netease.mjs` | 网易云曲目：把 `assets/music/` 里 `netease: <歌曲ID>` 的条目抓成快照（标题/歌手/专辑/封面/LRC/有没有直链），缓存进 `tools/netease-cache.json`；`build-content.mjs` 会自动调用它 | `npm run netease`（= `--all --refresh`）或 `node tools/fetch-netease.mjs <ID>` |
+| `import-netease-list.mjs` | 批量导入：把一份 `- [x] 歌名 歌手` 的 markdown 歌单清单，逐行匹配网易云 → 探测有没有直链 → 生成 `assets/music/*.md`（先 `--dry` 看匹配结果）。**推荐配 `--playlist <歌单ID>`**：先拉歌单再本地比对，精确且不受限流；不带则退回逐行搜索（网易云限流很凶）。带断点缓存 | `node tools/import-netease-list.mjs "<清单.md>" --playlist 6804342424 --dry` |
 | `check-site.mjs` | 导航页上线前体检：内联 script 语法 + 本地引用是否存在 | `npm run check:site` |
 | `check-layout.mjs` | 导航页磁贴排版校验（无重叠 / 不越界 / 铺满）：喂它一份 headless 导出的 DOM | `node tools/check-layout.mjs dump.html` |
 | `build-index.mjs` | 扫目录生成导航页的 `site/all.html` 清单页（**不会**动手写的 `index.html`） | `npm run index` |

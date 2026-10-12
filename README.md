@@ -18,7 +18,7 @@ stats.json         访客快照：日序列（关于页那张图）+ 按页总�
 content/           文字投递箱：articles/ assertions/ papers/ friends/ + about.md
 inbox/photos/      照片投递箱（gitignore，原始大图不进仓库，可建相册子目录）
 assets/photos/     照片产物：压缩后的 WebP + manifest.json（提交）
-assets/music/      音乐：音频 + 同名 .lrc 歌词 + 同名 .md/.json 元数据
+assets/music/      音乐：音频 + 同名 .lrc 歌词 + 同名 .md/.json 元数据；只写 netease: <歌曲ID> 的 .md = 网易云外链曲目（见下文「音乐」）
 assets/og-cover.jpg  分享卡片封面（1200×630，别改比例）
 .github/workflows/  stats.yml：每天定时刷新 stats.json
 tools/             serve / build-content / build-photos / check / fetch-stats + 运维脚本（详见 tools/README.md）
@@ -44,6 +44,7 @@ npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在
 #    content/articles|assertions|papers|friends/*.md|.html|.tex|.txt
 #    inbox/photos/*.jpg        ← 原图不入库，压缩后的 WebP 进 assets/photos/
 #    assets/music/*.mp3        ← 同名 .lrc 自动当歌词
+#    assets/music/*.md         ← 只写 netease: <歌曲ID>（没有同名音频）就是一首网易云外链曲目
 # 2) 重建
 npm run build                  # = content.auto.js + feed/atom + sitemap + 预渲染页 + 照片流水线
 # 3) 提交并推送（GitHub Pages 一分钟内自动刷新）
@@ -84,20 +85,56 @@ git add -A && git commit -m "更新内容" && git push
 
 页面底部常驻一条命令行（`> ` 开头）：按 `/` 或 `>` 聚焦，↑↓ 选择，Enter 打开，Esc 收起；检索范围包含标题、正文、摘要、标签、照片说明、音乐、友链。支持前缀过滤：`文章: 关键词`、`摄影: 山`、`music: 山`（中英文前缀与 `kind:` 都可以）。检索状态会写进地址栏（`#search/关键词`），可分享。
 
-## 音乐（含网易云评估）
+## 音乐（本地文件 + 网易云外链）
 
-自己放文件最省心：音频丢进 `assets/music/`，同名 `.lrc` 自动当歌词（播放器支持切歌、进度拖动、歌词同步滚动、刷新后重新播放）。
+两种加法，想用哪种就用哪种：
 
-关于「从网易云导入歌单」，实测结论（2026-10-11 在本机验证）：
+**① 自己的音频**（最省心、最稳）：音频丢进 `assets/music/`，同名 `.lrc` 自动当歌词、同名 `.md`/`.json` 提供标题与作者。
 
-| 能力 | 结论 |
-| --- | --- |
-| 歌单元数据（曲目 / 歌手 / 专辑 / 封面） | ✅ 公开歌单可用：`music.163.com/api/v6/playlist/detail?id=<歌单ID>` 返回 200 JSON，无需登录；可以做成构建时快照 |
-| 歌词 | ✅ 可用：`music.163.com/api/song/lyric?id=<歌曲ID>&lv=1&kv=1&tv=-1` 返回 200 LRC；但它没有 CORS 头，**只能构建时抓**，不能在浏览器里实时取 |
-| 音频直链播放 | ❌ 已失效：`music.163.com/song/media/outer/url?id=<ID>.mp3` 现在 302 到 `music.163.com/404`（返回 107 KB 的 HTML 错误页），参考系（我站）与空 Referer 都一样；VIP / 独家曲目本来也不给直链 |
-| 官方外链播放器 | ⚠️ 可用但不理想：`music.163.com/outchain/player?type=2&id=<ID>&auto=0&height=66` 返回 200，可以 iframe 嵌进静态页播放，但播放发生在网易云自己的 iframe 里——**拿不到播放进度，所以自己的歌词同步、进度条、切歌都用不了**，且 VIP 曲目只能试听 |
+**② 网易云曲目**（不用下载文件，加歌 = 写一行 ID）：
+在 `assets/music/` 里放一个**没有同名音频**的 `.md`，front matter 里写歌曲 ID 就行：
 
-所以：想要"我们这套播放器 + 同步歌词"的体验，请把音频文件给我（丢进 `assets/music/` 即可）；如果你接受"每首一个网易云官方小播放器 + 静态歌词（不同步）"，告诉我歌单链接，我按歌单快照 + 官方 iframe 的方式接。
+```yaml
+---
+netease: 1809646618          # 歌曲链接里 song?id= 后面那串数字
+date: 2026-10-12             # 可选；不写就用文件修改时间
+tags: [音乐]                 # 可选
+# title: / artist: / cover: / lyrics: 都可以手写，写了就盖掉抓来的值
+# playable: false            # 想强制标成「无直链」时用
+---
+```
+
+然后 `npm run build`（或 `npm run serve`）→ 构建期会自动抓标题 / 歌手 / 专辑 / 封面 / LRC 歌词，
+缓存进 `tools/netease-cache.json`（**进仓库**，所以离线、以及在海外机器上跑的 GitHub Actions 也能重建出一样的结果）。
+重新探测直链 / 刷新缓存：`npm run netease`。整站**仍然是纯静态**：没有任何接口、没有任何代理服务器。
+
+**③ 批量导入**（手上有一份歌单清单时）：
+`node tools/import-netease-list.mjs "<清单.md>" --playlist <歌单ID> --dry` —— 清单就是 `- [x] 歌名 歌手` 那种表
+（`- [ ]` 视为不要、标了「本地」的跳过）。给了歌单 ID 就**先拉一次歌单**拿到每首歌的 ID/歌名/歌手，
+再在本地跟清单逐行比对（比按名字搜准得多，也不吃搜索接口的限流）；不给歌单 ID 就退回搜索匹配。
+确认无误去掉 `--dry` 真写，加 `--extra` 还能把歌单里清单没写到的可播曲目一并导进来。
+
+### 网易云接入的实测结论（2026-10-12 复核，推翻第 5 轮的旧结论）
+
+第 5 轮记的「音频直链已失效」是**误判**：当时大概拿到的是周杰伦这类没有版权的歌（`song?id=186016` 正好 302 到
+`music.163.com/404`，返回 107 KB 的 HTML 错误页），于是把"这首歌没直链"当成了"这个接口坏了"。
+
+| 能力 | 结论 | 怎么用 |
+| --- | --- | --- |
+| 歌曲元数据 | ✅ 公开接口、不用登录：`music.163.com/api/song/detail/?id=<ID>&ids=[<ID>]` 返回 200 JSON（歌名 / 歌手 / 专辑 / 封面 picUrl）；**没有 CORS 头**，浏览器里 fetch 会被拦 | 构建期抓，`tools/fetch-netease.mjs` |
+| 歌词 | ✅ `music.163.com/api/song/lyric?id=<ID>&lv=-1&kv=-1&tv=-1` 返回 200 LRC；同样**没有 CORS 头** | 构建期抓，同上 |
+| 音频直链播放 | ✅ **能用**（前提是这首歌网易云自己有版权）：`music.163.com/song/media/outer/url?id=<ID>.mp3` → 302 → CDN `m7xx.music.126.net/...mp3`，支持 Range（可拖动进度）。VIP / 独家 / 无版权曲目才会 302 到 `/404` | `<audio src="…outer/url…">` 直接用；播放不需要 CORS |
+| http 跳转会不会被拦 | ✅ 不会：302 的目标虽然是 `http://`，但浏览器会把 https 页面里的这类"被动混合内容"**自动升级成 https** 再请求（本机在 https 页面上实测：`REQ -> https://m801.music.126.net/…`，`206`，正常出声）。构建期探测与运行时都不需要特殊处理 | — |
+| 歌单元数据 | ✅ `music.163.com/api/v6/playlist/detail?id=<歌单ID>` 返回 200 JSON，无需登录，可做构建时快照 | 暂时没做，需要就说 |
+| 官方外链播放器 | ⚠️ 可用但不理想：`music.163.com/outchain/player?type=2&id=<ID>&auto=0&height=66` 能 iframe 嵌入，但播放发生在网易云自己的 iframe 里，**拿不到进度**，自己的进度条 / 歌词同步 / 切歌都用不了 | 不用 |
+
+已知限制（写在这里免得以后当成 bug）：
+
+- **只有非 VIP 曲目有直链**。VIP / 独家 / 无版权（例如周杰伦整条线）网易云不签发直链，构建期会标记，
+  列表里显示「网易云 · 无直链（VIP / 独家 / 无版权）」，点它不会假装能播。
+- 直链的签名参数（`vuutv=`）每次请求都会变、**可能会过期**，所以站点**不缓存直链**，每次播放都重新走一次外链接口拿新的。
+- 封面图是网易云 CDN 上的原图（可能 1 MB 上下），只在播放器里按需加载当前这一首。
+- 海外访客、以及网易云改接口都可能让外链失效；真要"永远能听"，还是把音频文件放进 `assets/music/`。
 
 ## 测试样例
 
@@ -106,7 +143,24 @@ git add -A && git commit -m "更新内容" && git push
 - 文章 4 篇（Markdown+LaTeX+HTML 混排 / 纯 HTML / `.tex` / 纯文本）
 - 断言 2 则、学术 1 篇、友链 1 条
 - 照片 2 张（`inbox/photos/test-sample-01.jpg` 带 sidecar；`inbox/photos/2026-test-album/test-sample-02.png` 验证相册与格式转换）
-- 音乐 1 首（`assets/music/test-sample.wav` + `.lrc` + `.md`）
+- 音乐 0 首（原来的 `test-sample.wav/.lrc/.md` 与 `test-netease.md` 两个音乐样例 **2026-10-12 已删**；`assets/music/` 里现在都是真歌）
+
+> 注意 `assets/music/` 里现在都是**真歌**：`我喜欢的音乐` 歌单导进来的 51 首（一行 `netease: <ID>` 的 .md）
+> 加 5 首本地音频（`夏目.mp3` / `life.mp3` / `灯火里的中国.mp3` / `波斯序曲.mp3` / `帕格尼尼随想曲_第24号.mp3`）。
+> 本地那几首是用户在 `E:\SJTU2026\threebody\gay\` 放的 wav/flac，用 ffmpeg 转成 VBR mp3 进仓库
+> （原文件 82/57/42/13.5 MB → 9.5/5.5/5.1/4.1 MB，原始 wav/flac 没进仓库）。
+
+## 分享（国内社媒）
+
+文章与论文的详情页**最下方**有一个「复制标题与链接」按钮：点一下把 `标题 + 换行 + 真实路径链接`
+写进剪贴板（正文里那句提示写在按钮旁边），按钮短暂变成「已复制 ✓」。
+
+- 为什么不做"分享到微博/微信"：国内平台基本不读 OG 卡片，硬跳分享页反而更麻烦；复制粘贴最通用。
+- 链接用的是 `content.js` 里 `site.url` + 预渲染的真实路径（`/articles/<id>/`、`/academic/<id>/`），
+  所以分享出去的是爬虫也认的地址，不是 `#` 哈希路由。
+- 实现：`app.js` 的 `shareBar()` + `render()` 末尾挂载（**站内 SPA 与预渲染页都会出现**，因为预渲染页也被 `app.js` 接管）；
+  复制优先用 `navigator.clipboard`（https/localhost 才有），失败退回 `textarea + execCommand`，`http` 与 `file://` 双击也能用。
+- 断言（`assertions`）暂时没加，要的话在 `render()` 那一行的判断里加上 `currentPage === 'assertions'` 即可。
 
 ## 分享卡片 / 爬虫 / 访客统计（2026-10-11 加）
 
@@ -125,7 +179,15 @@ git add -A && git commit -m "更新内容" && git push
   ⚠️ **国内网络注意**：GoatCounter 的静态资源在 `*.zgo.at` 上，而这个域在国内被 **DNS 污染**（`static.zgo.at` / `gc.zgo.at` 都解析不出来）。两个后果：
   1. 后台页面里 **Token 列的 `show` 按钮点了没反应**（那按钮靠 `static.zgo.at/backend.js`）——token 其实就写在 HTML 里：在该页按 `Ctrl+U` 查看源代码，搜 `data-show`，引号里那串就是。
   2. 官方文档给的计数脚本 `//gc.zgo.at/count.js` 在国内访客那里也加载不出来。所以本站 `index.html` 里用的是 **`//static.goatcounter.com/count.js`**（同一个脚本的可达镜像，2026-10-11 实测 200）；别再改回 `gc.zgo.at`。
-- **Cloudflare Web Analytics**（可选，给自己看趋势、无 cookie）：`index.html` 末尾已插好官方 beacon，token 还是占位符 `REPLACE_WITH_CF_BEACON_TOKEN`，去 CF 后台 → Web Analytics → Add a site 建好再替换。
+- **Cloudflare Web Analytics**（可选，给自己看趋势、无 cookie）：`index.html` 末尾**脚本已插好但 token 还是占位符** `REPLACE_WITH_CF_BEACON_TOKEN`
+  —— 也就是说**目前并没有在记数据**，`npm run check` 会一直提醒。要用：CF 后台 → Web Analytics → Add a site（hostname 填 `x1shang.top`）→ 把给的 token 换掉那串占位符。
+  ⚠️ 别把它和**关于页最下方那张访客图**搞混：那张图的数据来自 **GoatCounter**（`tools/fetch-stats.mjs` 抓进 `stats.json`，`build-content.mjs` 读它算文章热度），跟 CF 完全无关。
+  CF 只是"另一个后台视角"，换掉 token 也不会让那张图变。
+
+- **访客图怎么刷新**：`.github/workflows/stats.yml` 每天 03:17 UTC 用仓库 Secrets（`GOATCOUNTER_SITE` / `GOATCOUNTER_TOKEN`）跑一次
+  `fetch-stats.mjs` → 重建 `content.auto.js` → 有变化才提交。**本地没 token 是刷不出来的**：
+  2026-10-12 实测，不带 token 走公开计数端点会全部返回 0（还会把 `stats.json` 里已有的真实数据刷没）。
+  所以 `fetch-stats.mjs` 现在有护栏：这种模式下若新数据全空而旧数据非空，**拒绝写入**并提示（真要清零加 `--force`）。
 
 ## 部署（GitHub Pages 等静态托管）
 
@@ -138,5 +200,5 @@ git add -A && git commit -m "更新内容" && git push
 
 - 照片：GIF/多帧图只取首帧；`.heic` 需要 Pillow 带 libheif（本机无）；`.avif` 取决于 Pillow 版本；原始照片目录不进仓库，换机器要重新投递原图
 - 照片的 `id` 只跟源文件路径走（稳定），产物文件名带内容哈希（缓存失效），重新编码不影响排序
-- 音乐播放需要由访客点击开始；外部音乐链接可能因跨域或防盗链无法播放
+- 音乐播放需要由访客点击开始；本地音频与网易云外链都是浏览器直接取，站点本身不代理任何流量。网易云只对**非 VIP / 非独家**曲目签发直链（构建期会探测并标注），且接口随时可能变
 - KaTeX / Google Fonts 走 CDN，离线时分别回退到原始 TeX 文本与系统字体

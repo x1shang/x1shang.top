@@ -1,0 +1,11 @@
+---
+# 导入自《我喜欢的音乐_无需VIP.md》第 70 行：战殇-The War 猎豹游戏-Cheetah Mobile Games
+# heat 只用于排序（越大越靠前），用 1000 - 清单行号："本地音频"那几首也按同一把尺子插回歌单位置。
+netease: 1464845040
+date: 2026-10-12
+tags: [音乐, 我喜欢的音乐]
+heat: 930
+---
+
+标题 / 歌手 / 专辑 / 封面 / 歌词都在构建期从网易云抓，缓存在 `tools/netease-cache.json`。
+播放走公开外链 `music.163.com/song/media/outer/url?id=1464845040.mp3`（纯静态，无后端）。

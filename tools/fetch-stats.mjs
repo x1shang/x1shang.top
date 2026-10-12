@@ -47,11 +47,28 @@ const num = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-async function getJson(url, headers) {
-  const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${url}`);
-  return res.json();
+async function getJson(url, headers, opts = {}) {
+  const tries = opts.tries ?? 1;
+  const retryStatuses = opts.retry ?? [408, 429, 500, 502, 503, 504];
+  let last;
+  for (let i = 1; i <= tries; i++) {
+    try {
+      const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
+      if (res.ok) return res.json();
+      last = new Error(`${res.status} ${res.statusText} — ${url}`);
+      if (i === tries || !retryStatuses.includes(res.status)) throw last;
+    } catch (e) {
+      last = e;
+      if (i === tries) throw e;
+    }
+    console.log(`[stats] 第 ${i} 次没成功（${String(last.message).slice(0, 60)}），${i * 2}s 后重试`);
+    await new Promise((r) => setTimeout(r, i * 2000));
+  }
+  throw last;
 }
+
+/** API 调用统一带重试：GoatCounter 托管实例偶尔瞬时抽风（同一请求先 404/401、几秒后 200） */
+const API_RETRY = { tries: 3, retry: [404, 408, 429, 500, 502, 503, 504] };
 
 /** 模式 1：API + token，一次拿到逐日访客数 */
 async function fromApi() {
@@ -61,7 +78,7 @@ async function fromApi() {
   const data = await getJson(url, {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${TOKEN}`,
-  });
+  }, API_RETRY);
   const acc = new Map(dayList.map((d) => [d, 0]));
   for (const hit of data.hits ?? []) {
     for (const st of hit.stats ?? []) {
@@ -121,7 +138,7 @@ async function knownPaths() {
 /** 有 token：一次 API 调用就能拿到所有路径的历史总量（limit=100 够个人站用）；顺便带回站点总访客 */
 async function apiPages() {
   const url = `${BASE}/api/v0/stats/hits?start=2000-01-01T00:00:00Z&end=${encodeURIComponent(new Date().toISOString())}&limit=100`;
-  const data = await getJson(url, { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` });
+  const data = await getJson(url, { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` }, API_RETRY);
   const out = {};
   for (const hit of data.hits ?? []) if (hit.path) out[hit.path] = num(hit.count);
   return { pages: out, total: num(data.total) || null };
@@ -201,8 +218,22 @@ const withData = Object.values(pages).filter((n) => n > 0).length;
 // 数据没变就不动文件（updated 是每次都变的，不参与比较）——免得住低流量站点每天白提交一次
 const stable = (s) => JSON.stringify(JSON.parse(s || '{}', (k, v) => (k === 'updated' ? '' : v)));
 const prev = await readFile(OUT, 'utf8').catch(() => '');
+/* 防误伤：**没 token** 的公开计数端点模式，在国内/未开启后台开关时常常全返回 0 ——
+   2026-10-12 实测：本地 `npm run stats`（无 token）把 10-11 抓到的真实数据（total=1、daily 有值）
+   整个刷成 0，等于把好数据删了。所以：这种模式下若新数据全空而旧数据非空，就拒绝写入。
+   确实想清零（比如站点真没人来了）就加 --force。 */
+const allZero = (p) => (p.series || []).every((x) => !x.n) && !Object.values(p.pages || {}).some((n) => n > 0);
+let prevPayload = null;
+try { prevPayload = JSON.parse(prev); } catch { /* 没有旧文件 / 旧文件坏了 */ }
+const wouldWipe = !DEMO && !TOKEN && source !== 'demo'
+  && allZero(payload) && prevPayload && !allZero(prevPayload)
+  && !args.includes('--force');
 if (prev && stable(prev) === stable(next)) {
   console.log('[stats] 数据与上次一致，保持原文件不动（不会产生提交）。');
+} else if (wouldWipe) {
+  console.log(`[stats] ⚠️  公开计数端点这次全返回 0，而 ${path.basename(OUT)} 里还有真实数据` +
+    `（total=${prevPayload.total ?? '?'}）——**保持原文件不动**，免得把好数据刷没。`);
+  console.log('        要确认站点真的没人来了，加 --force 重跑；更靠谱的是给 GOATCOUNTER_TOKEN（见脚本头注释）。');
 } else {
   await writeFile(OUT, next, 'utf8');
   console.log(`✅ 已写入 ${OUT}：source=${source}，近 ${DAYS} 天 ${total} 位访客` + (allTime === null ? '' : `，累计 ${allTime}`));

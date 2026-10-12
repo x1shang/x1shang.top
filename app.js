@@ -243,6 +243,57 @@
   const runLink = (href, label, extra = '') => `<a href="${safe(href)}"${extra}>${esc(label)}</a>`;
   const joinRun = (rows, fallback) => rows.length ? rows.join('<span class="dot">·</span>') : `<span class="meta">${fallback}</span>`;
 
+  /* 音乐：本地音频用仓库里的文件；只写了网易云 ID 的曲目走公开外链
+     （music.163.com/song/media/outer/url?id=<ID>.mp3，302 到 CDN，浏览器会自动把 http 目标升级成 https）。
+     能不能播是 tools/fetch-netease.mjs 在构建期探好的：playable === false 就是网易云不给直链。 */
+  const neteaseOuter = (id) => `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(String(id).trim())}.mp3`;
+  const trackSrc = (t) => (t && (t.src || (t.netease && t.playable !== false ? neteaseOuter(t.netease) : ''))) || '';
+
+  /* 分享：国内社媒（微信/QQ/小红书/微博正文）基本不读 OG 卡片，所以不走"分享到 X"那套，
+     只做一件事——点一下把「标题 + 链接」复制到剪贴板，用户自己粘。文章与论文的详情页末尾各一个。
+     站内 SPA 与预渲染的真实路径页共用这段逻辑（预渲染页也会被 app.js 接管）。 */
+  function shareBar(kind, id) {
+    const it = (kind === 'academic' ? C.papers : C.articles).find((x) => String(x.id) === id);
+    if (!it) return '';
+    const dir = kind === 'academic' ? 'academic' : 'articles';
+    const base = ((A.site && A.site.url) || location.origin).replace(/\/$/, '');
+    const url = `${base}/${dir}/${encodeURIComponent(id)}/`;
+    return `<div class="share" data-share data-title="${esc(it.title || id)}" data-url="${esc(url)}">
+      <button type="button" class="share-btn" data-share-btn>复制标题与链接</button>
+      <span class="share-note">有意思的想法值得分享</span>
+    </div>`;
+  }
+
+  /** 复制到剪贴板：先走异步 API（https / localhost 才有），失败退回 textarea + execCommand（http、file:// 也能用） */
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+    } catch { /* 落到下面的兜底 */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-1000px;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch { return false; }
+  }
+
+  async function onShareClick(box) {
+    const btn = box.querySelector('[data-share-btn]');
+    const text = `${box.dataset.title}\n${box.dataset.url}`;
+    const ok = await copyText(text);
+    if (!btn) return;
+    btn.textContent = ok ? '已复制 ✓' : '复制失败，请手动选择';
+    btn.classList.toggle('is-done', ok);
+    clearTimeout(btn._shareTimer);
+    btn._shareTimer = setTimeout(() => { btn.textContent = '复制标题与链接'; btn.classList.remove('is-done'); }, 1800);
+  }
+
   /* 首页：仿 okmij.org Index —— 三栏密集链接 */
   function home() {
     const articles = [...C.articles].sort(byHeatThenTime);
@@ -391,11 +442,16 @@
 
   function musicPage(detail) {
     const list = [...C.tracks].sort(byHeatThenTime);
-    const rows = list.length ? list.map((t, i) => `<div class="idx-item${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
+    const rows = list.length ? list.map((t, i) => {
+      const src = trackSrc(t);
+      const sub = [t.artist, t.album].filter(Boolean).join(' · ');
+      const note = [sub, t.netease ? (t.playable === false ? '网易云 · 无直链（VIP / 独家 / 无版权）' : '网易云外链') : '', t.test ? '测试样例' : ''].filter(Boolean).join(' · ');
+      return `<div class="idx-item${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
         <span class="rank">${String(i + 1).padStart(2, '0')}</span>
-        <button class="track" data-track="${esc(t.id)}" style="flex:1;border:0;padding:0"><span><strong>${esc(t.title)}</strong><small>${esc(t.artist || '')}${t.test ? (t.artist ? ' · ' : '') + '测试样例' : ''}</small></span><span class="track-play">${t.src ? '播放 ↗' : '暂无音频'}</span></button>
-        <span class="date">${esc(fmt(t.date))}</span></div>`).join('')
-      : empty('歌单，正在酝酿', '把音频放进 <code>assets/music/</code>（同名 .lrc 会自动当歌词）。');
+        <button class="track" data-track="${esc(t.id)}" style="flex:1;border:0;padding:0"><span><strong>${esc(t.title)}</strong><small>${esc(note)}</small></span><span class="track-play">${src ? '播放 ↗' : '暂无音频'}</span></button>
+        <span class="date">${esc(fmt(t.date))}</span></div>`;
+    }).join('')
+      : empty('歌单，正在酝酿', '把音频放进 <code>assets/music/</code>，或放一个只写 <code>netease: &lt;歌曲ID&gt;</code> 的 .md。');
     return head('music', '音乐') + rows + '<div id="lyrics" class="lyrics" aria-label="同步歌词"></div>';
   }
 
@@ -523,6 +579,10 @@
     else body = home();
 
     $('#main').innerHTML = body;
+    // 文章 / 论文详情页末尾挂一个"复制标题与链接"（预渲染页与站内 SPA 都会走到这里）
+    if (reading && (currentPage === 'articles' || currentPage === 'academic')) {
+      $('#main').insertAdjacentHTML('beforeend', shareBar(currentPage, detail));
+    }
     if (R.math) { try { R.math($('#main')); } catch { /* 公式渲染失败不影响阅读 */ } }
     if (currentPage === 'about') hydrateVisits();
     if (currentPage === 'music') {
@@ -547,6 +607,8 @@
 
   /* ------------------------------------------------------------------ 交互 */
   document.addEventListener('click', (e) => {
+    const shareBox = e.target.closest('[data-share]');
+    if (shareBox) { onShareClick(shareBox); return; }
     const shot = e.target.closest('[data-photo]');
     if (shot && !shot.closest('dialog')) { openPhoto(shot.dataset.photo); return; }
     const track = e.target.closest('[data-track]');
@@ -572,7 +634,7 @@
   $('#photo-dialog').addEventListener('click', (e) => { if (e.target === $('#photo-dialog')) e.target.close(); });
 
   /* ------------------------------------------------------------------ 音乐播放器 */
-  let activeTrack = -1, timedLyrics = [], lyricIndex = -1;
+  let activeTrack = -1, timedLyrics = [], lyricIndex = -1, failStreak = 0;
   const audio = $('#audio');
   function parseLrc(source) {
     const rows = [];
@@ -592,12 +654,18 @@
   function startTrack(index) {
     activeTrack = index;
     const t = C.tracks[index];
-    if (!t || !t.src) return;
-    audio.src = t.src;
+    const src = trackSrc(t);
+    if (!t || !src) return;
+    audio.src = src;
     audio.dataset.track = String(t.id);
     timedLyrics = parseLrc(t.lyrics);
     $('#player').hidden = false;
     $('#now-title').textContent = `${t.title}${t.artist ? ' · ' + t.artist : ''}`;
+    const cover = $('#now-cover');
+    if (cover) {
+      if (t.cover) { cover.src = t.cover; cover.hidden = false; }
+      else { cover.hidden = true; cover.removeAttribute('src'); }
+    }
     $('#now-lyric').textContent = '正在加载…';
     renderLyrics(); play();
   }
@@ -613,14 +681,32 @@
       $('#now-lyric').textContent = (timedLyrics[i] && timedLyrics[i].text) || '♪';
       $$('.lyric').forEach((el, k) => el.classList.toggle('current', k === i));
       const el = $(`[data-lyric="${i}"]`), box = $('#lyrics');
-      if (el && box) box.scrollTo({ top: el.offsetTop - box.offsetTop - box.clientHeight / 2 + el.clientHeight / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      if (el && box) {
+        // 把当前这句钉在歌词框正中：用 rect 差值算，别用 offsetTop（那是相对 offsetParent 的，
+        // 减去 box.offsetTop 会算成一个负数 → 每次都被夹到 0，于是永远钉在顶端）
+        const boxRect = box.getBoundingClientRect(), elRect = el.getBoundingClientRect();
+        box.scrollTo({
+          top: box.scrollTop + (elRect.top - boxRect.top) - box.clientHeight / 2 + elRect.height / 2,
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+        });
+      }
     }
   }
   audio.addEventListener('timeupdate', updateTime);
   audio.addEventListener('loadedmetadata', updateTime);
   audio.addEventListener('play', () => { $('#play-toggle').textContent = 'Ⅱ'; $('#play-toggle').setAttribute('aria-label', '暂停'); });
+  audio.addEventListener('playing', () => { failStreak = 0; });
   audio.addEventListener('pause', () => { $('#play-toggle').textContent = '▶'; $('#play-toggle').setAttribute('aria-label', '播放'); });
-  audio.addEventListener('error', () => { $('#now-lyric').textContent = '音频无法加载，请检查文件或链接'; });
+  audio.addEventListener('error', () => {
+    const t = C.tracks[activeTrack];
+    if (t && t.netease) {
+      // 网易云对 VIP / 独家 / 无版权曲目不签发直链（302 到 music.163.com/404）→ 提示并顺延，最多绕一圈
+      $('#now-lyric').textContent = '网易云没给这首歌直链（VIP / 独家 / 无版权），换下一首';
+      if (failStreak < C.tracks.length - 1) { failStreak++; setTimeout(() => startTrack((activeTrack + 1) % C.tracks.length), 1600); }
+    } else {
+      $('#now-lyric').textContent = '音频无法加载，请检查文件或链接';
+    }
+  });
   audio.addEventListener('ended', () => { if (C.tracks.length) startTrack((activeTrack + 1) % C.tracks.length); });
   $('#play-toggle').onclick = () => (audio.paused ? play() : audio.pause());
   $('#close-player').onclick = () => { audio.pause(); $('#player').hidden = true; };

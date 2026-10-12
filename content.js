@@ -13,7 +13,7 @@ window.SITE = {
   articles: [],    // { id, title, date, summary, body, format, tags }
   assertions: [],  // { id, date, body, format }
   photos: [],      // { id, src, thumb, title, date, location, tags }
-  tracks: [],      // { id, title, artist, src, date, lyrics }
+  tracks: [],      // { id, title, artist, src, date, lyrics }；网易云曲目由 assets/music/ 里只写 netease: <歌曲ID> 的 .md 自动生成
   friends: [],     // { name, url, description, date }
 
   // 作品清单不在这里：侧栏与首页的「作品」直接外链到站外导航页，

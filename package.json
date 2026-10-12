@@ -10,6 +10,7 @@
     "photos": "python tools/build-photos.py --inbox inbox/photos --out assets/photos --manifest assets/photos/manifest.json",
     "check": "node tools/check.mjs",
     "stats": "node tools/fetch-stats.mjs",
+    "netease": "node tools/fetch-netease.mjs --all --refresh",
     "index": "node tools/build-index.mjs",
     "check:site": "node tools/check-site.mjs",
     "layout": "node tools/check-layout.mjs",

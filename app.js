@@ -94,12 +94,16 @@
     .map((x) => fmt(x.date)).filter(Boolean).sort().pop() || fmt(A.recent) || fmt(new Date());
 
   /**
+   * 排序：① 测试样例（front matter `test: true`）**永远置底**；② 再按热度；③ 同热度按时间倒序；④ 再按标题。
    * 热度：文章 / 断言 / 论文用「访客总量」（构建期由 tools/fetch-stats.mjs 抓进 stats.json，
    * 再由 tools/build-content.mjs 写进内容包的 heat 字段，不联网）；照片 / 音乐 / 友链用 front matter 的
-   * heat（旧字段 likes 兼容）。同热度按时间倒序。
+   * heat（旧字段 likes 兼容）。
    */
   const heatOf = (it) => Number(it.heat) || 0;
-  const byHeatThenTime = (a, b) => (heatOf(b) - heatOf(a)) || String(b.date || '').localeCompare(String(a.date || '')) || String(a.title || a.name || '').localeCompare(String(b.title || b.name || ''), 'zh');
+  const byHeatThenTime = (a, b) => (Number(!!a.test) - Number(!!b.test))
+    || (heatOf(b) - heatOf(a))
+    || String(b.date || '').localeCompare(String(a.date || ''))
+    || String(a.title || a.name || '').localeCompare(String(b.title || b.name || ''), 'zh');
 
   /* ------------------------------------------------------------------ 检索索引 */
   let searchIndex = [];

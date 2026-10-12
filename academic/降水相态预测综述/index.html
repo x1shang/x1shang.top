@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2f4f6">
+<!-- build:head:start（由 tools/build-content.mjs 为预渲染页生成，勿手改） -->
+<meta name="description" content="梳理降水相态预测的两条主线——云微物理方案与温度廓线判据，并评述其在业务预报中的可用性与改进方向。">
+<title>降水相态预测 · x1shang</title>
+<link rel="canonical" href="https://x1shang.top/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="x1shang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="降水相态预测">
+<meta property="og:description" content="梳理降水相态预测的两条主线——云微物理方案与温度廓线判据，并评述其在业务预报中的可用性与改进方向。">
+<meta property="og:url" content="https://x1shang.top/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0/">
+<meta property="og:image" content="https://x1shang.top/assets/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2024-12-10">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="降水相态预测">
+<meta name="twitter:description" content="梳理降水相态预测的两条主线——云微物理方案与温度廓线判据，并评述其在业务预报中的可用性与改进方向。">
+<meta name="twitter:image" content="https://x1shang.top/assets/og-cover.jpg">
+<!-- build:head:end -->
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="../../feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Atom" href="../../atom.xml">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body class="reading">
+<a class="skip" href="#content">跳到正文</a><div class="pointer-light" aria-hidden="true"></div>
+
+<header class="hero" id="hero">
+ <div class="landscape"><img class="mountain" src="../../assets/mountain.jpg" alt="蓝天下的雪山与云海"><h1>x1shang</h1><img class="foreground" src="../../assets/mountain.jpg" alt="" aria-hidden="true"></div>
+ <div class="hero-top"><a href="#home" class="wordmark">x1 /</a><span>A PERSONAL SPACE</span><a href="#content" class="explore">向下探索 ↘</a></div>
+ <div class="hero-caption">山有轮廓，思绪没有。<span>THOUGHTS BEYOND THE HORIZON</span></div>
+ <aside class="identity glass">
+  <span class="card-label">HELLO, WORLD <span>↗</span></span>
+  <strong>x1shang<span class="status-dot"></span></strong>
+  <p class="bio">major in computer science at SJTU, have passion in AI + physics</p>
+  <p class="mail"><a href="mailto:zhu_jiahe2008@sjtu.edu.cn">zhu_jiahe2008@sjtu.edu.cn</a></p>
+  <div class="card-links">
+   <a class="card-icon" href="https://space.bilibili.com/695603904" target="_blank" rel="noopener noreferrer" title="b 站主页" aria-label="b 站主页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="15" width="36" height="23" rx="4"/><path d="M17 15l-5-7"/><path d="M31 15l5-7"/><circle cx="18" cy="26" r="1.9" fill="currentColor" stroke="none"/><circle cx="30" cy="26" r="1.9" fill="currentColor" stroke="none"/></svg>
+    <span>b 站</span>
+   </a>
+   <a class="card-icon" id="profile-github" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    <span>GitHub</span>
+   </a>
+   <a class="card-icon" href="https://xn--vnqp08bwj8a.xn--0iv.gay" target="_blank" rel="noopener noreferrer" title="导航页" aria-label="导航页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 24l34-15-9 33-8-12z"/><path d="M24 30l17-21"/></svg>
+    <span>导航页</span>
+   </a>
+  </div>
+ </aside>
+ <a href="#content" class="scroll-cue" aria-label="向下进入正文">↓</a>
+</header>
+
+<div class="site-layout" id="content">
+ <aside class="sidebar"><a class="site-name" href="#home">x1shang<span>个人索引 / PERSONAL INDEX</span></a><nav aria-label="主导航" id="navigation"></nav><div class="sidebar-bottom">因为山就在那里。<span id="local-clock"></span></div></aside>
+ <main id="main" tabindex="-1"><article class="prose" data-prerendered="/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0/"><h1>降水相态预测</h1><h2>研究背景</h2>
+<p>降水相态的预测是气象预报与生产生活间密切联系的体现。精确、及时的降水相态预测是冬季气象预报业务的重点，也一直都是难点。目前对于各种降水相态成因的理解已经有一套相对成熟的体系，但是对于实际的降水相态预测，还存在着数值预报偏差、对逆温过程预报准确度差、实况数据订正的结果偏差等问题。对冬季降水相态的预测不够精确，将会造成对降水影响的错误估计。例如北京知名的 12.7 过程，24h 降雪量为 1.8mm，量虽然不算大，但引起了城市交通大堵塞，影响十分严重；尤其是冬季冻雨等逆温性过程，其造成的危害隐蔽性强，常常能在不知觉中产生积冰，进而严重影响交通、科研与生活：上述诸多问题可能对人民生活和经济发展带来不利影响，是如今气象预报业务下亟待解决的难题。因此，对降水相态预测的研究是非常值得深入研究的课题，无论是对学术界还是对我们的生产生活均有着较强的现实意义。</p>
+<h2>研究现状</h2>
+<p>根据已经掌握的资料显示，理论界已经从以下几个方面开展了相关研究。</p>
+<p><strong>基于云和微物理的方案</strong>：该方案根据云内水凝物垂直分布与垂直温度层相结合的预测方法（Hersbach et al，2016）对降水相态进行一定的预测。</p>
+<p>《2011 年初湖南暴雪过程的成因和数值模拟分析》(姚蓉等，2012) 根据湖南省一次强降雪的气象数据，使用 WRF 模式对云微物理特征及降水相态转换机制进行了数值模拟，发现雪粒子的生成和发展不仅与液水比含量有关，还与其上空冰晶的含量及分布紧密相关。并提出要做好极端暴雪过程的预报，需关注本地固态降水温度阈值、大气上空温度时空变化特征，以及充分运用雷达、卫星等中小尺度资料，加强对未来天气演变的监控和分析。</p>
+<p>《冬季降水相态的理论模型构建及地形的影响研究》(陆正奇，2022) 通过对中国 2000 年至 2019 年期间地面和探空观测数据的统计分析，揭示了雨雪过渡区内冻雨、冰粒和雨夹雪等降水相态的形成机制及气象条件。接着，构建了一种新的理论模型（TPP 模型），该模型能够考虑降水相态形成的详细热力学过程，包括雨滴温度的变化、降水粒子的融化和再冻结过程。为进一步精确预报山地降水相态提供了理论基础和方法支持。</p>
+<p>Pruppacher 等（1997）对前人的观测资料做了整理后发现，在不同的温度下，云中所含的冰相粒子数有如下的特征：当温度高于 -4℃ 时，云中主要以过水状态存在；当温度低于 -10℃ 时，云中的冰相粒含量为 70% 以上。</p>
+<p><strong>基于温度廓线数据的主观判断法</strong>：根据温度廓线的结构与不同高度下温度阈值，多位学者结合地区实际情况提出了多种相态预报方法。该方法主要基于对关键层次的温度阈值进行判断。</p>
+<p>《北京地区冬季降水相态的识别判据研究》（张琳娜等，2013）通过分析 1980 年 7 月至 2010 年 6 月北京地区 31 年的降水数据，并进一步利用 2000 年至 2009 年冬季的日降水量资料，研究了雨雪转换过渡季节的降水过程和临界值降水过程，确定了与雨雪转换密切相关的六种物理量：低空 850hpa、925hpa、1000hpa 温度，1000-700hpa、1000-850hpa 厚度以及 2m 温度湿度的结合量，以及对应不同降水相态的阈值范围。该文献提出了三种相态分析方法，结合六种物理量，可以将预报准确度提高至 77% 左右。</p>
+<p>《伴随对流层中低层气温持续下降的雪转雨过程分析》(李海军等，2015) 利用欧洲中期天气预报中心（ECMWF）0.25°×0.25° 分辨率的细网格模式产品、探空观测资料和风廓线雷达等数据，详细研究了对流层中低层气温持续下降背景下降水相态转变的具体原因。文中着重分析了温度条件、垂直运动和水汽变化等因素在降水相态转换中的关键作用，并指出了海陆差异对地面气温的影响，进一步说明了这些因素如何共同作用导致了降水相态的转变。对研究降水相态的转变过程有着重要意义。</p>
+<p>《我国中东部平原地区临界气温条件下降水相态判别分析》(陈双等，2019) 中介绍了临界气温对降雪和降雨的影响，指出降雪出现的频率普遍高于降雨和雨夹雪。并通过分析温度和湿度的垂直分布特征，揭示了雨、雪天气中层温度差异的主要原因以及低层湿度对降水相态的影响。此外，文章还探讨了暖层的存在与否及其对降水相态转化的影响。通过引入决策树判别方法，构建了判别模型来区分雨和雪的相态，验证了该方法的有效性。这一文献，为建立便于理解和上手的理论模型提供了思路和理论支持。</p>
+<p>《冬季降水相态的探空廓线分型研究》(夏倩云等，2015) 文献概述了不同降水相态的形成机制及与典型温度分布间的关联，并提出了利用面积元方法计算探空廓线与 0℃ 等温线相交的正负面积和交点数作为预测因子。作者基于统计结果，提出了对不同降水相态进行诊断的判据，为进一步改进冬季降水相态预报提供了理论依据和实践指导。</p>
+<p>漆梁波等（2012）通过统计分析得出了中国东部地区冬季降水相态的识别判据，并发现综合考虑温度因子和厚度因子的识别判据表现更好。</p>
+<p>郑婧等利用多年探空资料提出以 1000 hPa 温度 &lt; 1.0 ℃、925 hPa 和 850 hPa 温度 &lt; -2.0 ℃ 和 700 hPa 温度 ≥ 0.0 ℃ 作为江西冻雨预报的温度阈值标准。</p>
+<p>许爱华等（2006）指出南方降水相态主要取决于 925hpa 以下大气温，降雪时以 925hpa 气温小于 -2℃ 可作为固态降水（雪）的预报判据。</p>
+<p>李江波等对河北地区冬季降水的研究发现当 0 ℃ 层高度低于 950hpa、地面气温在 0℃ 上下、1000hpa 温度低于 2℃、925hpa 温度低于 -2℃ 时，降水性质将从雨向雨夹雪或雪转变。</p>
+<p>国外的 Heppne 和 Czys 等分别对北美的降水相态判断进行了研究和总结，提出了重点关注 850-1000hpa 之间的气层位势厚度与 700-850hpa 之间的气层位势厚度。</p>
+<p><strong>构建其他的预测模型</strong>：多组学者为预测降水相态构建了多种模型，旨在提高对降水相态预测的准确度。</p>
+<p>《降水相态分离单临界气温模型建立和检验》中，作者使用雪日直接界定法，建立了东部季风区、西北干燥区和青藏高原区三个不同气候区的降水相态分离单临界气温统计模型，并对其外推能力和雨夹雪的偏差进行了分析。文中指出，建立的模型与实际记录的数据相关性均达到了显著水平。文中提供了长江以北地区降水相态预测的三个较为精确的模型，为进一步改进降水相态分离方法提供了基础数据支持和技术路线，并且有助于提升降水相态分类的准确性。</p>
+<p>《基于 L 波段探空观测的 FY-4A（风云四号 A 星）云顶温度产品评估及其在冬季降水相态判识中的应用》(赵渊明，2024) 基于 2019 年至 2021 年冬季上海宝山站 L 波段探空资料，对 FY-4A 云顶温度产品进行了评估。文中还探讨了 FY-4A 云顶温度产品在冬季降水相态判识中的应用潜力，指出其时空分辨率高、精度尚可，对未来降水相态的预测具有较好的应用前景。</p>
+<h2>总结与评述</h2>
+<p>上述学者的研究，总体体现了该领域下主要的研究方法：云微物理方案及温度廓线方案。不过，基于云微物理方案的研究手段，往往需要大量准确的高空探测数据作为支撑，由于相对易于获取的探空数据更新不够及时，毫米波云雷达、风廓线雷达、微波辐射计等非常规资料又难以获取，这意味着该方法大多数时候不能及时运用到实际降水相态预测中。所以云微物理体系更多是作为一套已有的结论辅助分析。在当今高空降水相态探测手段逐步完善的情况下，通过对历史降水过程相态进行再分析可以进一步完善云微物理体系。通过数值预报得到的温度廓线判断降水相态，大多都是通过特定高度的预报温度来确定降水相态，其高空预测数据本身就可能存在一定偏差，需要结合地面观测实况数据进行订正。在实际应用中，预报员的经验往往起到至关重要的作用。尽管如此，在遇到相对极端情况时，对降水相态比较容易出现误判。</p>
+<p>如今，在学术界虽然不乏有对大气微物理过程和温度廓线的相关研究，但鲜有将已有的云微物理研究体系融入预报性质的实况订正温度廓线的分析降水相态方法。因此，我们意图从实用性的角度出发，通过将实况数据订正、温度廓线与微物理过程相结合，总结出一套相对易于使用、门槛较低的降水相态经验性分析方法。</p>
+<h2>参考文献</h2>
+<p>[1] H H ,B B ,P B , et al. ERA5 全球再分析产品[J]. 气象科技进展, 2020, 10(04):160.</p>
+<p>[2] 姚蓉, 叶成志, 田莹, 等. 2011 年初湖南暴雪过程的成因和数值模拟分析[J]. 气象, 2012, 38(07):848-857.</p>
+<p>[3] 张琳娜, 郭锐, 曾剑, 等. 北京地区冬季降水相态的识别判据研究[J]. 高原气象, 2013, 32(06):1780-1786.</p>
+<p>[4] 李海军, 张雪慧, 潘士雄. 伴随对流层中低层气温持续下降的雪转雨过程分析[J]. 气象科技, 2015, 43(06):1164-1169. DOI:10.19517/j.1671-6345.2015.06.024.</p>
+<p>[5] 陈双, 谌芸, 何立富, 等. 我国中东部平原地区临界气温条件下降水相态判别分析[J]. 气象, 2019, 45(08):1037-1051.</p>
+<p>[6] 郑婧, 许爱华, 许彬. 江西省冻雨垂直温度层结分析及预报[J]. 气象与环境学报, 2014, 30(04):49-56.</p>
+<p>[7] 应冬梅, 许爱华, 彭江华. 江西省冰雹和短时强降水的多普勒雷达产品的对比分析[C]// 中国气象学会. 中国气象学会 2006 年年会“气象雷达及其应用”分会场论文集. 江西省气象台; 江西省气象台; 南昌市气象局;, 2006:9.</p>
+<p>[8] 漆梁波, 张瑛. 中国东部地区冬季降水相态的识别判据研究[J]. 气象, 2012, 38(01):96-102.</p>
+<p>[9] 陆正奇. 冬季降水相态的理论模型构建及地形的影响研究[D]. 南京信息工程学, 2022. DOI:10.27248/d.cnki.gnjqc.2022.000036.</p>
+<p>[10] 夏倩云, 钱贞成, 唐千红, 等. 冬季降水相态的探空廓线分型研究[J]. 气象与减灾研究, 2015, 38(04):54-59.</p>
+<p>[11] 刘玉莲, 任国玉, 孙秀宝. 降水相态分离单临界气温模型建立和检验[J]. 应用气象学报, 2018, 29(04):449-459.</p>
+<p>[12] 赵渊明, 孙静, 漆梁波, 等. 基于 L 波段探空观测的 FY-4A 云顶温度产品评估及其在冬季降水相态判识中的应用[J]. 气象, 2024, 50(01):59-70.</p>
+<p>[13] 赵思雄, 孙建华, 陈红, 等. 北京“12·7”降雪过程的分析研究[J]. 气候与环境研究, 2002, (01):7-21.</p>
+<p>[14] 刘朝茹, 韩永翔, 王瑾, 等. 我国冻雨统计及发生机制研究[J]. 灾害学, 2015, 30(03):219-222+234.</p></article></main>
+</div>
+
+<footer><span>© <span id="year"></span> x1shang</span><span>文字、代码，与生活的切片。</span><a href="#home">回到山间 ↑</a></footer>
+
+<section id="player" class="player glass" aria-label="音乐播放器" hidden><img id="now-cover" class="now-cover" alt="" referrerpolicy="no-referrer" hidden><button id="play-toggle" aria-label="播放">▶</button><div class="player-copy"><strong id="now-title"></strong><span id="now-lyric">等待播放</span></div><span id="time">0:00 / 0:00</span><input id="seek" type="range" min="0" max="100" value="0" aria-label="播放进度"><button id="next-track" aria-label="下一首">↠</button><button id="close-player" aria-label="停止并关闭">×</button></section>
+<audio id="audio" preload="metadata"></audio>
+
+<dialog id="photo-dialog"><button id="close-photo" aria-label="关闭照片">×</button><figure><img id="large-photo" alt=""><figcaption id="photo-caption"></figcaption></figure></dialog>
+
+<!-- 常驻底栏：命令行样式的全站检索 -->
+<form class="dock" id="dock" role="search" aria-label="全站检索">
+ <div class="dock-line">
+  <span class="dock-prompt" aria-hidden="true">&gt;</span>
+  <input id="dock-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="全站检索：标题 / 正文 / 标签 / 照片 / 音乐 / 友链…" aria-label="全站检索" aria-expanded="false" aria-controls="dock-results" role="combobox">
+  <span class="dock-hint" id="dock-hint">按 / 聚焦 · ↑↓ 选择 · Enter 打开 · Esc 收起</span>
+ </div>
+ <div class="dock-results" id="dock-results" role="listbox" aria-label="检索结果" hidden></div>
+</form>
+
+<script src="../../content.js"></script>
+<script src="../../content.auto.js"></script>
+<script src="../../render.js"></script>
+<script src="../../app.js"></script>
+<!-- GoatCounter：文章 / 断言 / 论文的「热度」= 访客总量，就是靠它按真实路径记账的。
+     去 goatcounter.com 注册一个免费站点，把短代码填到下面；不填的话热度恒为 0（排序退化成按时间）。
+     注意脚本地址用的是 static.goatcounter.com 而不是官方文档里的 gc.zgo.at：
+     实测 gc.zgo.at / static.zgo.at 在国内 DNS 不解析（连 GoatCounter 后台自己的 JS 都加载不出来），
+     而 static.goatcounter.com 是同一个 count.js 的可达镜像（2026-10-11 实测 200 / 9213 B）。 -->
+<script data-goatcounter="https://x1shang.goatcounter.com/count" async src="//static.goatcounter.com/count.js"></script>
+</body></html>

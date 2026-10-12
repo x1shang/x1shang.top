@@ -98,9 +98,6 @@ console.log('\n■ 分享卡片与统计');
     if (existsSync(path.join(ROOT, local))) ok(`og:image 指向的文件在仓库里（${local}）`);
     else no(`og:image 指向的 ${local} 不在仓库里`);
   }
-  if (/REPLACE_WITH_CF_BEACON_TOKEN/.test(html)) warn('Cloudflare Web Analytics 的 token 还是占位符（去后台 Add a site 后替换，见 index.html 注释）');
-  else ok('Cloudflare Web Analytics token 已填');
-
   for (const f of ['robots.txt', 'sitemap.xml']) {
     if (existsSync(path.join(ROOT, f))) ok(`${f} 存在`); else no(`${f} 不存在`);
   }

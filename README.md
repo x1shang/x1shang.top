@@ -71,7 +71,7 @@ git add -A && git commit -m "更新内容" && git push
 
 文件开头可写 `---` 元信息（`title` `date` `summary` `tags` `heat` `test` `draft` …），细节见 [content/README.md](content/README.md)；照片元数据见 [inbox/photos/README.md](inbox/photos/README.md)。
 
-**排序**：先热度后时间。文章 / 断言 / 论文的热度 = **该页访客总量**（来自 `stats.json` 的 `pages` 表，构建期写进内容包的 `heat`，不联网）；照片 / 音乐 / 友链仍用 front matter 的 `heat`（照片是 sidecar 的 `heat`）。没有访客数据时热度一律 0，排序自然退化成按时间倒序。`heat` 只用于排序，页面上不显示。
+**排序**：先热度后时间。文章 / 断言 / 论文的热度 = **该页访客总量**（来自 `stats.json` 的 `pages` 表，构建期写进内容包的 `heat`，不联网）；照片 / 音乐 / 友链仍用 front matter 的 `heat`（照片是 sidecar 的 `heat`）。没有访客数据时热度一律 0，排序自然退化成按时间倒序。**`test: true` 的测试样例永远排在所有列表最后**（2026-10-12 起，不受热度影响）。`heat` 只用于排序，页面上不显示。
 
 ## 渲染
 
@@ -179,10 +179,7 @@ tags: [音乐]                 # 可选
   ⚠️ **国内网络注意**：GoatCounter 的静态资源在 `*.zgo.at` 上，而这个域在国内被 **DNS 污染**（`static.zgo.at` / `gc.zgo.at` 都解析不出来）。两个后果：
   1. 后台页面里 **Token 列的 `show` 按钮点了没反应**（那按钮靠 `static.zgo.at/backend.js`）——token 其实就写在 HTML 里：在该页按 `Ctrl+U` 查看源代码，搜 `data-show`，引号里那串就是。
   2. 官方文档给的计数脚本 `//gc.zgo.at/count.js` 在国内访客那里也加载不出来。所以本站 `index.html` 里用的是 **`//static.goatcounter.com/count.js`**（同一个脚本的可达镜像，2026-10-11 实测 200）；别再改回 `gc.zgo.at`。
-- **Cloudflare Web Analytics**（可选，给自己看趋势、无 cookie）：`index.html` 末尾**脚本已插好但 token 还是占位符** `REPLACE_WITH_CF_BEACON_TOKEN`
-  —— 也就是说**目前并没有在记数据**，`npm run check` 会一直提醒。要用：CF 后台 → Web Analytics → Add a site（hostname 填 `x1shang.top`）→ 把给的 token 换掉那串占位符。
-  ⚠️ 别把它和**关于页最下方那张访客图**搞混：那张图的数据来自 **GoatCounter**（`tools/fetch-stats.mjs` 抓进 `stats.json`，`build-content.mjs` 读它算文章热度），跟 CF 完全无关。
-  CF 只是"另一个后台视角"，换掉 token 也不会让那张图变。
+- **Cloudflare Web Analytics：已删除（2026-10-12 决定）**。原来 `index.html` 末尾插着官方 beacon 但 token 一直是占位符，等于一个发无效请求的死脚本；既然 GoatCounter 已经同时管着「关于页访客图 + 文章热度」，就不再另养一套。将来想启用：CF 后台 → Web Analytics → Add a site（hostname 填 `x1shang.top`）→ 取 token，把官方 `<script src=".../beacon.min.js" data-cf-beacon='{"token":"…"}'>` 贴回 `</body>` 前即可。
 
 - **访客图怎么刷新**：`.github/workflows/stats.yml` 每天 03:17 UTC 用仓库 Secrets（`GOATCOUNTER_SITE` / `GOATCOUNTER_TOKEN`）跑一次
   `fetch-stats.mjs` → 重建 `content.auto.js` → 有变化才提交。**本地没 token 是刷不出来的**：

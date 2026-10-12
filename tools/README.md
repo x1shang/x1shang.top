@@ -29,6 +29,7 @@
 | --- | --- |
 | `gh-pages-setup.cjs` | 通过 API 开 Pages / 绑自定义域名（`GH_TOKEN=... node tools/gh-pages-setup.cjs`） |
 | `enable-https.cjs` | 轮询**某个** Pages 仓库的自定义域名证书、就绪后自动勾 Enforce HTTPS（`GH_TOKEN=... node tools/enable-https.cjs`；换目标：`$env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; node tools/enable-https.cjs`）。**证书现在是 GitHub 自动签发 + 手动勾选，一般用不到它；真要它出手时它还在** |
+| `recreate-pages.cjs` | **证书一直不签发的重锤**（health 全绿但 `https_certificate` 为 null 的卡死态）：用 API 删掉并重建 Pages 站点，逼 GitHub 重走「绑域名 → 申请证书」。⚠️ **站点会短暂下线 1~5 分钟**，所以按 ①`enable-https.cjs` 挂着等 ②去 Settings → Pages 点开一次 ③还不行再跑它 的顺序用。`$env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; GH_TOKEN=…; node tools/recreate-pages.cjs`（2026-10-12 从工作区根目录那个不在版本管理里的 `tools/` 收编进来，顺手改成可换仓库） |
 | `dns-overseas-check.cjs` | 从"境外视角"（走本地代理 + DoT）查 `x1shang.top` / `www` 的解析，排查"只有境内能解析"这类线路问题 |
 
 ## 约定

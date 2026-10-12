@@ -1,14 +1,16 @@
-// 等 GitHub 为 x1shang.top 签发 Let's Encrypt 证书，然后自动开启 Enforce HTTPS
+// 等 GitHub 给某个 Pages 仓库的自定义域名签发 Let's Encrypt 证书，就绪后自动开启 Enforce HTTPS
 // 用法： $env:GH_TOKEN = <token>; node tools/enable-https.cjs
-// 可选： INTERVAL_MS=90000  DEADLINE_MS=7200000
+//        默认盯 x1shang/x1shang.top 的 x1shang.top；换目标就带上这几个环境变量：
+//        $env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; node tools/enable-https.cjs
+// 可选： OWNER=x1shang  IP=185.199.108.153  INTERVAL_MS=90000  DEADLINE_MS=7200000
 const https = require('https');
 const tls = require('tls');
 
 const TOKEN = process.env.GH_TOKEN;
-const OWNER = 'x1shang';
-const NAME = 'x1shang.top';
-const DOMAIN = 'x1shang.top';
-const IP = '185.199.108.153';
+const OWNER = process.env.OWNER || 'x1shang';
+const NAME = process.env.REPO || 'x1shang.top';
+const DOMAIN = process.env.DOMAIN || 'x1shang.top';
+const IP = process.env.IP || '185.199.108.153';
 const INTERVAL_MS = Number(process.env.INTERVAL_MS || 90 * 1000);
 const DEADLINE_MS = Number(process.env.DEADLINE_MS || 2 * 60 * 60 * 1000);
 

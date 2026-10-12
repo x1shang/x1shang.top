@@ -28,7 +28,7 @@
 | 脚本 | 什么时候用 |
 | --- | --- |
 | `gh-pages-setup.cjs` | 通过 API 开 Pages / 绑自定义域名（`GH_TOKEN=... node tools/gh-pages-setup.cjs`） |
-| `enable-https.cjs` | 轮询证书签发、就绪后自动勾 Enforce HTTPS（`GH_TOKEN=... node tools/enable-https.cjs`）。**证书现在是 GitHub 自动签发 + 手动勾选，一般用不到它；真要它出手时它还在** |
+| `enable-https.cjs` | 轮询**某个** Pages 仓库的自定义域名证书、就绪后自动勾 Enforce HTTPS（`GH_TOKEN=... node tools/enable-https.cjs`；换目标：`$env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; node tools/enable-https.cjs`）。**证书现在是 GitHub 自动签发 + 手动勾选，一般用不到它；真要它出手时它还在** |
 | `dns-overseas-check.cjs` | 从"境外视角"（走本地代理 + DoT）查 `x1shang.top` / `www` 的解析，排查"只有境内能解析"这类线路问题 |
 
 ## 约定

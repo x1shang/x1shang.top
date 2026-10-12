@@ -1,6 +1,6 @@
 /* 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 与 assets/ 产出。 */
 window.AUTO = {
- "generated": "2026-10-12T12:09:17.459Z",
+ "generated": "2026-10-12T15:28:00.411Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",
@@ -1987,7 +1987,7 @@ window.AUTO = {
    "tags": []
   }
  ],
- "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。如果想联系作者，欢迎发邮件：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。",
+ "about": "这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $\\LaTeX$。\n\n一个安静的个人空间，用来记录研究、创作和生活。\n\n整站是纯静态的：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑。如果想联系作者，欢迎发邮件：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。\n\n### 快速开始\n\n试试页面底部的搜索框，或许能找到同频电波——\n\n- 摄影佬？看看我的相片墙√\n- 自驾玩家？可以看看大北线游记哦\n- 气象爱好者？这里有我手搓的湿球计算器，在友链中还可以找到RDFZ气象社官网！\n\n或许，点开一首音乐慢慢浏览，会多几许惬意。",
  "stats": {
   "articles": 16,
   "assertions": 1,

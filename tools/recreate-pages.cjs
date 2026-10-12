@@ -11,6 +11,7 @@
 //        $env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; node tools/recreate-pages.cjs
 // 可选： OWNER=x1shang  IP=185.199.108.153  CNAME=<写进 Pages 的自定义域名，默认同 DOMAIN>
 //        （punycode 域名可以 CNAME=xn--vnqp08bwj8a.xn--0iv.gay 而 DOMAIN 用明文 —— TLS 探测仍按明文域名的 SNI 走）
+// 若报 `unable to verify the first certificate`（本机对 api.github.com 有 TLS 拦截/自签根），用 node --use-system-ca 重跑
 const https = require('https');
 const http = require('http');
 const tls = require('tls');

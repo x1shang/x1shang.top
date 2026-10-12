@@ -3,6 +3,8 @@
 //        默认盯 x1shang/x1shang.top 的 x1shang.top；换目标就带上这几个环境变量：
 //        $env:REPO='navigation-page'; $env:DOMAIN='navi.x1shang.top'; node tools/enable-https.cjs
 // 可选： OWNER=x1shang  IP=185.199.108.153  INTERVAL_MS=90000  DEADLINE_MS=7200000
+// 若报 `unable to verify the first certificate`（本机对 api.github.com 有 TLS 拦截/自签根，2026-10-12 遇到过），
+// 用系统根证书重跑：node --use-system-ca tools/enable-https.cjs
 const https = require('https');
 const tls = require('tls');
 

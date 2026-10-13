@@ -20,7 +20,7 @@ const warn = (m) => console.log(`  ! ${m}`);
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
 
 console.log('\n■ 脚本语法');
-for (const f of ['app.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs', 'tools/fetch-stats.mjs', 'tools/build-index.mjs', 'tools/check-site.mjs', 'tools/check-layout.mjs']) {
+for (const f of ['app.js', 'theme.js', 'terminal.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs', 'tools/fetch-stats.mjs', 'tools/build-index.mjs', 'tools/check-site.mjs', 'tools/check-layout.mjs']) {
   const file = path.join(ROOT, f);
   if (!existsSync(file)) { no(`${f} 不存在`); continue; }
   const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });

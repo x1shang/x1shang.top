@@ -109,6 +109,9 @@ const server = http.createServer((req, res) => {
 });
 
 function watchDirs() {
+  watch(ROOT, (event, name) => {
+    if (String(name) === 'tips.json') scheduleBuild('tips', 400);
+  });
   for (const dir of [path.join(ROOT, 'content'), path.join(ROOT, 'inbox'), path.join(ROOT, 'assets/music')]) {
     if (!existsSync(dir)) continue;
     try {

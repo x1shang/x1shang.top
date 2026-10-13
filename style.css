@@ -3,7 +3,7 @@
 /* ============================================================
    x1shang — 雪山与云海（纯静态）
    配色：云的颜色（近白微灰）＋链接保留天空蓝；
-   下拉之后的正文区仿 okmij.org 的 Index：三栏密集链接索引；
+   下拉之后的正文区仿 okmij.org 的 Index：自适应均衡分栏链接索引；
    "呈现文本的页面"（文章 / 断言 / 论文正文）走简约阅读版式。
    ============================================================ */
 :root{
@@ -116,13 +116,11 @@ main:focus,main:focus-visible{outline:none}
 .idx-recent{font-size:13px;color:var(--ink);margin:0}
 .idx-recent b{font-weight:700}
 .idx-recent .sep{color:var(--faint);margin:0 8px}
-.idx-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:44px;align-items:start}
-.idx-col{min-width:0;padding-right:34px}
-.idx-col+.idx-col{border-left:1px solid var(--line-strong);padding-left:34px}
+.idx-columns{columns:240px 3;column-gap:36px;column-rule:1px solid var(--line-strong);column-fill:balance}
 .idx-cat{margin:0 0 30px}
-.idx-cat h3{font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:-.2px}
+.idx-cat h3{break-after:avoid;font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:-.2px}
 .idx-cat.short h3{font-style:italic;font-weight:600;color:#3f474e}
-.idx-run{font-size:13.5px;line-height:2.05;color:#4f575e;margin:0;overflow-wrap:break-word}
+.idx-run{orphans:2;widows:2;font-size:13.5px;line-height:2.05;color:#4f575e;margin:0;overflow-wrap:break-word}
 .idx-run .dot{color:#c6cbd1;margin:0 6px;font-weight:700}
 .idx-run a.on{font-weight:600}
 .idx-sub{font-size:11px;color:var(--faint);font-style:italic;margin:6px 0 0}
@@ -220,11 +218,11 @@ dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top
 
 /* ---------------------------------------------------------- 底部命令行检索 */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(248,250,251,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line-strong)}
-.dock-line{display:flex;align-items:center;gap:9px;padding:0 16px;height:var(--dock-h);max-width:1270px;margin:0 auto}
-.dock-prompt{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--link)}
-.dock input#dock-input{flex:1;min-width:0;border:0;background:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--ink);caret-color:var(--link)}
+.dock-line{display:flex;align-items:center;gap:9px;padding:0 16px;height:var(--dock-h);width:100%;margin:0 auto}
+.dock-prompt{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted);border:0;background:none;padding:5px 7px;flex:0 0 auto}
+.dock input#dock-input{flex:1;min-width:0;border:0;background:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--ink);caret-color:var(--muted);border:0;background:none;padding:5px 7px;flex:1 1 0}
 .dock input#dock-input::placeholder{color:#9fa6ac}
-.dock-hint{font-size:10px;color:var(--faint);font-family:var(--mono);white-space:nowrap}
+.dock-hint{flex:0 1 auto;max-width:42%;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:var(--faint);font-family:var(--mono);white-space:nowrap}
 .dock-results{max-height:min(56vh,520px);overflow:auto;border-top:1px solid var(--line);background:rgba(255,255,255,.82)}
 .dock-hits{max-width:1270px;margin:0 auto;padding:6px 0 10px}
 .dock-hit{display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:6px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:#3b434a}
@@ -244,7 +242,7 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 
 /* ---------------------------------------------------------- 响应式 */
 @media(min-width:1600px){.hero{max-height:1000px}.landscape h1{top:2%}}
-@media(max-width:1080px){.idx-columns{grid-template-columns:repeat(2,minmax(0,1fr))}.idx-col:nth-child(3){border-left:0;padding-left:0;grid-column:1/-1;border-top:1px solid var(--line-strong);padding-top:26px;margin-top:6px}}
+
 @media(max-width:760px){
   .hero{min-height:690px;height:94svh}
   .landscape h1{font-size:25vw;top:19%}
@@ -260,9 +258,7 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
   nav{flex-direction:row;flex-wrap:wrap;gap:15px 22px;margin:24px 0 35px;padding-bottom:22px;border-bottom:1px solid var(--line)}
   nav a span,nav a.active:after,.sidebar-bottom{display:none}
   .page-title{font-size:32px}
-  .idx-columns{grid-template-columns:minmax(0,1fr)}
-  .idx-col,.idx-col+.idx-col{border-left:0;padding-left:0;padding-right:0}
-  .idx-col+.idx-col{border-top:1px solid var(--line-strong);padding-top:24px;margin-top:24px}
+  .idx-columns{column-width:240px}
   .idx-head{margin-bottom:30px}
   .idx-item{flex-wrap:wrap}
   .idx-item .sub{flex-basis:100%;white-space:normal}
@@ -282,6 +278,46 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 @media(prefers-reduced-motion:reduce){html,.lyrics{scroll-behavior:auto}*{transition:none!important}.pointer-light{display:none}}
 @media(pointer:coarse){.pointer-light{display:none}}
 
+/* 夜色：原雪山沿山脊裁切并保留少量蓝色；星空放在山与字后方。 */
+.landscape:before{content:'';position:absolute;inset:0;background:#080e18 url('assets/star-sky.png') center center/cover no-repeat;opacity:0}
+.sky-credit{display:none;position:absolute;z-index:5;left:4%;bottom:14px;font-size:9px;color:#b9c4d6}
+.sky-credit a{color:inherit;text-decoration:underline}
+#theme-toggle{flex:0 0 auto;margin-left:auto;border:0;background:none;color:var(--muted);font-size:20px;padding:4px 8px;line-height:1}
+.dock.command-mode .dock-prompt{color:var(--link)}
+.command-output{max-width:1270px;margin:0 auto;padding:18px 24px;font:12px/1.95 var(--mono);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+:root[data-theme="dark"]{
+  color-scheme:dark;--ink:#dce5ef;--muted:#a9b6c5;--faint:#95a5b8;
+  --link:#87b9f3;--link-hover:#bad8ff;--cloud:#111820;--cloud-2:#1d2835;
+  --cloud-line:#354354;--line:rgba(157,176,199,.2);--line-strong:rgba(157,176,199,.36);--glass:rgba(22,31,44,.7);
+}
+[data-theme="dark"] body{background-image:radial-gradient(ellipse at 72% 30%,#1b2736,transparent 62%)}
+[data-theme="dark"] body.reading{background-image:none}
+[data-theme="dark"] .hero{background:#080e18}
+[data-theme="dark"] .landscape:before{opacity:1}
+[data-theme="dark"] .mountain{opacity:0}
+[data-theme="dark"] .foreground{filter:saturate(.22) brightness(.53) contrast(1.12)}
+/* 首页大字取山体的月色灰（与 .foreground 滤镜后的雪山同一色系），不再用偏冷的亮白 */
+[data-theme="dark"] .landscape h1{color:#7b8592;text-shadow:0 2px 30px #0008}
+[data-theme="dark"] .hero:before{background:rgba(9,19,34,.08)}
+[data-theme="dark"] .hero:after{background:linear-gradient(transparent,#111820aa)}
+[data-theme="dark"] .sky-credit{display:block}
+[data-theme="dark"] .glass{background:var(--glass);border-color:#b6c8df26;box-shadow:0 10px 50px #0003}
+[data-theme="dark"] .card-label,[data-theme="dark"] .identity .bio,[data-theme="dark"] .identity .mail a,[data-theme="dark"] .card-links a{color:#c2cedc}
+[data-theme="dark"] .card-links{border-color:#b6c8df26}
+[data-theme="dark"] .idx-note,[data-theme="dark"] .idx-run,[data-theme="dark"] .idx-cat.short h3,[data-theme="dark"] .prose,[data-theme="dark"] .prose h4{color:var(--ink)}
+[data-theme="dark"] .lead,[data-theme="dark"] .meta,[data-theme="dark"] .row p,[data-theme="dark"] .prose blockquote,[data-theme="dark"] .prose .math-fallback,[data-theme="dark"] .badge,[data-theme="dark"] .tag,[data-theme="dark"] footer,[data-theme="dark"] .idx-foot,[data-theme="dark"] .empty b{color:var(--muted)}
+[data-theme="dark"] .idx-run .dot{color:var(--faint)}
+[data-theme="dark"] .dock{background:#111820f2}
+[data-theme="dark"] .dock-results{background:#151e29f5}
+[data-theme="dark"] .dock-hit{color:var(--ink)}
+[data-theme="dark"] .dock-hit:hover{background:var(--cloud-2)}
+[data-theme="dark"] .dock-hit .snip,[data-theme="dark"] .dock-hit .n,[data-theme="dark"] .dock-hit .date{color:var(--muted)}
+[data-theme="dark"] .dock-hit mark{background:#345578;color:#edf5ff}
+[data-theme="dark"] .share-btn,[data-theme="dark"] .share-btn.is-done,[data-theme="dark"] .share-btn:hover{background:var(--cloud-2)}
+[data-theme="dark"] .pointer-light{background:radial-gradient(380px circle at var(--x,-1000px) var(--y,-1000px),#799edc0b,transparent 80%)}
+[data-theme="dark"] .skip{background:var(--cloud-2)}
+[data-theme="dark"] kbd{background:var(--cloud-2)}
+
 /* ---------------------------------------------------------- 关于页：访客量图 */
 .visits{margin-top:6px}
 .visits-total{margin:0 0 10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -293,3 +329,7 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 .visits-chart .vb:hover{opacity:1}
 .visits-chart .vaxis{stroke:var(--line-strong);stroke-width:1}
 .visits-chart .vmax,.visits-chart .vlabel{fill:var(--faint);font:10px var(--mono)}
+
+/* 明暗个人卡片共用磨砂玻璃的渐变、内高光与透光感。 */
+[data-theme="dark"] .identity.glass{background:linear-gradient(125deg,#ffffff30,#ffffff0d);border-color:#ffffff55;box-shadow:inset 0 1px 1px #ffffff55,0 16px 50px #0003}
+.track-lyrics{margin:0 0 20px}

@@ -2,7 +2,7 @@
    内容 = content.auto.js（自动扫描 content/ 与 assets/）+ content.js（手工条目，同 id 优先）
    排序 = 先热度（front matter 的热力值 / 作品用 GitHub 星数快照）后时间
    检索 = 底部常驻命令行（全站含正文）
-   阅读页 = 简约版式；索引页 = 仿 okmij.org Index 的三栏密集链接
+   阅读页 = 简约版式；索引页 = 仿 okmij.org Index 的自适应均衡分栏链接
    没有留言、点赞、友链申请：整站静态，互动层已移除。 */
 (() => {
   'use strict';
@@ -114,6 +114,7 @@
         kind, label, route,
         title: item.title || item.name || '',
         date: fmt(item.date),
+        heat: heatOf(item), test: !!item.test,
         text: plain([item.summary, item.abstract, item.description, item.body, item.caption, item.location, (item.tags || []).join(' '), item.authors, item.venue, extra].filter(Boolean).join(' \n ')),
       });
     };
@@ -124,8 +125,8 @@
     for (const p of C.papers) push('paper', '学术', p, `#academic/${encodeURIComponent(p.id)}`);
     for (const p of C.photos) push('photo', '摄影', p, `#photography/${encodeURIComponent(p.id)}`);
     for (const t of C.tracks) push('track', '音乐', t, `#music/${encodeURIComponent(t.id)}`, t.artist || '');
-    for (const f of C.friends) push('friend', '友链', f, '#friends', f.url || '');
-    searchIndex.push({ kind: 'page', label: '页面', route: '#about', title: '关于本站', date: '', text: '站点说明 建站天数 内容数量 订阅 RSS Atom 访客' });
+    for (const f of C.friends) push('friend', '友链', f, f.url || '#friends', f.url || '');
+    searchIndex.push({ kind: 'page', label: '作品', route: WORKS_URL, title: '作品导航', date: '', text: '作品 导航 磁贴' });
   }
 
   const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐', friend: '友链', page: '页面' };
@@ -168,77 +169,36 @@
     return out;
   }
 
-  /* ------------------------------------------------------------------ 底部命令行检索条 */
-  const dock = {
-    input: $('#dock-input'), results: $('#dock-results'),
-    hits: [], cursor: -1, baseHash: '',
-    render(q) {
-      const hits = search(q);
-      dock.hits = hits;
-      dock.cursor = hits.length ? 0 : -1;
-      if (!q.trim()) { dock.results.hidden = true; return; }
-      dock.results.hidden = false;
-      const prefix = (q.match(/^((?:[a-z]+|文章|断言|学术|论文|摄影|照片|音乐|友链|页面)[:：])/i) || [])[1] || '';
-      dock.results.innerHTML = hits.length
-        ? `<div class="dock-hits" role="listbox">${hits.map((h, i) => `<button class="dock-hit" role="option" data-hit="${i}" aria-selected="${i === dock.cursor}">
-            <span class="n">${String(i + 1).padStart(3, '0')}</span><span class="kind">${esc(h.label)}</span>
-            <span class="tt">${markTerms(h.title, q.slice(prefix.length))}</span><span class="snip">${markTerms(h.snip, q.slice(prefix.length))}</span><span class="date">${esc(h.date)}</span>
-          </button>`).join('')}</div>`
-        : `<p class="dock-empty">没有匹配「${esc(q)}」的内容。试试：文章: 关键词 · 摄影: 山 · work: blog</p>`;
-    },
-    select(i) {
-      if (!dock.hits.length) return;
-      dock.cursor = (i + dock.hits.length) % dock.hits.length;
-      $$('.dock-hit').forEach((el) => el.setAttribute('aria-selected', String(Number(el.dataset.hit) === dock.cursor)));
-      const el = $(`.dock-hit[data-hit="${dock.cursor}"]`);
-      if (el) el.scrollIntoView({ block: 'nearest' });
-    },
-    open(i = dock.cursor) {
-      const hit = dock.hits[i];
-      if (!hit) return;
-      dock.results.hidden = true;
-      dock.hits = [];
-      dock.input.value = '';
-      dock.input.blur();
-      if (hit.route === location.hash) render();
-      else location.hash = hit.route;
-    },
-    close(keepHash) {
-      dock.results.hidden = true;
-      dock.hits = [];
-      if (!keepHash && location.hash.startsWith('#search/')) location.hash = dock.baseHash || '#home';
-    },
-  };
-  let dockTimer = 0;
-  function dockSync() {
-    const q = dock.input.value;
-    if (!location.hash.startsWith('#search/')) dock.baseHash = location.hash;
-    dock.render(q);
-    clearTimeout(dockTimer);
-    dockTimer = setTimeout(() => {
-      if (q.trim()) history.replaceState(null, '', `#search/${encodeURIComponent(q)}`);
-      else if (location.hash.startsWith('#search/')) history.replaceState(null, '', dock.baseHash || '#home');
-    }, 500);
+  /* ------------------------------------------------------------------ 搜索与导航命令 */
+  const ENTRY_ALIASES = { '/': 'pages', home: 'pages', index: 'pages', 主页: 'pages', a: 'articles', 文章: 'articles', papers: 'academic', 学术: 'academic', t: 'assertions', 断言: 'assertions', p: 'photography', photos: 'photography', 摄影: 'photography', m: 'music', 音乐: 'music', f: 'friends', 友链: 'friends', 关于: 'about', w: 'works', 作品: 'works' };
+  function commandEntries(scope) {
+    scope = ENTRY_ALIASES[scope.toLowerCase()] || scope.toLowerCase();
+    if (scope === 'all') return [...searchIndex];
+    const kinds = { articles: 'article', academic: 'paper', assertions: 'assertion', photography: 'photo', music: 'track', friends: 'friend' };
+    const rows = scope === 'pages' ? searchIndex.filter(x => x.kind === 'page') : kinds[scope] ? searchIndex.filter(x => x.kind === kinds[scope]).sort(byHeatThenTime) : searchIndex.filter(x => x.kind === 'page' && x.route === `#${scope}`);
+    // 当页渲染出的正文链接、播放器及照片操作也能按编号访问。
+    if (scope === currentPage || (scope === 'pages' && currentPage === 'home')) {
+      for (const el of $$('#main a[href], #main button, #player:not([hidden]) button')) {
+        const route = el.getAttribute('href');
+        const title = el.textContent.trim() || el.getAttribute('aria-label') || el.querySelector('img')?.alt || '打开照片';
+        if (route && rows.some(x => x.route === route)) continue;
+        if (el.matches('button') && (el.hidden || el.disabled)) continue;
+        rows.push({ kind: 'action', label: el.matches('button') ? '操作' : '链接', title, route: route || '', action: () => el.click() });
+      }
+    }
+    return rows;
   }
-  dock.input.addEventListener('input', dockSync);
-  dock.input.addEventListener('focus', () => { if (!location.hash.startsWith('#search/')) dock.baseHash = location.hash; if (dock.input.value.trim()) dock.render(dock.input.value); });
-  dock.input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); dock.select(dock.cursor + 1); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); dock.select(dock.cursor - 1); }
-    else if (e.key === 'Enter') { e.preventDefault(); dock.open(); }
-    else if (e.key === 'Escape') { dock.input.value = ''; dock.close(); dock.input.blur(); }
-  });
-  dock.results.addEventListener('click', (e) => { const b = e.target.closest('[data-hit]'); if (b) dock.open(Number(b.dataset.hit)); });
-  $('#dock').addEventListener('submit', (e) => { e.preventDefault(); dock.open(); });
-  document.addEventListener('keydown', (e) => {
-    const el = document.activeElement;
-    const typing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
-    if (typing) return;
-    if (e.key === '/' || e.key === '>') { e.preventDefault(); dock.baseHash = location.hash.startsWith('#search/') ? dock.baseHash : location.hash; dock.input.focus(); }
-    else if (e.key === 'Escape' && !dock.results.hidden) dock.close();
-  });
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#dock') && document.activeElement === dock.input && !dock.input.value.trim()) dock.close();
+  const dock = window.createSiteDock({
+    search, esc, markTerms, entries: commandEntries,
+    path: () => {
+      const raw = (location.hash.startsWith('#search/') ? dock.baseHash.slice(1) : location.hash.slice(1)) || routeFromPath() || 'home';
+      return raw === 'content' ? 'home' : raw;
+    },
+    navigate: route => {
+      if (/^https?:/i.test(route)) { window.open(route, '_blank', 'noopener,noreferrer'); return; }
+      if (!route.startsWith('#')) return;
+      if (route === location.hash) render(); else location.hash = route;
+    },
   });
 
   /* ------------------------------------------------------------------ 视图 */
@@ -298,7 +258,8 @@
     btn._shareTimer = setTimeout(() => { btn.textContent = '复制标题与链接'; btn.classList.remove('is-done'); }, 1800);
   }
 
-  /* 首页：仿 okmij.org Index —— 三栏密集链接 */
+  /* 首页：仿 okmij.org Index —— 自适应均衡分栏链接 */
+  const INDEX_LIMIT = 100;
   function home() {
     const articles = [...C.articles].sort(byHeatThenTime);
     const papers = [...C.papers].sort(byHeatThenTime);
@@ -331,42 +292,38 @@
     const updateRow = ([kind, it, href]) =>
       `${runLink(href, it.title || it.location || assertionLabel(it, 24) || '未命名')}<span class="meta">${UPD_KIND[kind]} · ${esc(fmt(it.date))}</span>`;
 
-    const col1 = [
+    const categories = [
       cat('快捷入口', joinRun(shortcuts, '—'), { short: true }),
       cat('动态', updates.length
         ? joinRun(updates.map(updateRow), '—')
         : '<span class="meta">还没有更新：新发布的内容会自动出现在这里。</span>',
         { short: true, note: updates.length ? '最近三条 · 不含测试样例' : '' }),
-      cat('学术', joinRun(papers.map((p) => runLink(`#academic/${encodeURIComponent(p.id)}`, p.title)), '论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行'),
+      cat('学术', joinRun(papers.slice(0, INDEX_LIMIT).map((p) => runLink(`#academic/${encodeURIComponent(p.id)}`, p.title)), '论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行'),
         { note: papers.length ? `${papers.length} 篇` : '' }),
-      cat('摄影', joinRun(photos.slice(0, 24).map((p) => runLink(`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || '照片')), '还没有照片：丢进 inbox/photos/'),
+      cat('摄影', joinRun(photos.slice(0, INDEX_LIMIT).map((p) => runLink(`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || '照片')), '还没有照片：丢进 inbox/photos/'),
         { note: photos.length ? `${photos.length} 张 / 自动压缩为 WebP` : '' }),
-      cat('音乐', joinRun(tracks.map((t) => runLink(`#music/${encodeURIComponent(t.id)}`, t.title)), '还没有音乐：把音频放进 assets/music/')),
-    ].join('');
+      cat('音乐', joinRun(tracks.slice(0, INDEX_LIMIT).map((t) => runLink(`#music/${encodeURIComponent(t.id)}`, t.title)), '还没有音乐：把音频放进 assets/music/')),
 
-    const col2 = [
-      cat('文章', joinRun(articles.map((a) => runLink(`#articles/${encodeURIComponent(a.id)}`, a.title)), '还没有文章：把 .md 丢进 content/articles/'),
+      cat('文章', joinRun(articles.slice(0, INDEX_LIMIT).map((a) => runLink(`#articles/${encodeURIComponent(a.id)}`, a.title)), '还没有文章：把 .md 丢进 content/articles/'),
         { note: articles.length ? `${articles.length} 篇` : '', more: articles.length ? '<a href="#articles">全部文章 →</a>' : '' }),
-      cat('断言', joinRun(assertions.slice(0, 18).map((a) => runLink(`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), '还没有断言：把短句丢进 content/assertions/'),
+      cat('断言', joinRun(assertions.slice(0, INDEX_LIMIT).map((a) => runLink(`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), '还没有断言：把短句丢进 content/assertions/'),
         { note: assertions.length ? `${assertions.length} 则` : '', more: assertions.length ? '<a href="#assertions">全部断言 →</a>' : '' }),
-      cat('友链', joinRun(friends.map((f) => `<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), '还没有友链：写进 content/friends/'),
+      cat('友链', joinRun(friends.slice(0, INDEX_LIMIT).map((f) => `<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), '还没有友链：写进 content/friends/'),
         { more: '<a href="#friends">友链 →</a>' }),
-    ].join('');
 
-    const col3 = [
       cat('作品', `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>`,
         { note: '作品与磁贴入口都在站外的导航页' }),
       cat('索引与元信息', joinRun([runLink('#about', '关于本站'), `<a href="#search/%E7%89%A9%E7%90%86">检索「物理」</a>`], '—'),
-        { short: true, note: '按 / 或 &gt; 聚焦底部命令行检索' }),
+        { short: true, note: '按 / 进入命令模式，输入 help 查看帮助' }),
       cat('关于', `<span class="meta">${esc(S.intro || '')}</span>`, { short: true }),
-    ].join('');
+    ];
 
     return `<div class="idx-head">
         <h1 class="idx-title">Index</h1>
         <p class="idx-note">除非另有说明，本站的文字、照片与代码均由作者维护。内容按<b>热度</b>在前、<b>时间</b>在后排列。</p>
         <p class="idx-recent"><b>最近更新：</b> ${esc(fmtCn(newestDate()))}<span class="sep">|</span><a href="feed.xml">RSS</a><span class="sep">|</span><a href="atom.xml">Atom</a></p>
       </div>
-      <div class="idx-columns"><div class="idx-col">${col1}</div><div class="idx-col">${col2}</div><div class="idx-col">${col3}</div></div>
+      <div class="idx-columns">${categories.join('')}</div>
       <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
   }
 
@@ -456,7 +413,7 @@
         <span class="date">${esc(fmt(t.date))}</span></div>`;
     }).join('')
       : empty('歌单，正在酝酿', '把音频放进 <code>assets/music/</code>，或放一个只写 <code>netease: &lt;歌曲ID&gt;</code> 的 .md。');
-    return head('music', '音乐') + rows + '<div id="lyrics" class="lyrics" aria-label="同步歌词"></div>';
+    return head('music', '音乐') + rows;
   }
 
   function friendsPage() {
@@ -602,7 +559,8 @@
       if (location.hash === '#content') requestAnimationFrame(() => $('#content').scrollIntoView());
       else window.scrollTo(0, 0);
     } else window.scrollTo(0, 0);
-    if (!reading) $('#main').focus({ preventScroll: true });
+    if (dock.command) dock.input.focus({ preventScroll: true });
+    else if (!reading) $('#main').focus({ preventScroll: true });
     if (location.hash.startsWith('#search/')) {
       try { dock.input.value = decodeURIComponent(location.hash.slice(8)); } catch { /* 忽略 */ }
       dock.render(dock.input.value);
@@ -649,17 +607,25 @@
     return rows.sort((a, b) => a.time - b.time);
   }
   function renderLyrics() {
-    const box = $('#lyrics'); if (!box) return;
+    $('#lyrics')?.remove();
+    const track = C.tracks[activeTrack];
+    const row = track && document.getElementById(`track-${track.id}`);
+    if (!row) return;
+    const box = document.createElement('div');
+    box.id = 'lyrics'; box.className = 'lyrics track-lyrics';
+    box.setAttribute('aria-label', `${track.title} · 同步歌词`);
+    row.after(box);
     box.innerHTML = timedLyrics.length ? timedLyrics.map((l, i) => `<div class="lyric" data-lyric="${i}">${esc(l.text)}</div>`).join('')
       : `<p class="meta">${activeTrack < 0 ? '选择一首曲目，旋律从这里开始。' : '这首还没有歌词（同名 .lrc 会自动读取）。'}</p>`;
     lyricIndex = -1;
   }
   async function play() { try { await audio.play(); } catch { $('#now-lyric').textContent = '无法播放，请检查音频地址后重试'; } }
   function startTrack(index) {
-    activeTrack = index;
     const t = C.tracks[index];
+    if (!t) return;
     const src = trackSrc(t);
-    if (!t || !src) return;
+    if (!src) return;
+    activeTrack = index;
     audio.src = src;
     audio.dataset.track = String(t.id);
     timedLyrics = parseLrc(t.lyrics);

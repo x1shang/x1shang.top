@@ -348,7 +348,13 @@ if (!Object.keys(pageVisits).length) {
 }
 
 const allDates = [articles, assertions, papers, photos].flat().map((x) => x.date).filter(Boolean).sort();
+const tipsInput = JSON.parse(await readFile(path.join(ROOT, 'tips.json'), 'utf8'));
+if (!Array.isArray(tipsInput) || tipsInput.some(t => typeof t !== 'string' || !t.trim())) {
+  throw new Error('tips.json 必须是非空文本组成的 JSON 数组（可用 [] 暂停 tips）');
+}
+const tips = [...new Set(tipsInput.map(t => t.trim()))];
 const AUTO = {
+  tips,
   generated: new Date().toISOString(),
   recent: allDates.at(-1) || new Date().toISOString().slice(0, 10),
   site: siteCfg,

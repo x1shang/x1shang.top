@@ -2,7 +2,7 @@
   "name": "x1shang-site",
   "version": "0.2.0",
   "private": true,
-  "description": "x1shang 的个人站点（纯静态，无后端）：三栏密集索引首页 + 底部命令行全站检索 + 拖文件即发布的文本/照片/音乐",
+  "description": "x1shang 的个人站点（纯静态，无后端）：自适应均衡索引首页 + 明暗主题 + 搜索与导航命令 + 拖文件即发布的文本/照片/音乐",
   "scripts": {
     "serve": "node tools/serve.mjs",
     "build": "node tools/build-content.mjs --photos",

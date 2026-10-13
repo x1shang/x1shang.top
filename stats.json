@@ -1,15 +1,11 @@
 {
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
-  "updated": "2026-10-12T11:57:58.815Z",
+  "updated": "2026-10-13T10:37:59.778Z",
   "days": 30,
-  "total": 115,
-  "allTime": 115,
+  "total": 128,
+  "allTime": 128,
   "series": [
-    {
-      "d": "2026-09-13",
-      "n": 0
-    },
     {
       "d": "2026-09-14",
       "n": 0
@@ -124,17 +120,23 @@
     },
     {
       "d": "2026-10-12",
-      "n": 32
+      "n": 40
+    },
+    {
+      "d": "2026-10-13",
+      "n": 5
     }
   ],
   "pages": {
-    "/": 88,
+    "/": 97,
     "/academic/test-paper": 9,
+    "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A": 3,
     "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB": 2,
     "/assertions/dengqinwenwon": 2,
     "/articles/september-report": 2,
     "/articles/test-html": 2,
     "/articles/test-markdown": 2,
+    "/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0": 1,
     "/articles/%E7%82%B9%E7%9D%9B": 1,
     "/articles/%E9%82%A3%E4%BA%9B%E6%B8%A9%E6%9A%96%E7%9A%84%E5%8D%B0%E8%AE%B0": 1,
     "/articles/%E5%9B%9E%E7%94%98-%E4%BA%8C%E7%A8%BF": 1,

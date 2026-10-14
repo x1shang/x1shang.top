@@ -12,7 +12,7 @@ window.AUTO = {
   "失败了不可怕，重要的是要学会从失败中吸取教训",
   "你知道命令行模式真的支持命令行吗？点击>试试"
  ],
- "generated": "2026-10-13T15:55:37.582Z",
+ "generated": "2026-10-14T10:29:01.350Z",
  "recent": "2026-10-11",
  "site": {
   "name": "x1shang",
@@ -1987,6 +1987,66 @@ window.AUTO = {
  ],
  "friends": [
   {
+   "id": "3b1b",
+   "date": "2026-10-14",
+   "name": "3Blue1Brown",
+   "url": "https://www.3blue1brown.com",
+   "description": "I make videos about math",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
+   "id": "711",
+   "date": "2026-10-14",
+   "name": "711 Night",
+   "url": "https://rain.ptsfdtz.top",
+   "description": "通过让AI建模雨中街景直观表现AI性能区别",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
+   "id": "socpk",
+   "date": "2026-10-14",
+   "name": "极客湾芯片数据库",
+   "url": "https://www.socpk.com",
+   "description": "几乎已经成为展示soc性能的行业标准方法",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
+   "id": "xinghui",
+   "date": "2026-10-14",
+   "name": "XingHuiSamaの宝藏之地",
+   "url": "https://www.xinghuisama.top",
+   "description": "今天我也要学习吗",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
+   "id": "zuige",
+   "date": "2026-10-14",
+   "name": "zuige's blog",
+   "url": "https://blog.zuiges.com",
+   "description": "嵌入式开发 玩机折腾 技术随手记的小博客",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
    "id": "xuemi",
    "date": "2026-10-11",
    "name": "北京雪迷气象站",
@@ -2006,6 +2066,6 @@ window.AUTO = {
   "papers": 2,
   "photos": 33,
   "tracks": 56,
-  "friends": 1
+  "friends": 6
  }
 };

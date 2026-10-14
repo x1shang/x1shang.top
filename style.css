@@ -279,7 +279,7 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 @media(pointer:coarse){.pointer-light{display:none}}
 
 /* 夜色：原雪山沿山脊裁切并保留少量蓝色；星空放在山与字后方。 */
-.landscape:before{content:'';position:absolute;inset:0;background:#080e18 url('assets/star-sky.png') center center/cover no-repeat;opacity:0}
+.landscape:before{content:'';position:absolute;inset:0;background:#080e18 url('assets/star-sky.webp') center center/cover no-repeat;opacity:0}
 .sky-credit{display:none;position:absolute;z-index:5;left:4%;bottom:14px;font-size:9px;color:#b9c4d6}
 .sky-credit a{color:inherit;text-decoration:underline}
 #theme-toggle{flex:0 0 auto;margin-left:auto;border:0;background:none;color:var(--muted);font-size:20px;padding:4px 8px;line-height:1}

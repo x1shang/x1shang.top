@@ -28,6 +28,7 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="../../feed.xml">
 <link rel="alternate" type="application/atom+xml" title="Atom" href="../../atom.xml">
 <link rel="stylesheet" href="../../style.css">
+<script src="../../theme.js"></script>
 </head>
 <body class="reading">
 <a class="skip" href="#content">跳到正文</a><div class="pointer-light" aria-hidden="true"></div>
@@ -57,6 +58,7 @@
   </div>
  </aside>
  <a href="#content" class="scroll-cue" aria-label="向下进入正文">↓</a>
+ <span class="sky-credit">@STAR素材(CC0)</span>
 </header>
 
 <div class="site-layout" id="content">
@@ -141,9 +143,10 @@ $</div>
 <!-- 常驻底栏：命令行样式的全站检索 -->
 <form class="dock" id="dock" role="search" aria-label="全站检索">
  <div class="dock-line">
-  <span class="dock-prompt" aria-hidden="true">&gt;</span>
+  <button type="button" class="dock-prompt" id="command-toggle" aria-label="进入命令模式" aria-pressed="false">&gt;</button>
   <input id="dock-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="全站检索：标题 / 正文 / 标签 / 照片 / 音乐 / 友链…" aria-label="全站检索" aria-expanded="false" aria-controls="dock-results" role="combobox">
-  <span class="dock-hint" id="dock-hint">按 / 聚焦 · ↑↓ 选择 · Enter 打开 · Esc 收起</span>
+  <span class="dock-hint" id="dock-hint" aria-label="Tips">/ 命令模式 · ↑↓ 选择 · Enter 打开</span>
+  <button type="button" id="theme-toggle" aria-label="切换暗色模式" aria-pressed="false" title="切换主题；命令 theme system 跟随系统">☾</button>
  </div>
  <div class="dock-results" id="dock-results" role="listbox" aria-label="检索结果" hidden></div>
 </form>
@@ -151,6 +154,7 @@ $</div>
 <script src="../../content.js"></script>
 <script src="../../content.auto.js"></script>
 <script src="../../render.js"></script>
+<script src="../../terminal.js"></script>
 <script src="../../app.js"></script>
 <!-- GoatCounter：文章 / 断言 / 论文的「热度」= 访客总量，就是靠它按真实路径记账的。
      去 goatcounter.com 注册一个免费站点，把短代码填到下面；不填的话热度恒为 0（排序退化成按时间）。

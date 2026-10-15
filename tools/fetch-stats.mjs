@@ -15,12 +15,30 @@
  *   3) 演示数据（只为本地看图表长什么样，**不要提交**）：
  *        node tools/fetch-stats.mjs --demo
  *
+ * 失败处理（2026-10-15 加）：取数失败分两类报，不必对着红叉猜要不要管 ——
+ *   · 401/403（token 失效/权限不足）：红，需要你更新仓库 Secrets 的 GOATCOUNTER_TOKEN，重试无用；
+ *   · 其余（网络 RST、非鉴权的 4xx、5xx、超时）：绿，stats.json 原样不动，下次运行会自动回填（窗口是最近 DAYS 天，
+ *     所以偶发失败不会丢数据）；但若旧数据已超过 3 天没更新，仍按失败退出（说明不是偶发）。
+ * 2026-10-15 的实例：GoatCounter 会间歇性 RST 数据中心 IP（Azure runner 连它 ECONNRESET），当天定时任务因此变红。
+ *
  * 参数：--days 30（默认 30）· --out stats.json
  * 输出：{ source, site, updated, days, total, allTime, series: [{ d:'YYYY-MM-DD', n:number }] }
  * 口径：GoatCounter 的 daily / count 都是「访客数」（它的 count_unique 与 count 相同）。
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+/**
+ * 退出用这个，别直接 process.exit()：在 Windows 上刚跑完 fetch 就 exit 会撞 libuv 断言
+ * （Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)，退出码变成 0xC0000409/崩溃）。
+ * 这里先设 exitCode，再用定时器兜底硬退（保证不会挂死），同时用永不 resolve 的 promise 停住后面的代码。
+ * 2026-10-15 实测：直接 exit 3/3 崩；这个写法 3/3 干净退出。
+ */
+async function bail(code) {
+  process.exitCode = code;
+  setTimeout(() => process.exit(code), 300);
+  await new Promise(() => {});
+}
 
 const args = process.argv.slice(2);
 const flag = (name, def) => {
@@ -52,23 +70,25 @@ async function getJson(url, headers, opts = {}) {
   const retryStatuses = opts.retry ?? [408, 429, 500, 502, 503, 504];
   let last;
   for (let i = 1; i <= tries; i++) {
+    let retryable = true;
     try {
       const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
       if (res.ok) return res.json();
       last = new Error(`${res.status} ${res.statusText} — ${url}`);
-      if (i === tries || !retryStatuses.includes(res.status)) throw last;
+      retryable = retryStatuses.includes(res.status);   // 401/403/400 这类不必重试
     } catch (e) {
-      last = e;
-      if (i === tries) throw e;
+      last = e;                                          // 网络层错误（RST / 超时 / DNS）值得重试
     }
-    console.log(`[stats] 第 ${i} 次没成功（${String(last.message).slice(0, 60)}），${i * 2}s 后重试`);
-    await new Promise((r) => setTimeout(r, i * 2000));
+    if (i === tries || !retryable) throw last;
+    const waitS = Math.min(2 ** i, 30);   // 2、4、8、16、30… 指数退避（原来是 i*2 线性）
+    console.log(`[stats] 第 ${i} 次没成功（${String(last.message).slice(0, 60)}），${waitS}s 后重试`);
+    await new Promise((r) => setTimeout(r, waitS * 1000));
   }
   throw last;
 }
 
 /** API 调用统一带重试：GoatCounter 托管实例偶尔瞬时抽风（同一请求先 404/401、几秒后 200） */
-const API_RETRY = { tries: 3, retry: [404, 408, 429, 500, 502, 503, 504] };
+const API_RETRY = { tries: 5, retry: [404, 408, 425, 429, 500, 502, 503, 504] };   // 3 次 → 5 次
 
 /** 模式 1：API + token，一次拿到逐日访客数 */
 async function fromApi() {
@@ -178,27 +198,50 @@ let source;
 let series;
 let pages = {};
 let allTimeFromApi = null;
-if (DEMO) {
-  source = 'demo';
-  series = demo();
-  let seed = 424242;
-  const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
-  for (const p of await knownPaths()) pages[p] = Math.round(rnd() * 40);
-} else if (!SITE) {
-  console.log('[stats] 跳过：没有配置 GOATCOUNTER_SITE（也没给 --demo）。');
-  console.log('        用法见 tools/fetch-stats.mjs 顶部注释；关于页那张图会一直显示“数据还在积累”。');
-  process.exit(0);
-} else if (TOKEN) {
-  source = 'goatcounter-api';
-  series = await fromApi();
-  const r = await apiPages();
-  pages = r.pages;
-  allTimeFromApi = r.total;
-} else {
-  source = 'goatcounter-counter';
-  console.log(`[stats] 没给 token，走公开计数端点逐日取 ${DAYS} 天 + 逐页取总量（较慢）…`);
-  series = await fromCounter();
-  pages = await counterPages();
+try {
+  if (DEMO) {
+    source = 'demo';
+    series = demo();
+    let seed = 424242;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    for (const p of await knownPaths()) pages[p] = Math.round(rnd() * 40);
+  } else if (!SITE) {
+    console.log('[stats] 跳过：没有配置 GOATCOUNTER_SITE（也没给 --demo）。');
+    console.log('        用法见 tools/fetch-stats.mjs 顶部注释；关于页那张图会一直显示“数据还在积累”。');
+    await bail(0);
+  } else if (TOKEN) {
+    source = 'goatcounter-api';
+    series = await fromApi();
+    const r = await apiPages();
+    pages = r.pages;
+    allTimeFromApi = r.total;
+  } else {
+    source = 'goatcounter-counter';
+    console.log(`[stats] 没给 token，走公开计数端点逐日取 ${DAYS} 天 + 逐页取总量（较慢）…`);
+    series = await fromCounter();
+    pages = await counterPages();
+  }
+} catch (e) {
+  // 取数失败分两类报（见文件头「失败处理」）：401/403 要人出手；瞬时故障不把整天变红。
+  const msg = String(e?.message ?? e);
+  const auth = /\b(401|403)\b/.test(msg);
+  let staleDays = null;
+  try {
+    const prev = JSON.parse(await readFile(OUT, 'utf8'));
+    if (prev.updated) staleDays = (Date.now() - new Date(prev.updated).getTime()) / 86400000;
+  } catch { /* 没有旧文件，或旧文件坏了 */ }
+  const stale = staleDays === null ? '没有可用的旧数据' : `${staleDays.toFixed(1)} 天前更新`;
+  const line = auth
+    ? `❌ 取数失败（鉴权）：${msg} —— token 失效或权限不足，请更新仓库 Secrets 的 GOATCOUNTER_TOKEN；重试无用。`
+    : `⚠️  取数失败（非鉴权）：${msg} —— stats.json 保持不动（现数据 ${stale}），下次运行会自动回填最近 ${DAYS} 天。`;
+  console.error(`[stats] ${line}`);
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    try { await writeFile(process.env.GITHUB_STEP_SUMMARY, `## stats 取数\n\n${line}\n`, { flag: 'a' }); } catch { /* 摘要写不了就算了 */ }
+  }
+  if (auth) await bail(1);
+  if (staleDays !== null && staleDays <= 3) await bail(0);   // 瞬时故障且数据还新鲜 → 不把整天变红
+  console.error('[stats] ⚠️  数据已超过 3 天没更新 —— 按失败退出，需要人看一眼。');
+  await bail(1);
 }
 
 const total = series.reduce((s, x) => s + x.n, 0);

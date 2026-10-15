@@ -1,14 +1,18 @@
 name: stats
 
-# 每天刷新一次 stats.json（关于页最下方那张访客图 + 文章热度都靠它）。
+# 每天刷新 stats.json（关于页最下方那张访客图 + 文章热度都靠它）。
 # 需要两个仓库 secret：GOATCOUNTER_SITE（站点短代码，如 x1shang）与 GOATCOUNTER_TOKEN。
 # 没配 secret 时脚本会打印“跳过”并正常退出，不会产生提交。
 # 抓完会重建内容包与预渲染页，并把文章热度一起提交。
 # 注：GitHub 会在仓库连续 60 天没有活动后暂停定时任务，随便 push 一次即可恢复。
+#
+# 2026-10-15：一天跑两次（撞上上游抽风也不至于整天没数据；无变化时不产生提交）——
+# 当天 03:17 UTC 那次就是被 GoatCounter 间歇性 RST 掉、整天没数据，脚本窗口是最近 30 天，重跑即自动回填。
 
 on:
   schedule:
     - cron: '17 3 * * *'   # 每天 03:17 UTC（北京 11:17）
+    - cron: '17 15 * * *'  # 每天 15:17 UTC（北京 23:17）
   workflow_dispatch:
 
 permissions:

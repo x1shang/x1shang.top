@@ -26,6 +26,8 @@ tools/             serve / build-content / build-photos / check / fetch-stats + 
 
 ## 快速开始
 
+底栏主题按钮旁的 `EN / 中` 可即时切换界面语言，选择会保存在当前浏览器。关于页分别编辑 `content/about.md` 与 `content/about.en.md`，修改后运行 `npm run text`。其他文章、标题、摘要、歌词和 `tips.json` 中的轮播文字始终保留原文；界面译文维护在 `translations.js`。
+
 ```sh
 npm run serve        # 本地预览：http://127.0.0.1:8080/
                      # 监听 content/ · inbox/photos/ · assets/music/，拖文件进来即重建并自动刷新

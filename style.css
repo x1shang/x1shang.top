@@ -283,6 +283,10 @@ footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
 .sky-credit{display:none;position:absolute;z-index:5;left:4%;bottom:14px;font-size:9px;color:#b9c4d6}
 .sky-credit a{color:inherit;text-decoration:underline}
 #theme-toggle{flex:0 0 auto;margin-left:auto;border:0;background:none;color:var(--muted);font-size:20px;padding:4px 8px;line-height:1}
+#language-toggle{flex:0 0 auto;min-width:36px;min-height:32px;border:0;background:none;color:var(--muted);font-family:var(--mono);font-size:12px;padding:4px 6px;line-height:1}
+#language-toggle:hover,#theme-toggle:hover{color:var(--ink)}
+#language-toggle:focus-visible,#theme-toggle:focus-visible{outline:2px solid var(--link);outline-offset:2px;border-radius:3px}
+html[lang="en"] .prose{line-height:1.85}
 .dock.command-mode .dock-prompt{color:var(--link)}
 .command-output{max-width:1270px;margin:0 auto;padding:18px 24px;font:12px/1.95 var(--mono);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
 :root[data-theme="dark"]{

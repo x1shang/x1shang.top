@@ -304,6 +304,8 @@ const tracks = [...localTracks, ...remoteTracks].sort((a, b) => String(b.date).l
 let about = '';
 const aboutFile = path.join(ROOT, 'content/about.md');
 if (existsSync(aboutFile)) about = parseFrontMatter(await readFile(aboutFile, 'utf8')).body.trim();
+const aboutEnFile = path.join(ROOT, 'content/about.en.md');
+const aboutEn = existsSync(aboutEnFile) ? parseFrontMatter(await readFile(aboutEnFile, 'utf8')).body.trim() : '';
 
 /* 照片：读流水线清单 */
 const photoManifest = await readJson(path.join(ROOT, 'assets/photos/manifest.json'), { photos: [] });
@@ -358,7 +360,7 @@ const AUTO = {
   generated: new Date().toISOString(),
   recent: allDates.at(-1) || new Date().toISOString().slice(0, 10),
   site: siteCfg,
-  articles, assertions, papers, photos, tracks, friends, about,
+  articles, assertions, papers, photos, tracks, friends, about, aboutEn,
   stats: {
     articles: articles.length, assertions: assertions.length, papers: papers.length,
     photos: photos.length, tracks: tracks.length, friends: friends.length,

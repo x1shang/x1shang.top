@@ -6,13 +6,14 @@
    没有留言、点赞、友链申请：整站静态，互动层已移除。 */
 (() => {
   'use strict';
+  const { t: tr, ui } = window.SiteLanguage;
   const A = window.AUTO || {};
   const S = window.SITE || {};
   const R = window.Render || {
     escape: (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
-    md: (s) => `<p>${String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
+    md: (s) => ui`<p>${String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
     sanitizeHtml: (s) => String(s ?? ''),
-    renderFile: (f) => `<p>${String(f.body ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))}</p>`,
+    renderFile: (f) => ui`<p>${String(f.body ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))}</p>`,
     math: () => {},
   };
 
@@ -33,9 +34,9 @@
     return esc(raw);
   };
   const fmt = (d) => String(d || '').slice(0, 10);
-  const fmtCn = (d) => { const m = fmt(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[1]}年${Number(m[2])}月${Number(m[3])}日` : fmt(d); };
+  const fmtCn = (d) => { if (window.SiteLanguage.get() === 'en') return fmt(d); const m = fmt(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? ui`${m[1]}年${Number(m[2])}月${Number(m[3])}日` : fmt(d); };
   const host = (u) => { try { return new URL(u).host.replace(/^www\./, ''); } catch { return ''; } };
-  const testBadge = (it) => (it && it.test ? '<span class="badge" title="测试样例：检查完可以删掉对应文件">测试样例</span>' : '');
+  const testBadge = (it) => (it && it.test ? tr('<span class="badge" title="测试样例：检查完可以删掉对应文件">测试样例</span>') : '');
   /** 搜索 / 摘要用的可读纯文本：剥掉 HTML 标签与 Markdown、LaTeX 记号 */
   const plain = (s) => String(s ?? '')
     .replace(/<[^>]*>/g, ' ')
@@ -51,7 +52,7 @@
     if (full.length <= n) return full;
     let cut = full.slice(0, n);
     if (/[A-Za-z0-9]$/.test(cut) && /[A-Za-z0-9]/.test(full[n] || '')) cut = cut.replace(/[A-Za-z0-9]+$/, '').trimEnd();
-    return `${cut}…`;
+    return ui`${cut}…`;
   };
 
   const sections = [
@@ -119,14 +120,14 @@
       });
     };
     searchIndex = [];
-    for (const [id, label] of sections) searchIndex.push({ kind: 'page', label: '页面', route: `#${id}`, title: label, date: '', text: descriptions[id] || '' });
-    for (const a of C.articles) push('article', '文章', a, `#articles/${encodeURIComponent(a.id)}`);
-    for (const a of C.assertions) push('assertion', '断言', { ...a, title: assertionLabel(a, 42) }, `#assertions/${encodeURIComponent(a.id)}`);
-    for (const p of C.papers) push('paper', '学术', p, `#academic/${encodeURIComponent(p.id)}`);
-    for (const p of C.photos) push('photo', '摄影', p, `#photography/${encodeURIComponent(p.id)}`);
-    for (const t of C.tracks) push('track', '音乐', t, `#music/${encodeURIComponent(t.id)}`, t.artist || '');
-    for (const f of C.friends) push('friend', '友链', f, f.url || '#friends', f.url || '');
-    searchIndex.push({ kind: 'page', label: '作品', route: WORKS_URL, title: '作品导航', date: '', text: '作品 导航 磁贴' });
+    for (const [id, label] of sections) searchIndex.push({ kind: 'page', label: tr('页面'), route: ui`#${id}`, title: tr(label), date: '', text: tr(descriptions[id] || '') });
+    for (const a of C.articles) push('article', tr('文章'), a, ui`#articles/${encodeURIComponent(a.id)}`);
+    for (const a of C.assertions) push('assertion', tr('断言'), { ...a, title: assertionLabel(a, 42) }, ui`#assertions/${encodeURIComponent(a.id)}`);
+    for (const p of C.papers) push('paper', tr('学术'), p, ui`#academic/${encodeURIComponent(p.id)}`);
+    for (const p of C.photos) push('photo', tr('摄影'), p, ui`#photography/${encodeURIComponent(p.id)}`);
+    for (const t of C.tracks) push('track', tr('音乐'), t, ui`#music/${encodeURIComponent(t.id)}`, t.artist || '');
+    for (const f of C.friends) push('friend', tr('友链'), f, f.url || '#friends', f.url || '');
+    searchIndex.push({ kind: 'page', label: tr('作品'), route: WORKS_URL, title: tr('作品导航'), date: '', text: tr('作品 导航 磁贴') });
   }
 
   const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐', friend: '友链', page: '页面' };
@@ -164,7 +165,7 @@
   function markTerms(text, q) {
     let out = esc(text);
     for (const t of String(q).trim().split(/\s+/).filter((x) => x.length > 1)) {
-      try { out = out.replace(new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), (s) => `<mark>${s}</mark>`); } catch { /* 忽略 */ }
+      try { out = out.replace(new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), (s) => ui`<mark>${s}</mark>`); } catch { /* 忽略 */ }
     }
     return out;
   }
@@ -175,15 +176,15 @@
     scope = ENTRY_ALIASES[scope.toLowerCase()] || scope.toLowerCase();
     if (scope === 'all') return [...searchIndex];
     const kinds = { articles: 'article', academic: 'paper', assertions: 'assertion', photography: 'photo', music: 'track', friends: 'friend' };
-    const rows = scope === 'pages' ? searchIndex.filter(x => x.kind === 'page') : kinds[scope] ? searchIndex.filter(x => x.kind === kinds[scope]).sort(byHeatThenTime) : searchIndex.filter(x => x.kind === 'page' && x.route === `#${scope}`);
+    const rows = scope === 'pages' ? searchIndex.filter(x => x.kind === 'page') : kinds[scope] ? searchIndex.filter(x => x.kind === kinds[scope]).sort(byHeatThenTime) : searchIndex.filter(x => x.kind === 'page' && x.route === ui`#${scope}`);
     // 当页渲染出的正文链接、播放器及照片操作也能按编号访问。
     if (scope === currentPage || (scope === 'pages' && currentPage === 'home')) {
       for (const el of $$('#main a[href], #main button, #player:not([hidden]) button')) {
         const route = el.getAttribute('href');
-        const title = el.textContent.trim() || el.getAttribute('aria-label') || el.querySelector('img')?.alt || '打开照片';
+        const title = el.textContent.trim() || el.getAttribute('aria-label') || el.querySelector('img')?.alt || tr('打开照片');
         if (route && rows.some(x => x.route === route)) continue;
         if (el.matches('button') && (el.hidden || el.disabled)) continue;
-        rows.push({ kind: 'action', label: el.matches('button') ? '操作' : '链接', title, route: route || '', action: () => el.click() });
+        rows.push({ kind: 'action', label: el.matches('button') ? tr('操作') : tr('链接'), title, route: route || '', action: () => el.click() });
       }
     }
     return rows;
@@ -202,15 +203,15 @@
   });
 
   /* ------------------------------------------------------------------ 视图 */
-  const head = (id, title) => `<div class="eyebrow"><span>PERSONAL INDEX / ${(sections.find((x) => x[0] === id) || [, , 'READING'])[2].toUpperCase()}</span><span>x1shang / ${new Date().getFullYear()}</span></div><h1 class="page-title">${esc(title)}</h1><p class="lead">${descriptions[id] || ''}</p>`;
-  const empty = (title, text = '新的内容会慢慢出现在这里。') => `<div class="empty"><b>${title}</b>${text}</div>`;
-  const runLink = (href, label, extra = '') => `<a href="${safe(href)}"${extra}>${esc(label)}</a>`;
-  const joinRun = (rows, fallback) => rows.length ? rows.join('<span class="dot">·</span>') : `<span class="meta">${fallback}</span>`;
+  const head = (id, title) => ui`<div class="eyebrow"><span>PERSONAL INDEX / ${(sections.find((x) => x[0] === id) || [, , 'READING'])[2].toUpperCase()}</span><span>x1shang / ${new Date().getFullYear()}</span></div><h1 class="page-title">${esc(tr(title))}</h1><p class="lead">${tr(descriptions[id] || '')}</p>`;
+  const empty = (title, text = tr('新的内容会慢慢出现在这里。')) => ui`<div class="empty"><b>${title}</b>${text}</div>`;
+  const runLink = (href, label, extra = '') => ui`<a href="${safe(href)}"${extra}>${esc(label)}</a>`;
+  const joinRun = (rows, fallback) => rows.length ? rows.join('<span class="dot">·</span>') : ui`<span class="meta">${fallback}</span>`;
 
   /* 音乐：本地音频用仓库里的文件；只写了网易云 ID 的曲目走公开外链
      （music.163.com/song/media/outer/url?id=<ID>.mp3，302 到 CDN，浏览器会自动把 http 目标升级成 https）。
      能不能播是 tools/fetch-netease.mjs 在构建期探好的：playable === false 就是网易云不给直链。 */
-  const neteaseOuter = (id) => `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(String(id).trim())}.mp3`;
+  const neteaseOuter = (id) => ui`https://music.163.com/song/media/outer/url?id=${encodeURIComponent(String(id).trim())}.mp3`;
   const trackSrc = (t) => (t && (t.src || (t.netease && t.playable !== false ? neteaseOuter(t.netease) : ''))) || '';
 
   /* 分享：国内社媒（微信/QQ/小红书/微博正文）基本不读 OG 卡片，所以不走"分享到 X"那套，
@@ -221,8 +222,8 @@
     if (!it) return '';
     const dir = kind === 'academic' ? 'academic' : 'articles';
     const base = ((A.site && A.site.url) || location.origin).replace(/\/$/, '');
-    const url = `${base}/${dir}/${encodeURIComponent(id)}/`;
-    return `<div class="share" data-share data-title="${esc(it.title || id)}" data-url="${esc(url)}">
+    const url = ui`${base}/${dir}/${encodeURIComponent(id)}/`;
+    return ui`<div class="share" data-share data-title="${esc(it.title || id)}" data-url="${esc(url)}">
       <button type="button" class="share-btn" data-share-btn>复制标题与链接</button>
       <span class="share-note">有意思的想法值得分享</span>
     </div>`;
@@ -249,13 +250,13 @@
 
   async function onShareClick(box) {
     const btn = box.querySelector('[data-share-btn]');
-    const text = `${box.dataset.title}\n${box.dataset.url}`;
+    const text = ui`${box.dataset.title}\n${box.dataset.url}`;
     const ok = await copyText(text);
     if (!btn) return;
-    btn.textContent = ok ? '已复制 ✓' : '复制失败，请手动选择';
+    btn.textContent = ok ? tr('已复制 ✓') : tr('复制失败，请手动选择');
     btn.classList.toggle('is-done', ok);
     clearTimeout(btn._shareTimer);
-    btn._shareTimer = setTimeout(() => { btn.textContent = '复制标题与链接'; btn.classList.remove('is-done'); }, 1800);
+    btn._shareTimer = setTimeout(() => { btn.textContent = tr('复制标题与链接'); btn.classList.remove('is-done'); }, 1800);
   }
 
   /* 首页：仿 okmij.org Index —— 自适应均衡分栏链接 */
@@ -267,135 +268,135 @@
     const photos = [...C.photos].sort(byHeatThenTime);
     const tracks = [...C.tracks].sort(byHeatThenTime);
     const friends = [...C.friends].sort(byHeatThenTime);
-    const cat = (title, rows, opts = {}) => `<section class="idx-cat${opts.short ? ' short' : ''}"><h3>${esc(title)}</h3><p class="idx-run">${rows}</p>${opts.note ? `<p class="idx-sub">${opts.note}</p>` : ''}${opts.more ? `<p class="idx-more">${opts.more}</p>` : ''}</section>`;
+    const cat = (title, rows, opts = {}) => ui`<section class="idx-cat${opts.short ? ' short' : ''}"><h3>${esc(title)}</h3><p class="idx-run">${rows}</p>${opts.note ? ui`<p class="idx-sub">${opts.note}</p>` : ''}${opts.more ? ui`<p class="idx-more">${opts.more}</p>` : ''}</section>`;
 
     const shortcuts = [
-      ['#articles', '文章'], ['#assertions', '断言'], ['#academic', '学术'],
-      ['#photography', '摄影'], ['#music', '音乐'], ['#friends', '友链'], ['#about', '关于'],
+      ['#articles', tr('文章')], ['#assertions', tr('断言')], ['#academic', tr('学术')],
+      ['#photography', tr('摄影')], ['#music', tr('音乐')], ['#friends', tr('友链')], ['#about', tr('关于')],
     ].map(([h, l]) => runLink(h, l));
-    shortcuts.splice(3, 0, `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
+    shortcuts.splice(3, 0, ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
     shortcuts.push('<a href="feed.xml" type="application/rss+xml">RSS</a>', '<a href="atom.xml" type="application/atom+xml">Atom</a>',
-      `<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
+      ui`<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
 
     /* 动态：全站最新的三条「非测试样例」更新（文章 / 断言 / 学术 / 摄影 / 音乐） */
-    const UPD_KIND = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐' };
+    const UPD_KIND = { article: tr('文章'), assertion: tr('断言'), paper: tr('学术'), photo: tr('摄影'), track: tr('音乐') };
     const updates = [
-      ...C.articles.map((x) => ['article', x, `#articles/${encodeURIComponent(x.id)}`]),
-      ...C.assertions.map((x) => ['assertion', x, `#assertions/${encodeURIComponent(x.id)}`]),
-      ...C.papers.map((x) => ['paper', x, `#academic/${encodeURIComponent(x.id)}`]),
-      ...C.photos.map((x) => ['photo', x, `#photography/${encodeURIComponent(x.id)}`]),
-      ...C.tracks.map((x) => ['track', x, `#music/${encodeURIComponent(x.id)}`]),
+      ...C.articles.map((x) => ['article', x, ui`#articles/${encodeURIComponent(x.id)}`]),
+      ...C.assertions.map((x) => ['assertion', x, ui`#assertions/${encodeURIComponent(x.id)}`]),
+      ...C.papers.map((x) => ['paper', x, ui`#academic/${encodeURIComponent(x.id)}`]),
+      ...C.photos.map((x) => ['photo', x, ui`#photography/${encodeURIComponent(x.id)}`]),
+      ...C.tracks.map((x) => ['track', x, ui`#music/${encodeURIComponent(x.id)}`]),
     ]
       .filter(([, it]) => !it.test && fmt(it.date))
       .sort((a, b) => fmt(b[1].date).localeCompare(fmt(a[1].date)))
       .slice(0, 3);
     const updateRow = ([kind, it, href]) =>
-      `${runLink(href, it.title || it.location || assertionLabel(it, 24) || '未命名')}<span class="meta">${UPD_KIND[kind]} · ${esc(fmt(it.date))}</span>`;
+      ui`${runLink(href, it.title || it.location || assertionLabel(it, 24) || tr('未命名'))}<span class="meta">${UPD_KIND[kind]} · ${esc(fmt(it.date))}</span>`;
 
     const categories = [
-      cat('快捷入口', joinRun(shortcuts, '—'), { short: true }),
-      cat('动态', updates.length
+      cat(tr('快捷入口'), joinRun(shortcuts, '—'), { short: true }),
+      cat(tr('动态'), updates.length
         ? joinRun(updates.map(updateRow), '—')
-        : '<span class="meta">还没有更新：新发布的内容会自动出现在这里。</span>',
-        { short: true, note: updates.length ? '最近三条 · 不含测试样例' : '' }),
-      cat('学术', joinRun(papers.slice(0, INDEX_LIMIT).map((p) => runLink(`#academic/${encodeURIComponent(p.id)}`, p.title)), '论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行'),
-        { note: papers.length ? `${papers.length} 篇` : '' }),
-      cat('摄影', joinRun(photos.slice(0, INDEX_LIMIT).map((p) => runLink(`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || '照片')), '还没有照片：丢进 inbox/photos/'),
-        { note: photos.length ? `${photos.length} 张 / 自动压缩为 WebP` : '' }),
-      cat('音乐', joinRun(tracks.slice(0, INDEX_LIMIT).map((t) => runLink(`#music/${encodeURIComponent(t.id)}`, t.title)), '还没有音乐：把音频放进 assets/music/')),
+        : tr('<span class="meta">还没有更新：新发布的内容会自动出现在这里。</span>'),
+        { short: true, note: updates.length ? tr('最近三条 · 不含测试样例') : '' }),
+      cat(tr('学术'), joinRun(papers.slice(0, INDEX_LIMIT).map((p) => runLink(ui`#academic/${encodeURIComponent(p.id)}`, p.title)), tr('论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行')),
+        { note: papers.length ? ui`${papers.length} 篇` : '' }),
+      cat(tr('摄影'), joinRun(photos.slice(0, INDEX_LIMIT).map((p) => runLink(ui`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || tr('照片'))), tr('还没有照片：丢进 inbox/photos/')),
+        { note: photos.length ? ui`${photos.length} 张 / 自动压缩为 WebP` : '' }),
+      cat(tr('音乐'), joinRun(tracks.slice(0, INDEX_LIMIT).map((t) => runLink(ui`#music/${encodeURIComponent(t.id)}`, t.title)), tr('还没有音乐：把音频放进 assets/music/'))),
 
-      cat('文章', joinRun(articles.slice(0, INDEX_LIMIT).map((a) => runLink(`#articles/${encodeURIComponent(a.id)}`, a.title)), '还没有文章：把 .md 丢进 content/articles/'),
-        { note: articles.length ? `${articles.length} 篇` : '', more: articles.length ? '<a href="#articles">全部文章 →</a>' : '' }),
-      cat('断言', joinRun(assertions.slice(0, INDEX_LIMIT).map((a) => runLink(`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), '还没有断言：把短句丢进 content/assertions/'),
-        { note: assertions.length ? `${assertions.length} 则` : '', more: assertions.length ? '<a href="#assertions">全部断言 →</a>' : '' }),
-      cat('友链', joinRun(friends.slice(0, INDEX_LIMIT).map((f) => `<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), '还没有友链：写进 content/friends/'),
-        { more: '<a href="#friends">友链 →</a>' }),
+      cat(tr('文章'), joinRun(articles.slice(0, INDEX_LIMIT).map((a) => runLink(ui`#articles/${encodeURIComponent(a.id)}`, a.title)), tr('还没有文章：把 .md 丢进 content/articles/')),
+        { note: articles.length ? ui`${articles.length} 篇` : '', more: articles.length ? tr('<a href="#articles">全部文章 →</a>') : '' }),
+      cat(tr('断言'), joinRun(assertions.slice(0, INDEX_LIMIT).map((a) => runLink(ui`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), tr('还没有断言：把短句丢进 content/assertions/')),
+        { note: assertions.length ? ui`${assertions.length} 则` : '', more: assertions.length ? tr('<a href="#assertions">全部断言 →</a>') : '' }),
+      cat(tr('友链'), joinRun(friends.slice(0, INDEX_LIMIT).map((f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), tr('还没有友链：写进 content/friends/')),
+        { more: tr('<a href="#friends">友链 →</a>') }),
 
-      cat('作品', `<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>`,
-        { note: '作品与磁贴入口都在站外的导航页' }),
-      cat('索引与元信息', joinRun([runLink('#about', '关于本站'), `<a href="#search/%E7%89%A9%E7%90%86">检索「物理」</a>`], '—'),
-        { short: true, note: '按 / 进入命令模式，输入 help 查看帮助' }),
-      cat('关于', `<span class="meta">${esc(S.intro || '')}</span>`, { short: true }),
+      cat(tr('作品'), ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>`,
+        { note: tr('作品与磁贴入口都在站外的导航页') }),
+      cat(tr('索引与元信息'), joinRun([runLink('#about', tr('关于本站')), ui`<a href="#search/%E7%89%A9%E7%90%86">检索「物理」</a>`], '—'),
+        { short: true, note: tr('按 / 进入命令模式，输入 help 查看帮助') }),
+      cat(tr('关于'), ui`<span class="meta">${esc(tr(S.intro || ''))}</span>`, { short: true }),
     ];
 
-    return `<div class="idx-head">
+    return ui`<div class="idx-head">
         <h1 class="idx-title">Index</h1>
         <p class="idx-note">除非另有说明，本站的文字、照片与代码均由作者维护。内容按<b>热度</b>在前、<b>时间</b>在后排列。</p>
         <p class="idx-recent"><b>最近更新：</b> ${esc(fmtCn(newestDate()))}<span class="sep">|</span><a href="feed.xml">RSS</a><span class="sep">|</span><a href="atom.xml">Atom</a></p>
       </div>
       <div class="idx-columns">${categories.join('')}</div>
-      <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
+      <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ui` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
   }
 
   /* 板块列表：密集索引行 */
   function idxList(items, rowFn, opts = {}) {
-    if (!items.length) return empty(opts.emptyTitle || '这里还空着', opts.emptyText);
-    return `<ol class="idx-list">${items.map((it, i) => `<li class="idx-item${it.test ? ' is-test' : ''}">
+    if (!items.length) return empty(opts.emptyTitle || tr('这里还空着'), opts.emptyText);
+    return ui`<ol class="idx-list">${items.map((it, i) => ui`<li class="idx-item${it.test ? ' is-test' : ''}">
       <span class="rank">${String(i + 1).padStart(2, '0')}</span><span class="tt">${rowFn(it, i)}</span>
-      ${opts.sub ? `<span class="sub">${opts.sub(it)}</span>` : ''}
+      ${opts.sub ? ui`<span class="sub">${opts.sub(it)}</span>` : ''}
       <span class="date">${esc(fmt(it.date))}</span>
     </li>`).join('')}</ol>`;
   }
 
   function academicList() {
     const papers = [...C.papers].sort(byHeatThenTime);
-    return head('academic', '学术') + idxList(papers, (p) => `<a href="#academic/${encodeURIComponent(p.id)}">${esc(p.title)}</a>${testBadge(p)}`,
-      { sub: (p) => [p.authors, p.venue].filter(Boolean).map(esc).join(' · '), emptyTitle: '研究记录，待续', emptyText: '把 .md / .tex 丢进 content/papers/ 就会出现在这里。' });
+    return head('academic', tr('学术')) + idxList(papers, (p) => ui`<a href="#academic/${encodeURIComponent(p.id)}">${esc(p.title)}</a>${testBadge(p)}`,
+      { sub: (p) => [p.authors, p.venue].filter(Boolean).map(esc).join(' · '), emptyTitle: tr('研究记录，待续'), emptyText: tr('把 .md / .tex 丢进 content/papers/ 就会出现在这里。') });
   }
 
   function academicDetail(id) {
     const p = C.papers.find((x) => String(x.id) === id);
-    if (!p) return empty('论文未找到', '<a href="#academic">返回学术列表</a>');
-    return `<a class="backlink" href="#academic">← 学术</a>
+    if (!p) return empty(tr('论文未找到'), tr('<a href="#academic">返回学术列表</a>'));
+    return ui`<a class="backlink" href="#academic">← 学术</a>
       <div class="reading-head"><h1>${esc(p.title)}</h1>${testBadge(p)}
-      <div class="reading-meta"><span>${esc(fmt(p.date))}</span>${p.authors ? `<span>${esc(p.authors)}</span>` : ''}${p.venue ? `<span>${esc(p.venue)}</span>` : ''}${p.url ? `<span><a href="${safe(p.url)}" target="_blank" rel="noopener noreferrer">原文 ↗</a></span>` : ''}${p.file ? `<span>${esc(p.file)}</span>` : ''}</div></div>
-      ${p.abstract ? `<p class="lead">${esc(p.abstract)}</p>` : ''}
-      <article class="prose" data-format="${esc(p.format || 'md')}">${p.body ? R.renderFile({ format: p.format, body: p.body }) : '<p class="meta">这条记录没有正文，只有上面的信息。</p>'}</article>`;
+      <div class="reading-meta"><span>${esc(fmt(p.date))}</span>${p.authors ? ui`<span>${esc(p.authors)}</span>` : ''}${p.venue ? ui`<span>${esc(p.venue)}</span>` : ''}${p.url ? ui`<span><a href="${safe(p.url)}" target="_blank" rel="noopener noreferrer">原文 ↗</a></span>` : ''}${p.file ? ui`<span>${esc(p.file)}</span>` : ''}</div></div>
+      ${p.abstract ? ui`<p class="lead">${esc(p.abstract)}</p>` : ''}
+      <article class="prose" data-format="${esc(p.format || 'md')}">${p.body ? R.renderFile({ format: p.format, body: p.body }) : tr('<p class="meta">这条记录没有正文，只有上面的信息。</p>')}</article>`;
   }
 
   function articlesList() {
     const list = [...C.articles].sort(byHeatThenTime);
-    return head('articles', '文章') + idxList(list, (a) => `<a href="#articles/${encodeURIComponent(a.id)}">${esc(a.title)}</a>${testBadge(a)}`,
-      { sub: (a) => [...(a.tags || []).map((t) => '#' + t), a.summary].filter(Boolean).join(' '), emptyTitle: '还没有文章', emptyText: '把 .md / .html / .tex / .txt 丢进 content/articles/，刷新即可。' });
+    return head('articles', tr('文章')) + idxList(list, (a) => ui`<a href="#articles/${encodeURIComponent(a.id)}">${esc(a.title)}</a>${testBadge(a)}`,
+      { sub: (a) => [...(a.tags || []).map((t) => '#' + t), a.summary].filter(Boolean).join(' '), emptyTitle: tr('还没有文章'), emptyText: tr('把 .md / .html / .tex / .txt 丢进 content/articles/，刷新即可。') });
   }
 
   function articlesDetail(id) {
     const a = C.articles.find((x) => String(x.id) === id);
-    if (!a) return empty('文章未找到', '<a href="#articles">返回文章列表</a>');
-    return `<a class="backlink" href="#articles">← 所有文章</a>
+    if (!a) return empty(tr('文章未找到'), tr('<a href="#articles">返回文章列表</a>'));
+    return ui`<a class="backlink" href="#articles">← 所有文章</a>
       <div class="reading-head"><h1>${esc(a.title)}</h1>${testBadge(a)}
-      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => `<span>#${esc(t)}</span>`).join('')}<span>${esc(a.format || 'md')}</span>${a.file ? `<span>${esc(a.file)}</span>` : ''}</div></div>
+      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}<span>${esc(a.format || 'md')}</span>${a.file ? ui`<span>${esc(a.file)}</span>` : ''}</div></div>
       <article class="prose" data-format="${esc(a.format || 'md')}">${R.renderFile({ format: a.format, body: a.body })}</article>`;
   }
 
   function assertionsList() {
     const list = [...C.assertions].sort(byHeatThenTime);
-    if (!list.length) return head('assertions', '断言') + empty('等待下一个念头', '把短句丢进 content/assertions/，一个文件一则。');
-    return head('assertions', '断言') + list.map((a) => `<article class="idx-item${a.test ? ' is-test' : ''}" style="display:block">
-        <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => `<span>#${esc(t)}</span>`).join('')}${a.test ? testBadge(a) : ''}</div>
+    if (!list.length) return head('assertions', tr('断言')) + empty(tr('等待下一个念头'), tr('把短句丢进 content/assertions/，一个文件一则。'));
+    return head('assertions', tr('断言')) + list.map((a) => ui`<article class="idx-item${a.test ? ' is-test' : ''}" style="display:block">
+        <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}${a.test ? testBadge(a) : ''}</div>
         <div class="prose" style="margin:10px 0 0">${R.renderFile({ format: a.format, body: a.body })}</div>
       </article>`).join('');
   }
 
   function assertionDetail(id) {
     const a = C.assertions.find((x) => String(x.id) === id);
-    if (!a) return empty('断言未找到', '<a href="#assertions">返回断言列表</a>');
-    return `<a class="backlink" href="#assertions">← 断言</a>
-      <div class="reading-head"><h1>${esc(assertionLabel(a, 46) || '断言')}</h1>${testBadge(a)}
-      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => `<span>#${esc(t)}</span>`).join('')}</div></div>
+    if (!a) return empty(tr('断言未找到'), tr('<a href="#assertions">返回断言列表</a>'));
+    return ui`<a class="backlink" href="#assertions">← 断言</a>
+      <div class="reading-head"><h1>${esc(assertionLabel(a, 46) || tr('断言'))}</h1>${testBadge(a)}
+      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}</div></div>
       <article class="prose" data-format="${esc(a.format || 'md')}">${R.renderFile({ format: a.format, body: a.body })}</article>`;
   }
 
   function worksPage() {
-    return head('works', '作品')
-      + `<p class="note">作品都在站外的导航页：<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>（磁贴入口 + 作品区都在那边）。</p>`;
+    return head('works', tr('作品'))
+      + ui`<p class="note">作品都在站外的导航页：<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>（磁贴入口 + 作品区都在那边）。</p>`;
   }
 
   function photographyPage(detail) {
-    if (!C.photos.length) return head('photography', '摄影') + empty('留一个位置，给下一束光', '把照片拖进 <code>inbox/photos/</code>，流水线会自动压缩成 WebP（该目录已 gitignore）。');
+    if (!C.photos.length) return head('photography', tr('摄影')) + empty(tr('留一个位置，给下一束光'), tr('把照片拖进 <code>inbox/photos/</code>，流水线会自动压缩成 WebP（该目录已 gitignore）。'));
     const list = [...C.photos].sort(byHeatThenTime);
-    return head('photography', '摄影') + `<div class="photo-grid">${list.map((p) => `<figure class="photo" id="photo-${esc(p.id)}" style="margin:0">
-        <button class="shot" data-photo="${esc(p.id)}" aria-label="放大：${esc(p.title || '照片')}"><img loading="lazy" src="${safe(p.thumb || p.src)}" alt="${esc(p.title || '')}"></button>
+    return head('photography', tr('摄影')) + ui`<div class="photo-grid">${list.map((p) => ui`<figure class="photo" id="photo-${esc(p.id)}" style="margin:0">
+        <button class="shot" data-photo="${esc(p.id)}" aria-label="放大：${esc(p.title || tr('照片'))}"><img loading="lazy" src="${safe(p.thumb || p.src)}" alt="${esc(p.title || '')}"></button>
         <figcaption class="cap"><span>${esc(p.title || '')}${testBadge(p)}</span><span class="meta">${esc(p.location || '')}</span><span class="date">${esc(fmt(p.date))}</span></figcaption>
       </figure>`).join('')}</div>
       <p class="note">照片来自 <code>inbox/photos/</code>（原始文件不入库），构建时自动旋转、压缩并转成 WebP。</p>`;
@@ -406,32 +407,33 @@
     const rows = list.length ? list.map((t, i) => {
       const src = trackSrc(t);
       const sub = [t.artist, t.album].filter(Boolean).join(' · ');
-      const note = [sub, t.netease ? (t.playable === false ? '网易云 · 无直链（VIP / 独家 / 无版权）' : '网易云外链') : '', t.test ? '测试样例' : ''].filter(Boolean).join(' · ');
-      return `<div class="idx-item${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
+      const note = [sub, t.netease ? (t.playable === false ? tr('网易云 · 无直链（VIP / 独家 / 无版权）') : tr('网易云外链')) : '', t.test ? tr('测试样例') : ''].filter(Boolean).join(' · ');
+      return ui`<div class="idx-item${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
         <span class="rank">${String(i + 1).padStart(2, '0')}</span>
-        <button class="track" data-track="${esc(t.id)}" style="flex:1;border:0;padding:0"><span><strong>${esc(t.title)}</strong><small>${esc(note)}</small></span><span class="track-play">${src ? '播放 ↗' : '暂无音频'}</span></button>
+        <button class="track" data-track="${esc(t.id)}" style="flex:1;border:0;padding:0"><span><strong>${esc(t.title)}</strong><small>${esc(note)}</small></span><span class="track-play">${src ? tr('播放 ↗') : tr('暂无音频')}</span></button>
         <span class="date">${esc(fmt(t.date))}</span></div>`;
     }).join('')
-      : empty('歌单，正在酝酿', '把音频放进 <code>assets/music/</code>，或放一个只写 <code>netease: &lt;歌曲ID&gt;</code> 的 .md。');
-    return head('music', '音乐') + rows;
+      : empty(tr('歌单，正在酝酿'), tr('把音频放进 <code>assets/music/</code>，或放一个只写 <code>netease: &lt;歌曲ID&gt;</code> 的 .md。'));
+    return head('music', tr('音乐')) + rows;
   }
 
   function friendsPage() {
     const list = [...C.friends].sort(byHeatThenTime);
-    const rows = list.length ? idxList(list, (f) => `<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)} ↗</a>${testBadge(f)}`,
+    const rows = list.length ? idxList(list, (f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)} ↗</a>${testBadge(f)}`,
       { sub: (f) => esc(f.description || host(f.url)) })
-      : empty('期待在这里，遇见同路人');
-    return head('friends', '友链') + rows
-      + '<p class="note">友链是站内写定的静态清单（<code>content/friends/</code>）；本站不收在线申请。</p>';
+      : empty(tr('期待在这里，遇见同路人'));
+    return head('friends', tr('友链')) + rows
+      + tr('<p class="note">友链是站内写定的静态清单（<code>content/friends/</code>）；本站不收在线申请。</p>');
   }
 
   function aboutPage() {
-    const days = Math.max(1, Math.floor((Date.now() - new Date(`${S.since}T00:00:00+08:00`)) / 86400000) + 1);
-    const stats = [[days, '建站天数'], [C.articles.length + C.assertions.length + C.papers.length, '文字记录'], [C.photos.length, '摄影作品'], [C.tracks.length, '音乐'], [C.friends.length, '友链']];
-    return head('about', '关于')
-      + `<div class="stats">${stats.map(([n, label]) => `<div class="stat glass"><strong>${n}</strong><span>${label}</span></div>`).join('')}</div>`
-      + (C.about ? `<article class="prose" style="margin-top:32px">${R.renderFile({ format: 'md', body: C.about })}</article>` : '')
-      + `<article class="row" style="margin-top:28px"><h3>这座小站怎么运转</h3>
+    const about = window.SiteLanguage.get() === 'en' ? (A.aboutEn || C.about) : C.about;
+    const days = Math.max(1, Math.floor((Date.now() - new Date(ui`${S.since}T00:00:00+08:00`)) / 86400000) + 1);
+    const stats = [[days, tr('建站天数')], [C.articles.length + C.assertions.length + C.papers.length, tr('文字记录')], [C.photos.length, tr('摄影作品')], [C.tracks.length, tr('音乐')], [C.friends.length, tr('友链')]];
+    return head('about', tr('关于'))
+      + ui`<div class="stats">${stats.map(([n, label]) => ui`<div class="stat glass"><strong>${n}</strong><span>${label}</span></div>`).join('')}</div>`
+      + (about ? ui`<article class="prose" style="margin-top:32px">${R.renderFile({ format: 'md', body: about })}</article>` : '')
+      + ui`<article class="row" style="margin-top:28px"><h3>这座小站怎么运转</h3>
           <p>整站是纯静态的 HTML / CSS / JavaScript：文字丢进 <code>content/</code>（文章 / 断言 / 学术 / 友链）、照片丢进 <code>inbox/photos/</code>、音乐丢进 <code>assets/music/</code>，跑一次构建就编入索引。照片目录已被 gitignore，只有压缩后的 WebP 会进仓库。</p>
           <p>页面底部常驻一条命令行检索：按 <kbd>/</kbd> 或 <kbd>&gt;</kbd> 聚焦，↑↓ 选择，Enter 打开。文章、断言与论文正文用简约阅读版式，公式由 KaTeX 渲染。</p>
         </article>
@@ -456,8 +458,8 @@
     if (!series.length) {
       box.dataset.state = 'empty';
       box.innerHTML = raw.length || data
-        ? '<p class="note">统计刚上线，数据还在积累。</p>'
-        : '<p class="note">还没有统计数据（本地 <code>file://</code> 预览下不显示）。</p>';
+        ? tr('<p class="note">统计刚上线，数据还在积累。</p>')
+        : tr('<p class="note">还没有统计数据（本地 <code>file://</code> 预览下不显示）。</p>');
       return;
     }
     const W = 640, H = 170, T = 12, B = 26, L = 6, R = 6;
@@ -466,14 +468,14 @@
     const bars = series.map((x, i) => {
       const h = Math.round((H - T - B) * (x.n / max));
       const bx = L + i * bw + bw * 0.18, by = H - B - h;
-      return `<rect class="vb" x="${bx.toFixed(1)}" y="${by}" width="${Math.max(1.2, bw * 0.64).toFixed(1)}" height="${Math.max(1, h)}" rx="1.6"><title>${esc(x.d)}：${x.n} 位访客</title></rect>`;
+      return ui`<rect class="vb" x="${bx.toFixed(1)}" y="${by}" width="${Math.max(1.2, bw * 0.64).toFixed(1)}" height="${Math.max(1, h)}" rx="1.6"><title>${esc(x.d)}：${x.n} 位访客</title></rect>`;
     }).join('');
     const total = Number(data.total || series.reduce((s, x) => s + x.n, 0));
     const updated = data.updated ? String(data.updated).slice(0, 10) : '';
     const first = series[0].d, last = series[series.length - 1].d;
     box.dataset.state = 'ready';
-    box.innerHTML = `
-      <p class="visits-total"><strong>${total}</strong><span>近 ${series.length} 天访客</span>${data.allTime ? `<span class="visits-all">累计 ${data.allTime}</span>` : ''}</p>
+    box.innerHTML = ui`
+      <p class="visits-total"><strong>${total}</strong><span>近 ${series.length} 天访客</span>${data.allTime ? ui`<span class="visits-all">累计 ${data.allTime}</span>` : ''}</p>
       <svg class="visits-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="近 ${series.length} 天每日访客数">
         <line class="vaxis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"></line>
         <text class="vmax" x="${L}" y="${T - 1}">${max}</text>
@@ -481,7 +483,7 @@
         <text class="vlabel" x="${L}" y="${H - 8}">${esc(first)}</text>
         <text class="vlabel" x="${W - R}" y="${H - 8}" text-anchor="end">${esc(last)}</text>
       </svg>
-      ${updated ? `<p class="note">更新于 ${esc(updated)}${data.site ? ` · 数据源 <a href="${safe(data.site)}" target="_blank" rel="noopener noreferrer">GoatCounter</a>` : ''}</p>` : ''}`;
+      ${updated ? ui`<p class="note">更新于 ${esc(updated)}${data.site ? ui` · 数据源 <a href="${safe(data.site)}" target="_blank" rel="noopener noreferrer">GoatCounter</a>` : ''}</p>` : ''}`;
   }
 
   /* ------------------------------------------------------------------ 渲染调度 */
@@ -495,7 +497,7 @@
   function routeFromPath() {
     const m = location.pathname.match(/\/(articles|assertions|academic)\/([^/]+)\/(?:index\.html)?$/);
     if (!m) return '';
-    try { return `${m[1]}/${decodeURIComponent(m[2])}`; } catch { return `${m[1]}/${m[2]}`; }
+    try { return ui`${m[1]}/${decodeURIComponent(m[2])}`; } catch { return ui`${m[1]}/${m[2]}`; }
   }
 
   /**
@@ -506,15 +508,15 @@
   function trackVisit(route, detail) {
     const gc = window.goatcounter;
     if (!gc || typeof gc.count !== 'function' || !detail || !DETAIL_KIND[route]) return;
-    try { gc.count({ path: `/${route}/${encodeURIComponent(detail)}/` }); } catch { /* 统计失败不影响阅读 */ }
+    try { gc.count({ path: ui`/${route}/${encodeURIComponent(detail)}/` }); } catch { /* 统计失败不影响阅读 */ }
   }
 
-  function render() {
+  function render(options = {}) {
     const fromPath = routeFromPath();
     const raw = location.hash.slice(1) || fromPath;
     const [route, ...rest] = raw.split('/');
     let detail = ''; try { detail = decodeURIComponent(rest.join('/')); } catch { detail = rest.join('/'); }
-    if (detail && !(fromPath && fromPath === raw)) trackVisit(route, detail);
+    if (!options.languageOnly && detail && !(fromPath && fromPath === raw)) trackVisit(route, detail);
     const isSection = sections.some((x) => x[0] === route);
     currentPage = isSection ? route : 'home';
     const reading = (currentPage === 'articles' && detail) || (currentPage === 'academic' && detail) || (currentPage === 'assertions' && detail);
@@ -526,7 +528,7 @@
       if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     const title = (sections.find((x) => x[0] === currentPage) || [, , 'Index'])[1];
-    document.title = `${title} · x1shang`;
+    document.title = `${tr(title)} · x1shang`;
 
     let body;
     if (currentPage === 'home') body = home();
@@ -576,7 +578,7 @@
     const track = e.target.closest('[data-track]');
     if (track) {
       const t = C.tracks.find((x) => String(x.id) === track.dataset.track);
-      if (t && t.src) { location.hash = `#music/${encodeURIComponent(t.id)}`; startTrack(C.tracks.indexOf(t)); }
+      if (t && t.src) { location.hash = ui`#music/${encodeURIComponent(t.id)}`; startTrack(C.tracks.indexOf(t)); }
       return;
     }
     if (e.target.closest('#next-track') && C.tracks.length) { startTrack((activeTrack + 1) % C.tracks.length); }
@@ -609,17 +611,17 @@
   function renderLyrics() {
     $('#lyrics')?.remove();
     const track = C.tracks[activeTrack];
-    const row = track && document.getElementById(`track-${track.id}`);
+    const row = track && document.getElementById(ui`track-${track.id}`);
     if (!row) return;
     const box = document.createElement('div');
     box.id = 'lyrics'; box.className = 'lyrics track-lyrics';
-    box.setAttribute('aria-label', `${track.title} · 同步歌词`);
+    box.setAttribute('aria-label', ui`${track.title} · 同步歌词`);
     row.after(box);
-    box.innerHTML = timedLyrics.length ? timedLyrics.map((l, i) => `<div class="lyric" data-lyric="${i}">${esc(l.text)}</div>`).join('')
-      : `<p class="meta">${activeTrack < 0 ? '选择一首曲目，旋律从这里开始。' : '这首还没有歌词（同名 .lrc 会自动读取）。'}</p>`;
+    box.innerHTML = timedLyrics.length ? timedLyrics.map((l, i) => ui`<div class="lyric" data-lyric="${i}">${esc(l.text)}</div>`).join('')
+      : ui`<p class="meta">${activeTrack < 0 ? tr('选择一首曲目，旋律从这里开始。') : tr('这首还没有歌词（同名 .lrc 会自动读取）。')}</p>`;
     lyricIndex = -1;
   }
-  async function play() { try { await audio.play(); } catch { $('#now-lyric').textContent = '无法播放，请检查音频地址后重试'; } }
+  async function play() { try { await audio.play(); } catch { $('#now-lyric').textContent = tr('无法播放，请检查音频地址后重试'); } }
   function startTrack(index) {
     const t = C.tracks[index];
     if (!t) return;
@@ -630,19 +632,19 @@
     audio.dataset.track = String(t.id);
     timedLyrics = parseLrc(t.lyrics);
     $('#player').hidden = false;
-    $('#now-title').textContent = `${t.title}${t.artist ? ' · ' + t.artist : ''}`;
+    $('#now-title').textContent = ui`${t.title}${t.artist ? ' · ' + t.artist : ''}`;
     const cover = $('#now-cover');
     if (cover) {
       if (t.cover) { cover.src = t.cover; cover.hidden = false; }
       else { cover.hidden = true; cover.removeAttribute('src'); }
     }
-    $('#now-lyric').textContent = '正在加载…';
+    $('#now-lyric').textContent = tr('正在加载…');
     renderLyrics(); play();
   }
-  const timeText = (n) => `${Math.floor((Number.isFinite(n) ? n : 0) / 60)}:${String(Math.floor((Number.isFinite(n) ? n : 0) % 60)).padStart(2, '0')}`;
+  const timeText = (n) => ui`${Math.floor((Number.isFinite(n) ? n : 0) / 60)}:${String(Math.floor((Number.isFinite(n) ? n : 0) % 60)).padStart(2, '0')}`;
   function updateTime() {
     const duration = audio.duration;
-    $('#time').textContent = `${timeText(audio.currentTime)} / ${timeText(duration)}`;
+    $('#time').textContent = ui`${timeText(audio.currentTime)} / ${timeText(duration)}`;
     $('#seek').value = duration ? (audio.currentTime / duration) * 100 : 0;
     let i = -1;
     timedLyrics.forEach((l, k) => { if (l.time <= audio.currentTime) i = k; });
@@ -650,7 +652,7 @@
       lyricIndex = i;
       $('#now-lyric').textContent = (timedLyrics[i] && timedLyrics[i].text) || '♪';
       $$('.lyric').forEach((el, k) => el.classList.toggle('current', k === i));
-      const el = $(`[data-lyric="${i}"]`), box = $('#lyrics');
+      const el = $(ui`[data-lyric="${i}"]`), box = $('#lyrics');
       if (el && box) {
         // 把当前这句钉在歌词框正中：用 rect 差值算，别用 offsetTop（那是相对 offsetParent 的，
         // 减去 box.offsetTop 会算成一个负数 → 每次都被夹到 0，于是永远钉在顶端）
@@ -664,17 +666,17 @@
   }
   audio.addEventListener('timeupdate', updateTime);
   audio.addEventListener('loadedmetadata', updateTime);
-  audio.addEventListener('play', () => { $('#play-toggle').textContent = 'Ⅱ'; $('#play-toggle').setAttribute('aria-label', '暂停'); });
+  audio.addEventListener('play', () => { $('#play-toggle').textContent = 'Ⅱ'; $('#play-toggle').setAttribute('aria-label', tr('暂停')); });
   audio.addEventListener('playing', () => { failStreak = 0; });
-  audio.addEventListener('pause', () => { $('#play-toggle').textContent = '▶'; $('#play-toggle').setAttribute('aria-label', '播放'); });
+  audio.addEventListener('pause', () => { $('#play-toggle').textContent = '▶'; $('#play-toggle').setAttribute('aria-label', tr('播放')); });
   audio.addEventListener('error', () => {
     const t = C.tracks[activeTrack];
     if (t && t.netease) {
       // 网易云对 VIP / 独家 / 无版权曲目不签发直链（302 到 music.163.com/404）→ 提示并顺延，最多绕一圈
-      $('#now-lyric').textContent = '网易云没给这首歌直链（VIP / 独家 / 无版权），换下一首';
+      $('#now-lyric').textContent = tr('网易云没给这首歌直链（VIP / 独家 / 无版权），换下一首');
       if (failStreak < C.tracks.length - 1) { failStreak++; setTimeout(() => startTrack((activeTrack + 1) % C.tracks.length), 1600); }
     } else {
-      $('#now-lyric').textContent = '音频无法加载，请检查文件或链接';
+      $('#now-lyric').textContent = tr('音频无法加载，请检查文件或链接');
     }
   });
   audio.addEventListener('ended', () => { if (C.tracks.length) startTrack((activeTrack + 1) % C.tracks.length); });
@@ -688,25 +690,39 @@
     const rect = box.getBoundingClientRect(), scale = Math.max(rect.width / 1607, rect.height / 1080), dx = (rect.width - 1607 * scale) / 2, dy = (rect.height - 1080 * scale) / 2;
     const ridge = [[0, 606], [28, 590], [53, 555], [77, 520], [110, 502], [138, 509], [160, 541], [181, 561], [224, 590], [268, 582], [300, 571], [323, 554], [348, 523], [367, 552], [389, 591], [403, 583], [421, 610], [448, 590], [469, 616], [490, 627], [513, 644], [530, 640], [541, 660], [567, 629], [598, 584], [635, 542], [670, 501], [689, 479], [703, 453], [719, 440], [745, 406], [768, 379], [795, 342], [821, 308], [847, 273], [877, 239], [897, 252], [915, 264], [932, 292], [949, 318], [962, 345], [980, 367], [995, 391], [1012, 414], [1040, 438], [1083, 453], [1118, 471], [1138, 467], [1145, 453], [1155, 476], [1187, 493], [1201, 509], [1225, 511], [1238, 529], [1255, 525], [1277, 508], [1293, 516], [1307, 535], [1336, 550], [1368, 568], [1385, 612], [1400, 633], [1413, 637], [1428, 657], [1441, 637], [1473, 633], [1498, 629], [1514, 639], [1540, 646], [1563, 674], [1607, 702], [1607, 1080], [0, 1080]];
     const fg = $('.foreground');
-    if (fg) fg.style.clipPath = `polygon(${ridge.map(([x, y]) => `${(x * scale + dx).toFixed(2)}px ${(y * scale + dy).toFixed(2)}px`).join(',')})`;
+    if (fg) fg.style.clipPath = ui`polygon(${ridge.map(([x, y]) => ui`${(x * scale + dx).toFixed(2)}px ${(y * scale + dy).toFixed(2)}px`).join(',')})`;
   }
   addEventListener('resize', alignMountain);
   document.addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return;
-    document.documentElement.style.setProperty('--x', `${e.clientX}px`);
-    document.documentElement.style.setProperty('--y', `${e.clientY}px`);
+    document.documentElement.style.setProperty('--x', ui`${e.clientX}px`);
+    document.documentElement.style.setProperty('--y', ui`${e.clientY}px`);
   });
-  function clock() { $('#local-clock').textContent = `${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' })} / UTC+8`; }
+  function clock() { $('#local-clock').textContent = ui`${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' })} / UTC+8`; }
 
   /* ------------------------------------------------------------------ 启动 */
   $('#year').textContent = new Date().getFullYear();
-  $('#profile-github').href = `https://github.com/${encodeURIComponent(S.github)}`;
-  $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
-    ? `<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`
-    : `<a href="#${id}" data-page="${id}"><span>${String(i + 1).padStart(2, '0')}</span>${label}</a>`)).join('');
+  $('#profile-github').href = ui`https://github.com/${encodeURIComponent(S.github)}`;
+  function renderNavigation() { $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
+    ? ui`<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${tr(label)}</a>`
+    : ui`<a href="#${id}" data-page="${id}"><span>${String(i + 1).padStart(2, '0')}</span>${tr(label)}</a>`)).join(''); }
+  renderNavigation();
   clock(); setInterval(clock, 60000);
   buildSearchIndex();
   alignMountain();
   addEventListener('hashchange', render);
+  addEventListener('languagechange', () => {
+    const scroll = window.scrollY;
+    const focus = document.activeElement;
+    const lyric = $('#now-lyric');
+    // Translate player status messages, but keep timed lyrics verbatim.
+    if (lyricIndex < 0) lyric.textContent = tr(window.SiteLanguage.source(lyric.textContent));
+    $('#play-toggle').setAttribute('aria-label', tr(audio.paused ? '播放' : '暂停'));
+    renderNavigation(); buildSearchIndex(); render({ languageOnly: true });
+    dock.refreshLanguage();
+    window.scrollTo(0, scroll);
+    if (focus?.isConnected) focus.focus({ preventScroll: true });
+  });
+  $('#now-lyric').textContent = tr('等待播放');
   render();
 })();

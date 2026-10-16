@@ -1,0 +1,57 @@
+name: stat-export
+
+# 每周把自建统计（stat.x1shang.top = Workers + D1）的全量数据拉一份落进仓库。
+# 为什么：计划 §8.7 —— 「数据别再一次只存在别人手里」。D1 是我们自己的库，但它仍然只有一份：
+# 导出进 git 之后，最坏情况下（CF 账号丢失 / 误删库）数据还能从仓库里恢复。
+# 需要两个仓库 secret：STATS_API_URL（https://stat.x1shang.top）与 STATS_API_TOKEN。
+#
+# 2026-10-16 加（Phase 2 上线当天）。手动跑：Actions → stat-export → Run workflow。
+
+on:
+  schedule:
+    - cron: '23 4 * * 1'   # 每周一 04:23 UTC（北京 12:23）——避开 stats 任务的两个时间点
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stat-export
+  cancel-in-progress: true
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 拉取全量导出（/api/export）
+        env:
+          STATS_API_URL: ${{ secrets.STATS_API_URL }}
+          STATS_API_TOKEN: ${{ secrets.STATS_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${STATS_API_URL}" ] || [ -z "${STATS_API_TOKEN}" ]; then
+            echo "::warning::缺少 STATS_API_URL / STATS_API_TOKEN，跳过导出"
+            exit 0
+          fi
+          curl -sSf --max-time 60 -H "Authorization: Bearer ${STATS_API_TOKEN}" \
+            "${STATS_API_URL}/api/export" -o tools/stat-export.json
+          # 形状自检：拿不到合法 JSON 或 data 不是数组就当失败，绝不把坏文件提交进去
+          node -e "
+            const d = require('./tools/stat-export.json');
+            if (!Array.isArray(d.data)) { console.error('导出文件形状不对'); process.exit(1); }
+            console.log('导出行数', d.rows, '｜导出于', d.exported);
+          "
+
+      - name: 有变化就提交
+        run: |
+          if git diff --quiet -- tools/stat-export.json; then
+            echo "导出内容与上次一致，不产生提交"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/stat-export.json
+          git commit -m "chore(stats): 自建统计全量导出备份 $(date -u +%Y-%m-%d)"
+          git push

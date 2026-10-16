@@ -2,6 +2,10 @@
 
 > 计划：[`计划-Cloudflare迁移与统计自建.md`](../../../计划-Cloudflare迁移与统计自建.md) §5（Phase 2）
 > 目标：取代 GoatCounter —— 采集端与数据端都在自己域名下，**精确计数（无采样）**，数据落在自己的 D1 里。
+>
+> ✅ **2026-10-16 已上线**：Worker `x1shang-stats` + D1（region APAC）+ 自定义域 `stat.x1shang.top`（橙云）；
+> beacon 已进 `index.html` 与全部 24 个预渲染页，与 GoatCounter 双跑中。验收证据见计划 §5.3 / §5.5。
+> **下面"部署"一节是按实际跑通的顺序重写过的**（原文里"控制台建 Worker / 挂自定义域"两步已不需要）。
 
 | 文件 | 作用 |
 | --- | --- |
@@ -45,48 +49,47 @@
 - `series` 一定是 `days` 条、升序、缺失日补 0 —— 关于页那张图靠它，**缺一天图就断**。
 - Phase 3 的 `fetch-stats.mjs` 会把它当 provider 直接用，`build-content.mjs` 零改动（§6.1）。
 
-## 部署（§5.2 的人 / agent 分工）
+## 部署（2026-10-16 实际跑通的顺序）
 
 ```powershell
 cd x1shang/tools/stat-worker
 
-# ① 登录（人，浏览器授权）
+# ① 登录（人：浏览器点 Authorize 即可）
 npx wrangler@latest login
 
-# ② 建库（人/agent）—— **记下输出的 database_id**
+# ② 建库 —— **记下输出的 database_id**（本库：57681a30-9059-433a-84b5-5e5d7288f1ca，region APAC）
 npx wrangler@latest d1 create x1shang-stats
-#    然后把 wrangler.toml 里的 REPLACE_WITH_YOUR_DATABASE_ID 换成它
+#    然后把 wrangler.toml 里的 database_id 换成它
 
 # ③ 建表
 npx wrangler@latest d1 execute x1shang-stats --remote --file=./schema.sql
 
-# ④ 生成并写入 API token（**只显示一次，立刻存进密码管理器 + 仓库 Secrets**）
+# ④ 生成并写入 API token（值同时要存进密码管理器/本地文件 + GitHub 仓库 Secrets）
 node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
-npx wrangler@latest secret put API_TOKEN
+#    注意：这一步时 Worker 还不存在是正常的，wrangler 会问"要不要新建"→ 是（非交互下自动 yes）
+$tok | npx wrangler@latest secret put API_TOKEN
 #    同值再填到 GitHub 仓库 Secrets：STATS_API_TOKEN，并加 STATS_API_URL=https://stat.x1shang.top
 
-# ⑤ 部署（先落在 workers.dev 上）
+# ⑤ 部署（wrangler.toml 里 workers_dev=false + [[routes]] custom_domain=true）
 npx wrangler@latest deploy
-
-# ⑥ 挂自定义域（人，控制台）
-#    Worker → Settings → Domains & Routes → Add → Custom domain → stat.x1shang.top
-#    CF 自动建 DNS 记录 + 签证书；**这条记录是橙云**——本计划里唯一允许橙云的（§8.1）
-
-# ⑦ 再部署一次让配置对齐（挂了域之后）
-npx wrangler@latest deploy
+#    这一条命令同时完成：上传脚本 → 建 stat 的 DNS 记录（橙云）→ 签证书 → 绑路由
 ```
 
-**接 beacon（§5.2 第 6 步，两处都要改，漏一处预渲染页就收不到数）**
+**三个实测踩到的点**
+
+1. **`workers_dev = true` 会让 deploy 直接失败**：本账号没注册 workers.dev 子域 → `You need to register a workers.dev subdomain before publishing to workers.dev` 后 exit 1。用 `workers_dev = false` + `[[routes]] custom_domain = true` 绕过（也**不需要**去控制台手动挂域）。
+2. **不必先去控制台建 Worker**：`secret put` 会自动建（见上）。
+3. **beacon 只需改 `index.html` 一处**（下面"接 beacon"原文说两处，是多余的）：
+
+**接 beacon** —— 只改 `x1shang/index.html` 的 `</body>` 前一行即可：
 
 ```html
 <script defer src="https://stat.x1shang.top/s.js"></script>
 ```
 
-1. `x1shang/index.html`
-2. `x1shang/tools/build-content.mjs` 的预渲染模板
+预渲染页（`articles/*/index.html` 等 24 个）是拿 `index.html` 当模板生成的（`tools/build-content.mjs` 的 `writeShell()`），**改模板即全量继承**；实测 rebuild 后 25 个文件命中 beacon。改完 `npm run build` → `npm run deploy`。
 
 > ⚠️ 这一阶段 **GoatCounter 的 snippet 与 `data-goatcounter` 原样不动**（双跑 2 周，§6.1）。
-> 改完 `npm run build` → `npm run deploy`。
 
 ## 本地自测（**部署前先跑**）
 

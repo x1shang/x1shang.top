@@ -22,6 +22,7 @@
 | `check-layout.mjs` | 导航页磁贴排版校验（无重叠 / 不越界 / 铺满）：喂它一份 headless 导出的 DOM | `node tools/check-layout.mjs dump.html` |
 | `build-index.mjs` | 扫目录生成导航页的 `site/all.html` 清单页（**不会**动手写的 `index.html`） | `npm run index` |
 | `deploy-x1shang.ps1` | 个人站一键：重建 → 提交 → 推送（走本地代理 127.0.0.1:10809） | `npm run deploy` |
+| `stat-worker/` | **自建统计的后端**（Phase 2）：一个 Cloudflare Worker（`/s.js` `/c` `/api/stats` `/api/export`）+ D1 表结构 + wrangler 配置。部署与验收步骤见它自己的 `README.md` | `cd tools/stat-worker; npx wrangler@latest deploy` |
 
 ## 一次性 / 应急（已用过，留着以备重来）
 

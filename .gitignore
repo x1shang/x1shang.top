@@ -13,3 +13,6 @@ node_modules/
 # Python 字节码缓存（tools/build-photos.py 被 import / py_compile 时会生成）
 __pycache__/
 *.pyc
+
+# wrangler 的本地状态（缓存、本地 D1 模拟库），只有 tools/stat-worker/ 会生成
+tools/stat-worker/.wrangler/

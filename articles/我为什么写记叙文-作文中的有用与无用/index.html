@@ -103,4 +103,9 @@
      实测 gc.zgo.at / static.zgo.at 在国内 DNS 不解析（连 GoatCounter 后台自己的 JS 都加载不出来），
      而 static.goatcounter.com 是同一个 count.js 的可达镜像（2026-10-11 实测 200 / 9213 B）。 -->
 <script data-goatcounter="https://x1shang.goatcounter.com/count" async src="//static.goatcounter.com/count.js"></script>
+<!-- 自建统计（Phase 2，计划 §5.2 第 6 步）：beacon 由自己的 Worker 托管（stat.x1shang.top = Workers + D1），
+     精确计数、无采样、数据在自己库里。**与上面的 GoatCounter 双跑 2 周**（§6.1），退役前两者都留着。
+     口径是「页面浏览量（PV）」不是「访客数（UV）」，双跑期数值有差异是正常的。
+     这一行写在 index.html 就够：预渲染页（articles/*/index.html）是拿 index.html 当模板生成的（tools/build-content.mjs）。 -->
+<script defer src="https://stat.x1shang.top/s.js"></script>
 </body></html>

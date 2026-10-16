@@ -1,0 +1,36 @@
+# tools/stat-worker/wrangler.toml
+#
+# stat.x1shang.top 的 Worker 配置（计划 §5.2）
+#
+# 部署前必做：
+#   1. npx wrangler@latest login
+#   2. npx wrangler@latest d1 create x1shang-stats      ← 记下输出的 database_id
+#   3. 把下面的 database_id 换成真的（不换会部署失败）
+#   4. npx wrangler@latest d1 execute x1shang-stats --remote --file=./schema.sql
+#   5. npx wrangler@latest secret put API_TOKEN         ← 生成随机串，见 README
+#   6. npx wrangler@latest deploy
+
+name = "x1shang-stats"
+main = "src/index.js"
+compatibility_date = "2026-10-15"
+
+# 2026-10-16 实测：本账号**没有注册 workers.dev 子域**，所以 workers_dev = true 会让 deploy 直接失败
+# （"You need to register a workers.dev subdomain before publishing to workers.dev"）。
+# 我们本来就要挂 stat.x1shang.top 这个自定义域，因此关掉 workers.dev、只走 routes（见文件末尾）。
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"                       # 代码里是 env.DB，改这里也要改代码
+database_name = "x1shang-stats"
+database_id = "57681a30-9059-433a-84b5-5e5d7288f1ca"   # 2026-10-16 建库实测（region: APAC）
+
+# ── 自定义域（计划 §5.2 第 4 步）────────────────────────────────────────────
+# 两种加法，二选一：
+#   A. 控制台：Worker → Settings → Domains & Routes → Add → Custom domain → stat.x1shang.top
+#      （CF 会自动建 DNS 记录并签证书，这条记录是**橙云**——本计划里唯一允许橙云的）
+#   B. 用 wrangler：取消下面注释后 deploy（前提：x1shang.top 已在本账号且 zone 为 Active）
+#
+# ✅ 2026-10-16 实际采用 B：一条命令同时建 DNS 记录 + 签证书 + 绑定路由，省掉控制台一步。
+[[routes]]
+pattern = "stat.x1shang.top"
+custom_domain = true

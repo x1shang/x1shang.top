@@ -1,6 +1,6 @@
 {
   "source": "selfhosted",
-  "exported": "2026-10-16T10:22:34.033Z",
+  "exported": "2026-10-16T10:31:42.971Z",
   "schema": "hits(day TEXT, path TEXT, n INTEGER)",
   "rows": 2,
   "data": [

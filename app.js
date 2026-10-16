@@ -33,6 +33,17 @@
     }
     return esc(raw);
   };
+  /* 站点根：从 app.js 自己的绝对地址反推（todo.md §1.4 修法 A）。
+     根路径 → https://x1shang.top/ ｜ 预渲染页 → …/articles/x/../../app.js → 仍是根 ｜ file:// 双击 → 本地目录。三者都对。
+     为什么需要它：下面的 fetch / href / img / audio 用的是相对路径，而相对路径按「当前文档 URL」解析，
+     于是硬打开 /articles/<id>/ 的会话里全都指到 /articles/<id>/ 下面 → 访客图、照片、音乐、RSS 全 404。 */
+  const SITE_ROOT = (() => {
+    const src = document.currentScript?.src || document.querySelector('script[src$="app.js"]')?.src;
+    try { return src ? new URL('.', src).href : new URL('.', location.href).href; }
+    catch { return new URL('.', location.href).href; }
+  })();
+  /** 站内相对地址 → 绝对地址；本来就是绝对 URL（http / mailto / file / data）的原样返回 */
+  const at = (p) => { try { return new URL(String(p ?? ''), SITE_ROOT).href; } catch { return String(p ?? ''); } };
   const fmt = (d) => String(d || '').slice(0, 10);
   const fmtCn = (d) => { if (window.SiteLanguage.get() === 'en') return fmt(d); const m = fmt(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? ui`${m[1]}年${Number(m[2])}月${Number(m[3])}日` : fmt(d); };
   const host = (u) => { try { return new URL(u).host.replace(/^www\./, ''); } catch { return ''; } };
@@ -275,7 +286,7 @@
       ['#photography', tr('摄影')], ['#music', tr('音乐')], ['#friends', tr('友链')], ['#about', tr('关于')],
     ].map(([h, l]) => runLink(h, l));
     shortcuts.splice(3, 0, ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
-    shortcuts.push('<a href="feed.xml" type="application/rss+xml">RSS</a>', '<a href="atom.xml" type="application/atom+xml">Atom</a>',
+    shortcuts.push(ui`<a href="${safe(at('feed.xml'))}" type="application/rss+xml">RSS</a>`, ui`<a href="${safe(at('atom.xml'))}" type="application/atom+xml">Atom</a>`,
       ui`<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
 
     /* 动态：全站最新的三条「非测试样例」更新（文章 / 断言 / 学术 / 摄影 / 音乐） */
@@ -322,7 +333,7 @@
     return ui`<div class="idx-head">
         <h1 class="idx-title">Index</h1>
         <p class="idx-note">除非另有说明，本站的文字、照片与代码均由作者维护。内容按<b>热度</b>在前、<b>时间</b>在后排列。</p>
-        <p class="idx-recent"><b>最近更新：</b> ${esc(fmtCn(newestDate()))}<span class="sep">|</span><a href="feed.xml">RSS</a><span class="sep">|</span><a href="atom.xml">Atom</a></p>
+        <p class="idx-recent"><b>最近更新：</b> ${esc(fmtCn(newestDate()))}<span class="sep">|</span><a href="${safe(at('feed.xml'))}">RSS</a><span class="sep">|</span><a href="${safe(at('atom.xml'))}">Atom</a></p>
       </div>
       <div class="idx-columns">${categories.join('')}</div>
       <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ui` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
@@ -340,7 +351,11 @@
 
   function academicList() {
     const papers = [...C.papers].sort(byHeatThenTime);
-    return head('academic', tr('学术')) + idxList(papers, (p) => ui`<a href="#academic/${encodeURIComponent(p.id)}">${esc(p.title)}</a>${testBadge(p)}`,
+    /* 学术页的机构邮箱（todo.md §2.2）：投稿 / 竞赛 / 暑研表格常点名要机构邮箱，
+       而 ciallo@ 回信进 @sjtu.edu.cn 会被 SJTU 的 rspamd 灰名单拦进垃圾箱（§2.3），所以这里留 SJTU 这一封。 */
+    return head('academic', tr('学术'))
+      + ui`<p class="lead contact">学术联系：<a href="mailto:zhu_jiahe2008@sjtu.edu.cn">zhu_jiahe2008@sjtu.edu.cn</a></p>`
+      + idxList(papers, (p) => ui`<a href="#academic/${encodeURIComponent(p.id)}">${esc(p.title)}</a>${testBadge(p)}`,
       { sub: (p) => [p.authors, p.venue].filter(Boolean).map(esc).join(' · '), emptyTitle: tr('研究记录，待续'), emptyText: tr('把 .md / .tex 丢进 content/papers/ 就会出现在这里。') });
   }
 
@@ -396,7 +411,7 @@
     if (!C.photos.length) return head('photography', tr('摄影')) + empty(tr('留一个位置，给下一束光'), tr('把照片拖进 <code>inbox/photos/</code>，流水线会自动压缩成 WebP（该目录已 gitignore）。'));
     const list = [...C.photos].sort(byHeatThenTime);
     return head('photography', tr('摄影')) + ui`<div class="photo-grid">${list.map((p) => ui`<figure class="photo" id="photo-${esc(p.id)}" style="margin:0">
-        <button class="shot" data-photo="${esc(p.id)}" aria-label="放大：${esc(p.title || tr('照片'))}"><img loading="lazy" src="${safe(p.thumb || p.src)}" alt="${esc(p.title || '')}"></button>
+        <button class="shot" data-photo="${esc(p.id)}" aria-label="放大：${esc(p.title || tr('照片'))}"><img loading="lazy" src="${safe(at(p.thumb || p.src))}" alt="${esc(p.title || '')}"></button>
         <figcaption class="cap"><span>${esc(p.title || '')}${testBadge(p)}</span><span class="meta">${esc(p.location || '')}</span><span class="date">${esc(fmt(p.date))}</span></figcaption>
       </figure>`).join('')}</div>
       <p class="note">照片来自 <code>inbox/photos/</code>（原始文件不入库），构建时自动旋转、压缩并转成 WebP。</p>`;
@@ -437,29 +452,32 @@
           <p>整站是纯静态的 HTML / CSS / JavaScript：文字丢进 <code>content/</code>（文章 / 断言 / 学术 / 友链）、照片丢进 <code>inbox/photos/</code>、音乐丢进 <code>assets/music/</code>，跑一次构建就编入索引。照片目录已被 gitignore，只有压缩后的 WebP 会进仓库。</p>
           <p>页面底部常驻一条命令行检索：按 <kbd>/</kbd> 或 <kbd>&gt;</kbd> 聚焦，↑↓ 选择，Enter 打开。文章、断言与论文正文用简约阅读版式，公式由 KaTeX 渲染。</p>
         </article>
-        <article class="row"><h3>订阅与统计</h3><p><a href="feed.xml">RSS</a> · <a href="atom.xml">Atom</a> · 内容数量来自站内数据，建站天数按设定日期计算。</p></article>
+        <article class="row"><h3>订阅与统计</h3><p><a href="${safe(at('feed.xml'))}">RSS</a> · <a href="${safe(at('atom.xml'))}">Atom</a> · 内容数量来自站内数据，建站天数按设定日期计算。</p></article>
         <article class="row"><h3>访客</h3>
           <div class="visits" id="visits" data-state="loading"><p class="note">正在读取访客数据…</p></div>
           <p class="note">图表只读站内的静态快照 <code>stats.json</code>（由 <code>tools/fetch-stats.mjs</code> 刷新）；访客的浏览器不会为这张图请求任何统计服务。</p>
         </article>`;
   }
 
-  /** 关于页最下方：访客量图（只读同目录的 stats.json；拿不到就安静降级，不留破图） */
+  /** 关于页最下方：访客量图（读站内的 stats.json；拿不到就安静降级，不留破图） */
   async function hydrateVisits() {
     const box = document.getElementById('visits');
     if (!box) return;
-    let data = null;
+    let data = null, why = '';
     try {
-      const res = await fetch('stats.json', { cache: 'no-store' });
-      if (res.ok) data = await res.json();
-    } catch { /* file:// 或断网：保持安静 */ }
+      const res = await fetch(at('stats.json'), { cache: 'no-store' });
+      if (res.ok) {
+        try { data = await res.json(); } catch { why = tr('stats.json 解析失败'); }
+      } else why = ui`暂时读不到 stats.json（HTTP ${res.status}）`;
+    } catch { why = tr('读取失败，可能是断网'); }
     const raw = data && Array.isArray(data.series) ? data.series : [];
     const series = raw.filter((x) => x && typeof x.n === 'number' && x.d).slice(-30);
     if (!series.length) {
       box.dataset.state = 'empty';
-      box.innerHTML = raw.length || data
-        ? tr('<p class="note">统计刚上线，数据还在积累。</p>')
-        : tr('<p class="note">还没有统计数据（本地 <code>file://</code> 预览下不显示）。</p>');
+      // 三分支：真失败 → 说清楚失败在哪；拿到了但没数据 → 才说"还在积累"
+      box.innerHTML = why
+        ? ui`<p class="note">${esc(why)}</p>`
+        : tr('<p class="note">统计刚上线，数据还在积累。</p>');
       return;
     }
     const W = 640, H = 170, T = 12, B = 26, L = 6, R = 6;
@@ -588,7 +606,7 @@
   function openPhoto(id) {
     const p = C.photos.find((x) => String(x.id) === id);
     if (!p) return;
-    $('#large-photo').src = p.src;
+    $('#large-photo').src = at(p.src);
     $('#large-photo').alt = p.title || '';
     $('#photo-caption').textContent = [p.title, p.location, fmt(p.date), p.caption].filter(Boolean).join(' · ');
     const dialog = $('#photo-dialog');
@@ -628,14 +646,14 @@
     const src = trackSrc(t);
     if (!src) return;
     activeTrack = index;
-    audio.src = src;
+    audio.src = at(src);
     audio.dataset.track = String(t.id);
     timedLyrics = parseLrc(t.lyrics);
     $('#player').hidden = false;
     $('#now-title').textContent = ui`${t.title}${t.artist ? ' · ' + t.artist : ''}`;
     const cover = $('#now-cover');
     if (cover) {
-      if (t.cover) { cover.src = t.cover; cover.hidden = false; }
+      if (t.cover) { cover.src = at(t.cover); cover.hidden = false; }
       else { cover.hidden = true; cover.removeAttribute('src'); }
     }
     $('#now-lyric').textContent = tr('正在加载…');

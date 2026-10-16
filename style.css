@@ -73,7 +73,9 @@ kbd{font-family:var(--mono);font-size:.82em;background:#fff;border:1px solid var
 .scroll-cue{position:absolute;bottom:25px;left:50%;z-index:5;color:white;font-size:25px}
 
 /* ---------------------------------------------------------- 骨架 / 侧栏 */
-.site-layout{max-width:1270px;margin:auto;padding:90px 55px 100px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:65px;min-height:780px}
+/* 版心 1440：为了首页索引能在 240px 列宽下真的排出第 4 列（4×240 + 3×30 = 1050 ≤ 1085）。
+   1405px 以上窗口才会出现 4 列；更窄时浏览器按宽度自动退成 3 / 2 / 1 列，列宽不低于 240px。 */
+.site-layout{max-width:1440px;margin:auto;padding:90px 55px 100px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:65px;min-height:780px}
 .sidebar{align-self:start;position:sticky;top:45px}
 .site-name{font-size:24px;color:var(--ink);font-weight:800;letter-spacing:-1px}
 .site-name span{display:block;font-size:8px;letter-spacing:1.4px;font-weight:400;color:var(--muted);margin-top:5px}
@@ -92,6 +94,8 @@ main:focus,main:focus-visible{outline:none}
 .eyebrow{font-size:9px;letter-spacing:2.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
 .page-title{font-size:40px;font-weight:500;letter-spacing:-1.4px;line-height:1.4;margin:18px 0}
 .lead{font-size:13px;color:#7c848b;max-width:560px;line-height:2.1;margin-bottom:32px}
+/* 学术页第二行 .lead（学术联系）：两行叠起来会显得空，收紧一点（todo.md §2.2） */
+.lead.contact{font-size:12.5px;margin-top:-20px}
 .section-line{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:20px;gap:14px}
 .section-line h2{font-size:14px;font-weight:500;margin:0}
 .section-line span,.section-line a{font-size:10px}
@@ -116,7 +120,9 @@ main:focus,main:focus-visible{outline:none}
 .idx-recent{font-size:13px;color:var(--ink);margin:0}
 .idx-recent b{font-weight:700}
 .idx-recent .sep{color:var(--faint);margin:0 8px}
-.idx-columns{columns:240px 3;column-gap:36px;column-rule:1px solid var(--line-strong);column-fill:balance}
+/* 列数上限 4、列宽下限 240px：宽度够就 4 列，不够自动退列（240px 是"不许更窄"的底线）。
+   注意 columns 的 count 只是上限，真正决定列数的是宽度够不够（todo.md §3.2）。 */
+.idx-columns{columns:240px 4;column-gap:30px;column-rule:1px solid var(--line-strong);column-fill:balance}
 .idx-cat{margin:0 0 30px}
 .idx-cat h3{break-after:avoid;font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:-.2px}
 .idx-cat.short h3{font-style:italic;font-weight:600;color:#3f474e}
@@ -237,7 +243,8 @@ dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top
 .dock-empty{padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--muted);max-width:1270px;margin:0 auto}
 
 /* ---------------------------------------------------------- 页脚 / 光效 */
-footer{max-width:1160px;margin:0 auto;padding:25px 0 70px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8c949b;font-size:10px}
+/* 页脚宽度跟版心的内容盒对齐（1440 − 55×2 = 1330），换了版心就要跟着换，否则宽屏上左右对不上 */
+footer{max-width:1330px;margin:0 auto;padding:25px 0 70px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8c949b;font-size:10px}
 .pointer-light{position:fixed;inset:0;pointer-events:none;z-index:10;background:radial-gradient(380px circle at var(--x,-1000px) var(--y,-1000px),#ffffff2e,transparent 80%)}
 
 /* ---------------------------------------------------------- 响应式 */

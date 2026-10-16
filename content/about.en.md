@@ -18,7 +18,9 @@ The site's source code is on GitHub under the MIT license. Why not try building 
 
 **2026–present · Shanghai Jiao Tong University.** I'm studying computer science, with the aim of doing research at the intersection of AI and physics.
 
-**Get in touch:** [zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn).
+**Get in touch:** [ciallo@x1shang.top](mailto:ciallo@x1shang.top).
+
+**Academic contact:** [zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn).
 
 ### Take a look around
 

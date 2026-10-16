@@ -18,7 +18,9 @@ date: 2026-10-14
 
 2026-今 上海交通大学，学生。计算机科学专业，志于 AI + 物理方面研究。
 
-**联系方式**：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。
+**联系方式**：[ciallo@x1shang.top](mailto:ciallo@x1shang.top)。
+
+**学术联系**：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。
 
 ### 快速开始
 

@@ -22,6 +22,14 @@ The site's source code is on GitHub under the MIT license. Why not try building 
 
 **Academic contact:** [zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn).
 
+### Honors & Awards
+
+- *Nov 2025 & Apr 2026* — Benchmark Essay (Category I, Middle Band), Narrative Writing, Haidian District Senior Year 3 Midterm Examination and First Mock Examination
+- *May 2025* — First Prize, Research-Based Learning Project, RDFZ — "A Study on Determining Precipitation Type from the Area of the Wet-Bulb Melting Layer"
+- *Apr 2025* — Champion, National Security Knowledge Competition, The High School Affiliated to Renmin University of China (RDFZ)
+- *Nov 2024* — Provincial Second Prize (Beijing Division), 41st Chinese Physics Olympiad (CPhO)
+- *Jul 2024* — Bronze Award, Creative Structure Event, Regular Senior High School Division, National Youth Labor Skills and Intelligent Design Competition (AILD)
+
 ### Take a look around
 
 Try the search box at the bottom of the page. You might find something on your wavelength.

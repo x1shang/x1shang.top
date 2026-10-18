@@ -21,6 +21,9 @@
   --line:rgba(120,130,140,.20);
   --line-strong:rgba(120,130,140,.36);
   --glass:rgba(255,255,255,.43);
+  --player-accent:#e93b3b;
+  --player-icon:#4b5563;
+  --player-track:rgba(120,130,140,.24);
   --dock-h:46px;
   --mono:ui-monospace,'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;
 }
@@ -213,14 +216,40 @@ dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top
 .share-btn:hover{background:#fff;border-color:var(--link)}
 .share-btn.is-done{color:var(--ink);border-color:var(--line-strong);background:rgba(255,255,255,.95)}
 .share-note{font-size:11px;color:var(--muted)}
-.player{position:fixed;z-index:35;bottom:calc(var(--dock-h) + 14px);left:50%;transform:translateX(-50%);width:min(670px,calc(100% - 30px));border-radius:18px;padding:12px 18px;display:flex;gap:16px;align-items:center}
-.player button{border:0;background:none;font-size:20px}
-.now-cover{width:38px;height:38px;border-radius:9px;object-fit:cover;flex:0 0 auto;background:#e6e9ee}
-.player-copy{min-width:100px;max-width:190px;flex:1}
-.player-copy strong,.player-copy span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px}
-.player-copy span{font-size:10px;color:var(--muted)}
-#time{font-size:9px;color:var(--muted);font-family:var(--mono)}
-#seek{width:100px;accent-color:var(--link)}
+/* ---------------------------------------------------------- 音乐播放器（网易云式）
+   从左到右：封面 · 上一首 · 播放/暂停 · 下一首 · 歌名/歌词 · 时间 · 进度 · 播放模式 · 关闭
+   播放模式按钮在随机 / 顺序 / 单曲循环之间切换（图标与提示跟着变）。 */
+.player{position:fixed;z-index:35;bottom:calc(var(--dock-h) + 14px);left:50%;transform:translateX(-50%);width:min(960px,calc(100% - 30px));border-radius:18px;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.player-btn,.player-play{border:0;padding:0;font:inherit;background:none;color:inherit}
+.now-cover{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:0 0 auto;background:var(--cloud-2);box-shadow:0 4px 14px rgba(40,50,58,.14)}
+.player-transport{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.player-btn{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--player-icon);transition:background-color .18s,color .18s,transform .18s;flex:0 0 auto}
+.player-btn:hover{background:rgba(40,50,58,.07);color:var(--ink)}
+.player-btn:active{transform:scale(.94)}
+.player-btn svg{display:block;width:18px;height:18px;fill:currentColor}
+#play-mode svg{fill:none}
+.player-play{width:40px;height:40px;margin:0 3px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#ff5a5a,var(--player-accent));box-shadow:0 5px 14px rgba(233,59,59,.34),inset 0 1px 0 rgba(255,255,255,.36);transition:transform .18s,box-shadow .18s;flex:0 0 auto}
+.player-play:hover{transform:scale(1.06);box-shadow:0 7px 18px rgba(233,59,59,.42),inset 0 1px 0 rgba(255,255,255,.36)}
+.player-play:active{transform:scale(.97)}
+.player-play svg{display:block;width:17px;height:17px;fill:currentColor}
+.player-copy{flex:1 1 180px;min-width:0;max-width:280px;line-height:1.35}
+.player-copy strong,.player-copy span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.player-copy strong{font-size:12.5px;font-weight:600;letter-spacing:.1px}
+.player-copy span{font-size:10.5px;color:var(--muted);margin-top:2px}
+#time{flex:0 0 auto;font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap;letter-spacing:.02em}
+#seek{--seek:0%;-webkit-appearance:none;appearance:none;flex:1 1 140px;width:auto;max-width:320px;min-width:52px;height:18px;margin:0;background:transparent;cursor:pointer}
+#seek::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:linear-gradient(to right,var(--player-accent) var(--seek),var(--player-track) var(--seek))}
+#seek::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4px;border-radius:50%;background:#fff;border:2px solid var(--player-accent);box-shadow:0 1px 4px rgba(30,40,50,.22);transition:transform .15s}
+#seek:hover::-webkit-slider-thumb{transform:scale(1.15)}
+#seek::-moz-range-track{height:4px;border:0;border-radius:999px;background:var(--player-track)}
+#seek::-moz-range-progress{height:4px;border-radius:999px;background:var(--player-accent)}
+#seek::-moz-range-thumb{width:10px;height:10px;border:2px solid var(--player-accent);border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(30,40,50,.22)}
+#seek:focus-visible{outline:2px solid var(--link);outline-offset:4px;border-radius:999px}
+.player-close{color:var(--faint)}
+.player-close:hover{background:rgba(233,59,59,.10);color:var(--player-accent)}
+.player-close svg{width:16px;height:16px}
+.player-mode-tip{position:absolute;right:52px;bottom:calc(100% + 9px);padding:5px 10px;border-radius:8px;background:rgba(32,39,47,.86);color:#fff;font-size:10.5px;letter-spacing:.05em;white-space:nowrap;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .18s,transform .18s}
+.player-mode-tip.is-show{opacity:1;transform:translateY(0)}
 
 /* ---------------------------------------------------------- 底部命令行检索 */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(248,250,251,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line-strong)}
@@ -272,15 +301,33 @@ footer{max-width:1330px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
   .idx-item .date{margin-left:0}
   .prose{font-size:15.5px}
   .dock-hint{display:none}
-  .player{gap:9px}
-  .now-cover{width:28px;height:28px;border-radius:7px}
-  #seek{width:60px}
+  .player{gap:8px;padding:8px 12px;width:calc(100% - 20px);border-radius:16px}
+  .now-cover{width:32px;height:32px;border-radius:8px}
+  .player-transport{gap:0}
+  .player-btn{width:28px;height:28px}
+  .player-btn svg{width:16px;height:16px}
+  .player-play{width:36px;height:36px;margin:0 2px}
+  .player-play svg{width:15px;height:15px}
+  .player-copy{flex:1 1 80px;max-width:none}
+  .player-copy strong{font-size:11.5px}
+  .player-copy span{font-size:9.5px}
+  #seek{flex:1 1 54px;width:auto;max-width:150px;min-width:44px}
   #time{display:none}
+  .player-mode-tip{right:44px}
   .stats{gap:8px}
   .stat{padding:12px}
   .stat strong{font-size:23px}
   footer{margin:0 24px;padding-bottom:60px;gap:20px}
   footer>span:nth-child(2){display:none}
+}
+@media(max-width:480px){
+  .player{gap:6px;padding:7px 10px}
+  .now-cover{width:28px;height:28px;border-radius:7px}
+  .player-btn{width:26px;height:26px}
+  .player-play{width:34px;height:34px}
+  .player-copy strong{font-size:10.5px}
+  .player-copy span{font-size:9px}
+  #seek{flex:1 1 44px;max-width:90px;min-width:40px}
 }
 @media(prefers-reduced-motion:reduce){html,.lyrics{scroll-behavior:auto}*{transition:none!important}.pointer-light{display:none}}
 @media(pointer:coarse){.pointer-light{display:none}}
@@ -300,6 +347,7 @@ html[lang="en"] .prose{line-height:1.85}
   color-scheme:dark;--ink:#dce5ef;--muted:#a9b6c5;--faint:#95a5b8;
   --link:#87b9f3;--link-hover:#bad8ff;--cloud:#111820;--cloud-2:#1d2835;
   --cloud-line:#354354;--line:rgba(157,176,199,.2);--line-strong:rgba(157,176,199,.36);--glass:rgba(22,31,44,.7);
+  --player-icon:#a9b6c5;--player-track:rgba(220,230,242,.18);
 }
 [data-theme="dark"] body{background-image:radial-gradient(ellipse at 72% 30%,#1b2736,transparent 62%)}
 [data-theme="dark"] body.reading{background-image:none}
@@ -313,6 +361,8 @@ html[lang="en"] .prose{line-height:1.85}
 [data-theme="dark"] .hero:after{background:linear-gradient(transparent,#111820aa)}
 [data-theme="dark"] .sky-credit{display:block}
 [data-theme="dark"] .glass{background:var(--glass);border-color:#b6c8df26;box-shadow:0 10px 50px #0003}
+[data-theme="dark"] .player-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+[data-theme="dark"] .player-mode-tip{background:rgba(235,242,250,.92);color:#1a2430}
 [data-theme="dark"] .card-label,[data-theme="dark"] .identity .bio,[data-theme="dark"] .identity .mail a,[data-theme="dark"] .card-links a{color:#c2cedc}
 [data-theme="dark"] .card-links{border-color:#b6c8df26}
 [data-theme="dark"] .idx-note,[data-theme="dark"] .idx-run,[data-theme="dark"] .idx-cat.short h3,[data-theme="dark"] .prose,[data-theme="dark"] .prose h4{color:var(--ink)}

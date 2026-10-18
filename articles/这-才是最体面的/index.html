@@ -86,7 +86,20 @@
 
 <footer><span>© <span id="year"></span> x1shang</span><span>文字、代码，与生活的切片。</span><a href="#home">回到山间 ↑</a></footer>
 
-<section id="player" class="player glass" aria-label="音乐播放器" hidden><img id="now-cover" class="now-cover" alt="" referrerpolicy="no-referrer" hidden><button id="play-toggle" aria-label="播放">▶</button><div class="player-copy"><strong id="now-title"></strong><span id="now-lyric">等待播放</span></div><span id="time">0:00 / 0:00</span><input id="seek" type="range" min="0" max="100" value="0" aria-label="播放进度"><button id="next-track" aria-label="下一首">↠</button><button id="close-player" aria-label="停止并关闭">×</button></section>
+<section id="player" class="player glass" aria-label="音乐播放器" hidden>
+ <img id="now-cover" class="now-cover" alt="" referrerpolicy="no-referrer" hidden>
+ <div class="player-transport" role="group" aria-label="播放控制">
+  <button type="button" id="prev-track" class="player-btn" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6z"/><path d="M19 5.5v13L8.6 12z"/></svg></button>
+  <button type="button" id="play-toggle" class="player-play" aria-label="播放" title="播放"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.4v13.2L19 12z"/></svg></button>
+  <button type="button" id="next-track" class="player-btn" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5h2.4v13H16z"/><path d="M5 5.5v13L15.4 12z"/></svg></button>
+ </div>
+ <div class="player-copy"><strong id="now-title"></strong><span id="now-lyric">等待播放</span></div>
+ <span id="time">0:00 / 0:00</span>
+ <input id="seek" type="range" min="0" max="100" value="0" aria-label="播放进度">
+ <button type="button" id="play-mode" class="player-btn" aria-label="播放模式：顺序播放（点击切换）" title="播放模式：顺序播放（点击切换）"></button>
+ <span id="play-mode-tip" class="player-mode-tip" role="status" aria-live="polite"></span>
+ <button type="button" id="close-player" class="player-btn player-close" aria-label="停止并关闭" title="停止并关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z"/></svg></button>
+</section>
 <audio id="audio" preload="metadata"></audio>
 
 <dialog id="photo-dialog"><button id="close-photo" aria-label="关闭照片">×</button><figure><img id="large-photo" alt=""><figcaption id="photo-caption"></figcaption></figure></dialog>

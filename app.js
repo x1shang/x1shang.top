@@ -447,8 +447,17 @@
     const rows = list.length ? idxList(list, (f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)} ↗</a>${testBadge(f)}`,
       { sub: (f) => esc(f.description || host(f.url)) })
       : empty(tr('期待在这里，遇见同路人'));
+    const avatar = 'https://x1shang.top/assets/img/x1shang-avatar.webp';
     return head('friends', tr('友链')) + rows
-      + tr('<p class="note">友链是站内写定的静态清单（<code>content/friends/</code>）；本站不收在线申请。</p>');
+      + ui`<div class="friend-apply glass">
+          <p>${tr('如想添加请')}<a href="mailto:ciallo@x1shang.top">${tr('邮箱')}</a>${tr('联系，并使用以下信息添加我进入你的友链哦')}</p>
+          <dl>
+            <dt>${tr('名称：')}</dt><dd>x1shang-山与回响</dd>
+            <dt>${tr('简介：')}</dt><dd>${tr('山有轮廓，思绪没有')}</dd>
+            <dt>${tr('链接：')}</dt><dd><a href="https://www.x1shang.top" target="_blank" rel="noopener noreferrer">https://www.x1shang.top</a></dd>
+            <dt>${tr('头像：')}</dt><dd><a href="${avatar}" target="_blank" rel="noopener noreferrer">${avatar}</a></dd>
+          </dl>
+        </div>`;
   }
 
   function aboutPage() {

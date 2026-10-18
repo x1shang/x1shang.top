@@ -1,7 +1,8 @@
 {
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
-  "updated": "2026-10-18T08:03:26.555Z",
+  "metric": "visits",
+  "updated": "2026-10-18T08:41:05.495Z",
   "days": 30,
   "total": 214,
   "allTime": 214,

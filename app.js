@@ -648,12 +648,17 @@
     single: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></svg>',
   };
   let activeTrack = -1, timedLyrics = [], lyricIndex = -1, failStreak = 0;
+  const LOCAL_RETRY_LIMIT = 2;
   let playMode = (() => {
     try { const saved = localStorage.getItem(PLAY_MODE_KEY); return PLAY_MODES.includes(saved) ? saved : 'order'; }
     catch { return 'order'; }
   })();
-  let randomHistory = [], errorSkipTimer = 0, modeTipTimer = 0;
+  let randomHistory = [], errorSkipTimer = 0, retryTimer = 0, modeTipTimer = 0, retryCount = 0;
   const audio = $('#audio');
+  /** 播放器提示：锁住 #now-lyric，避免 loadedmetadata / timeupdate 把「重试中 / 点击播放」覆盖成 ♪ */
+  let lyricNotice = '';
+  function setPlayerNotice(text) { lyricNotice = text; $('#now-lyric').textContent = tr(text); }
+  function clearPlayerNotice() { lyricNotice = ''; }
   function parseLrc(source) {
     const rows = [];
     String(source || '').split('\n').forEach((line) => {
@@ -675,7 +680,17 @@
       : ui`<p class="meta">${activeTrack < 0 ? tr('选择一首曲目，旋律从这里开始。') : tr('这首还没有歌词（同名 .lrc 会自动读取）。')}</p>`;
     lyricIndex = timedLyrics.length ? -1 : -2;
   }
-  async function play() { try { await audio.play(); } catch { $('#now-lyric').textContent = tr('无法播放，请检查音频地址后重试'); } }
+  async function play() {
+    try {
+      await audio.play();
+    } catch (err) {
+      // 切歌会中止上一首的 play()，这不是故障；自动播放被拦也不是地址问题。
+      if (err && err.name === 'AbortError') return;
+      if (err && err.name === 'NotAllowedError') { setPlayerNotice('点击播放键开始播放'); return; }
+      if (audio.error) return; // 真正的加载失败交给 error 事件统一重试
+      setPlayerNotice('无法播放，请检查网络后重试');
+    }
+  }
   function paintPlayMode() {
     const btn = $('#play-mode');
     if (!btn) return;
@@ -738,14 +753,22 @@
     if (!t) return;
     const src = trackSrc(t);
     if (!src) return;
+    if (!opts.retry) retryCount = 0;
     clearTimeout(errorSkipTimer);
+    clearTimeout(retryTimer);
+    retryTimer = 0;
     // 随机模式记下上一首，才能让“上一首”真的退回去；顺序/单曲按数组下标走即可。
     if (playMode === 'random' && !opts.fromHistory && activeTrack >= 0 && activeTrack !== index) {
       randomHistory.push(activeTrack);
       if (randomHistory.length > 50) randomHistory.shift();
     }
     activeTrack = index;
-    audio.src = at(src);
+    // 本地音频失败重试时加 ?retry=N：绕开浏览器/GitHub Pages 可能缓存的失败响应。
+    const url = at(src);
+    const retryUrl = opts.retry && /^https?:/i.test(url)
+      ? ui`${url}${url.includes('?') ? '&' : '?'}retry=${retryCount}`
+      : url;
+    audio.src = retryUrl;
     audio.dataset.track = String(t.id);
     timedLyrics = parseLrc(t.lyrics);
     $('#player').hidden = false;
@@ -758,7 +781,7 @@
     const seek = $('#seek');
     if (seek) { seek.value = 0; seek.style.setProperty('--seek', '0%'); }
     $('#time').textContent = '0:00 / 0:00';
-    $('#now-lyric').textContent = tr('正在加载…');
+    setPlayerNotice(opts.notice || '正在加载…');
     renderLyrics(); play();
   }
   function nextTrack() {
@@ -784,6 +807,7 @@
       seek.value = percent;
       seek.style.setProperty('--seek', `${percent}%`);
     }
+    if (lyricNotice) return;
     let i = -1;
     timedLyrics.forEach((l, k) => { if (l.time <= audio.currentTime) i = k; });
     if (i !== lyricIndex) {
@@ -805,14 +829,28 @@
   audio.addEventListener('timeupdate', updateTime);
   audio.addEventListener('loadedmetadata', updateTime);
   audio.addEventListener('play', paintPlayToggle);
-  audio.addEventListener('playing', () => { failStreak = 0; });
+  audio.addEventListener('playing', () => {
+    failStreak = 0;
+    retryCount = 0;
+    clearTimeout(retryTimer);
+    retryTimer = 0;
+    clearPlayerNotice();
+    updateTime();
+  });
   audio.addEventListener('pause', paintPlayToggle);
+  // 缓冲提示：只在“已经播过一点、又卡住”时显示；初次加载仍显示「正在加载…」
+  const showBuffering = () => {
+    if (activeTrack >= 0 && !audio.paused && audio.currentTime > 0) setPlayerNotice('缓冲中…');
+  };
+  audio.addEventListener('waiting', showBuffering);
+  audio.addEventListener('stalled', showBuffering);
   audio.addEventListener('error', () => {
     if (activeTrack < 0) return;
     const t = playlist[activeTrack];
-    if (t && t.netease) {
+    if (!t) return;
+    if (t.netease) {
       // 网易云对 VIP / 独家 / 无版权曲目不签发直链（302 到 music.163.com/404）→ 提示并顺延，最多绕一圈
-      $('#now-lyric').textContent = tr('网易云没给这首歌直链（VIP / 独家 / 无版权），换下一首');
+      setPlayerNotice('网易云没给这首歌直链（VIP / 独家 / 无版权），换下一首');
       if (failStreak < playlist.length - 1) {
         failStreak++;
         clearTimeout(errorSkipTimer);
@@ -822,16 +860,31 @@
           if (index >= 0) startTrack(index, { fromHistory: true });
         }, 1600);
       }
-    } else {
-      $('#now-lyric').textContent = tr('音频无法加载，请检查文件或链接');
+      return;
     }
+    // 本地文件仍在 GitHub Pages 上：网络抖动/断流时先原地重试两次，不要立刻判死。
+    if (retryCount < LOCAL_RETRY_LIMIT && !retryTimer) {
+      retryCount++;
+      setPlayerNotice('网络波动，正在重试…');
+      retryTimer = setTimeout(() => {
+        retryTimer = 0;
+        if (activeTrack >= 0) startTrack(activeTrack, { retry: true, notice: '网络波动，正在重试…' });
+      }, 900 * retryCount);
+      return;
+    }
+    setPlayerNotice('音频加载失败，请检查网络后重试');
   });
   audio.addEventListener('ended', () => {
     if (!playlist.length) return;
     if (playMode === 'single') { audio.currentTime = 0; play(); return; }
     nextTrack();
   });
-  $('#play-toggle').onclick = () => (audio.paused ? play() : audio.pause());
+  $('#play-toggle').onclick = () => {
+    if (!audio.paused) { audio.pause(); return; }
+    // 已经报错过一次：点播放键 = 重新加载（否则 error 状态下的 play() 不会恢复）
+    if (audio.error && activeTrack >= 0) { startTrack(activeTrack); return; }
+    play();
+  };
   const prevButton = $('#prev-track');
   if (prevButton) prevButton.onclick = prevTrack;
   const nextButton = $('#next-track');

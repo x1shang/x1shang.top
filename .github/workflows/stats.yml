@@ -14,7 +14,8 @@ name: stats
 #   · **双跑**：每次运行都同时取 GoatCounter 与自建两边，对比写进 Job Summary + tools/stat-dual-run.log（**不进 stats.json**）
 #   · 站上显示哪一侧由仓库 **Variable** `STATS_PROVIDER` 决定：缺省/`goatcounter` = 现状不变；
 #     想切到自建就在 Settings → Variables 里设成 `selfhosted`（或用 `gh variable set STATS_PROVIDER --body selfhosted`），
-#     切之前记得按 §8.8 把关于页文案从“N 位访客”改成“N 次浏览”。切回同理。
+#     自建 v2 与 GoatCounter 均按页 visits（会话内同页去重），都不是全站独立人数；
+#     旧 PV 单独保留，自建 visits 从 API 的 since 起累计。
 
 on:
   schedule:

@@ -10,17 +10,17 @@
  *   GET  /api/export          全量导出（备份用，Bearer token）
  *   GET  /robots.txt          计数器主机不做内容，整站 Disallow
  *
- * 口径：**PV（页面浏览量）**，不是 UV。与 GoatCounter 的"访客数"不同口径，
- *       双跑期（§6.1）允许绝对值有差异，但**不允许缺日/断档**。
- *       要 UV 见 §5.1 的 `visitors(day, vid_hash)` 方案（Phase 2.5，可选）。
+ * 口径：visits，与 GoatCounter 默认规则接近：8 小时固定会话，同一页只计一次。
+ *       各页 visits 求和不是全站独立人数。旧 PV 留在 hits，不冒充历史 visits。
  *
- * 隐私：无 cookie、无 IP、无 UA、无第三方脚本。只记「哪一天 / 哪一页 / 几次」。
+ * 隐私：无 cookie。IP + UA 仅用于服务端 HMAC，原文不落库；采集和取数时清理过期会话。
  *
  * 兼容性硬约束（别改）：`/api/stats` 的字段名与类型必须和 tools/fetch-stats.mjs 写出的
  * `stats.json` 完全一致 —— Phase 3 要把它直接当 provider 用，`build-content.mjs` 零改动。
  */
 
-const VERSION = '1.0.0';
+const VERSION = '2.0.0';
+const SESSION_MS = 8 * 60 * 60 * 1000;
 
 /* ------------------------------------------------------------------ 配置 */
 
@@ -40,9 +40,10 @@ const DAY_OFFSET_MINUTES = 0;
 
 /** path 白名单正则（计划 §5.1）：只允许 URL path 里合法且无歧义的字符 */
 const PATH_RE = /^\/[A-Za-z0-9%._~!$&'()*+,;=:@/-]*$/;
-const MAX_PATH_LEN = 200;
-const MAX_BODY_BYTES = 1024;
+const MAX_PATH_LEN = 2048;
+const MAX_BODY_BYTES = 8192;
 const MAX_DAYS = 365;
+const BOT_RE = /bot\b|spider|crawler|slurp|headlesschrome|facebookexternalhit|bingpreview|\b(?:curl|wget|python-requests|python-urllib|httpclient|go-http-client)\//i;
 
 /* ------------------------------------------------------------ 小工具 */
 
@@ -107,19 +108,45 @@ function corsHeaders(request) {
  */
 function beaconScript(origin) {
   const js = `(function(){var U=${JSON.stringify(origin + '/c')},L='';
-function s(p){if(!p||p===L)return;L=p;try{navigator.sendBeacon(U,JSON.stringify({p:p}))}catch(e){}}
-function n(){s(location.pathname)}
+function p(){var m=location.hash.match(new RegExp('^#(articles|assertions|academic)/(.+)$'));if(m){try{return '/'+m[1]+'/'+encodeURIComponent(decodeURIComponent(m[2]))+'/'}catch(e){}}return location.pathname}
+function n(){var q=p();if(!q||q===L)return;try{if(navigator.sendBeacon(U,JSON.stringify({p:q})))L=q}catch(e){}}
 n();
 addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')n()},{passive:true});
 addEventListener('pagehide',n,{passive:true});
 ['pushState','replaceState'].forEach(function(m){var f=history[m];history[m]=function(){var r=f.apply(this,arguments);n();return r}});
-addEventListener('popstate',n,{passive:true});})();`;
+addEventListener('popstate',n,{passive:true});
+addEventListener('hashchange',n,{passive:true});})();`;
   return new Response(js, {
     headers: {
       'content-type': 'application/javascript; charset=utf-8',
       'cache-control': 'public, max-age=600',
     },
   });
+}
+
+/** 与 GoatCounter 的路径键对齐：去结尾斜杠，统一 URI 编码；拒绝编码后的穿越。 */
+function normalizePath(p) {
+  if (typeof p !== 'string' || !p || p.length > MAX_PATH_LEN || !PATH_RE.test(p) || p.includes('//')) return null;
+  try {
+    const parts = p.split('/').map((part) => {
+      const text = decodeURIComponent(part);
+      if (text === '.' || text === '..' || /[/\\\x00-\x1f\x7f]/.test(text)) throw new Error('invalid path');
+      return encodeURIComponent(text);
+    });
+    return parts.join('/').replace(/\/+$/, '') || '/';
+  } catch { return null; }
+}
+
+/** 只信任 Cloudflare 提供的连接 IP，不接受客户端自报的 ID / X-Forwarded-For。 */
+async function visitorKey(request, env) {
+  const ip = request.headers.get('CF-Connecting-IP');
+  const ua = request.headers.get('User-Agent');
+  if (!ip || !ua || !env.API_TOKEN || BOT_RE.test(ua) || request.cf?.botManagement?.verifiedBot) return null;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.API_TOKEN),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const digest = await crypto.subtle.sign('HMAC', key,
+    new TextEncoder().encode(JSON.stringify(['x1shang-stats-session-v1', ip, ua])));
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -140,18 +167,34 @@ async function collect(request, env) {
     const raw = await request.text();
     if (!raw || raw.length > MAX_BODY_BYTES) return NO_CONTENT(cors);
 
-    const p = JSON.parse(raw)?.p;
-    if (typeof p !== 'string' || !p || p.length > MAX_PATH_LEN) return NO_CONTENT(cors);
-    // PATH_RE 只管**字符集**（`..` 和 `//` 里的 `.` `/` 都是合法字符，能过正则），
-    // 所以语义垃圾要单独挡：计数器没有文件系统、`..` 不构成穿越，但没必要让脏键进库。
-    if (!PATH_RE.test(p) || p.includes('//') || p.includes('..')) return NO_CONTENT(cors);
+    let body;
+    try { body = JSON.parse(raw); } catch { return NO_CONTENT(cors); }
+    const p = normalizePath(body?.p);
+    if (!p) return NO_CONTENT(cors);
+    const key = await visitorKey(request, env);
+    if (!key) return NO_CONTENT(cors);
 
-    await env.DB.prepare(
-      `INSERT INTO hits (day, path, n) VALUES (?1, ?2, 1)
-       ON CONFLICT(day, path) DO UPDATE SET n = hits.n + 1`
-    ).bind(dayKey(), p).run();
+    const now = Date.now(), day = dayKeyAt(now);
+    // D1 batch 是事务：并发刷新也只能把同一 session/path 的 visits 加一。
+    // 会话从首次访问起固定 8 小时，跨 UTC 午夜不会重新计数。
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?1').bind(now),
+      env.DB.prepare('INSERT OR IGNORE INTO sessions (visitor_key, session_id, expires_at) VALUES (?1, ?2, ?3)')
+        .bind(key, crypto.randomUUID(), now + SESSION_MS),
+      env.DB.prepare("INSERT OR IGNORE INTO stats_meta (key, value) VALUES ('visits_since', ?1)")
+        .bind(new Date(now).toISOString()),
+      env.DB.prepare(`INSERT INTO hits (day, path, n) VALUES (?1, ?2, 1)
+        ON CONFLICT(day, path) DO UPDATE SET n = hits.n + 1`).bind(day, p),
+      env.DB.prepare(`INSERT INTO visits (day, path, n)
+        SELECT ?1, ?2, 1 FROM sessions s WHERE s.visitor_key = ?3
+          AND NOT EXISTS (SELECT 1 FROM session_paths sp WHERE sp.session_id = s.session_id AND sp.path = ?2)
+        ON CONFLICT(day, path) DO UPDATE SET n = visits.n + 1`).bind(day, p, key),
+      env.DB.prepare(`INSERT OR IGNORE INTO session_paths (session_id, path)
+        SELECT session_id, ?1 FROM sessions WHERE visitor_key = ?2`).bind(p, key),
+    ]);
   } catch {
-    /* 静默丢弃：统计端点绝不能因为垃圾请求而 5xx，也不能泄漏失败原因 */
+    /* 不把 IP / UA / 路径写进日志；返回仍是 204。 */
+    console.error('[stats] collection failed');
   }
   return NO_CONTENT(cors);
 }
@@ -161,16 +204,21 @@ async function collect(request, env) {
 /** GET /api/stats?days=30 —— 与 stats.json 同形状（多一个 source 字段：'selfhosted'） */
 async function apiStats(request, url, env) {
   if (!authed(request, env)) return json({ error: 'unauthorized' }, 401);
+  await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?1').bind(Date.now()).run();
 
   const asked = Number.parseInt(url.searchParams.get('days') ?? '30', 10);
   const days = Math.min(Math.max(Number.isFinite(asked) ? asked : 30, 1), MAX_DAYS);
   const list = lastDays(days);
   const from = list[0];
+  const metric = url.searchParams.get('metric') || 'visits';
+  if (!['visits', 'pageviews'].includes(metric)) return json({ error: 'invalid metric' }, 400);
+  const table = metric === 'visits' ? 'visits' : 'hits';
 
-  const [byDay, allTimeRow, pagesRows] = await Promise.all([
-    env.DB.prepare(`SELECT day AS d, SUM(n) AS n FROM hits WHERE day >= ?1 GROUP BY day`).bind(from).all(),
-    env.DB.prepare(`SELECT COALESCE(SUM(n), 0) AS t FROM hits`).first(),
-    env.DB.prepare(`SELECT path, SUM(n) AS n FROM hits GROUP BY path`).all(),
+  const [byDay, allTimeRow, pagesRows, since] = await Promise.all([
+    env.DB.prepare(`SELECT day AS d, SUM(n) AS n FROM ${table} WHERE day >= ?1 GROUP BY day`).bind(from).all(),
+    env.DB.prepare(`SELECT COALESCE(SUM(n), 0) AS t FROM ${table}`).first(),
+    env.DB.prepare(`SELECT path, SUM(n) AS n FROM ${table} GROUP BY path`).all(),
+    env.DB.prepare("SELECT value FROM stats_meta WHERE key = 'visits_since'").first(),
   ]);
 
   const seen = new Map((byDay.results ?? []).map((r) => [r.d, Number(r.n) || 0]));
@@ -181,6 +229,9 @@ async function apiStats(request, url, env) {
 
   return json({
     source: 'selfhosted',
+    metric,
+    sessionHours: metric === 'visits' ? 8 : null,
+    since: metric === 'visits' ? (since?.value ?? null) : '2026-10-16T00:00:00Z',
     site: url.origin + '/',
     updated: new Date().toISOString(),
     days,
@@ -194,14 +245,20 @@ async function apiStats(request, url, env) {
 /** GET /api/export —— 全量导出（每周拉一次落进仓库，§8.7「数据别只在别人手里」） */
 async function apiExport(request, env) {
   if (!authed(request, env)) return json({ error: 'unauthorized' }, 401);
+  await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?1').bind(Date.now()).run();
   const r = await env.DB.prepare(`SELECT day, path, n FROM hits ORDER BY day, path`).all();
   const rows = r.results ?? [];
+  const visits = await env.DB.prepare('SELECT day, path, n FROM visits ORDER BY day, path').all();
+  const since = await env.DB.prepare("SELECT value FROM stats_meta WHERE key = 'visits_since'").first();
   return json({
     source: 'selfhosted',
     exported: new Date().toISOString(),
     schema: 'hits(day TEXT, path TEXT, n INTEGER)',
     rows: rows.length,
     data: rows,
+    metric: 'pageviews',             // 保持旧备份 data 字段的口径，历史 PV 不丢失
+    visits: visits.results ?? [],
+    visitsSince: since?.value ?? null,
   });
 }
 
@@ -222,7 +279,8 @@ export default {
       case '/robots.txt':
         return new Response('User-agent: *\nDisallow: /\n', { headers: { 'content-type': 'text/plain; charset=utf-8' } });
       case '/':
-        return json({ service: 'x1shang-stats', version: VERSION, endpoints: ['/s.js', '/c', '/api/stats', '/api/export'] });
+        return json({ service: 'x1shang-stats', version: VERSION, metric: 'visits', sessionHours: 8,
+          endpoints: ['/s.js', '/c', '/api/stats', '/api/export'] });
       default:
         return new Response('not found\n', { status: 404 });
     }

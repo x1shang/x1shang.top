@@ -23,8 +23,8 @@
  *
  * 参数：--days 30（默认 30）· --out stats.json · --provider goatcounter|selfhosted
  * 输出：{ source, site, updated, days, total, allTime, series: [{ d:'YYYY-MM-DD', n:number }] }
- * 口径：GoatCounter 的 daily / count 都是「访客数」（它的 count_unique 与 count 相同）；
- *      自建（selfhosted）是「页面浏览量（PV）」—— 两者绝对值天然有差异，双跑看的是**趋势**。
+ * 口径：两侧都是按页 visits（约 8 小时会话内同页去重），各页之和不是全站独立人数。
+ *      自建 v2 从 since 起单独累计；v1 的历史 PV 保留在后端，不能混进 visits。
  *
  * ── Phase 3（2026-10-16 加）：自建统计 + 双跑 ────────────────────────────────
  * provider 选择顺序：
@@ -202,14 +202,15 @@ async function counterPages() {
   return out;
 }
 
-/* ── Phase 3：自建 provider（stat.x1shang.top/api/stats，字段与 stats.json 同形状） ──
-   它返回的是 **PV**（页面浏览量），GoatCounter 那边是访客数（UV）：绝对值不该相等，
-   双跑看的是"趋势一致 + 不缺日"（§6.1）。 */
+/* 自建 provider：显式请求 visits，并拒绝尚未升级的 PV API，避免静默混用口径。 */
 async function fromSelfHosted() {
-  const data = await getJson(`${STATS_API_URL}/api/stats?days=${DAYS}`, { Authorization: `Bearer ${STATS_API_TOKEN}` }, API_RETRY);
+  const data = await getJson(`${STATS_API_URL}/api/stats?days=${DAYS}&metric=visits`, { Authorization: `Bearer ${STATS_API_TOKEN}` }, API_RETRY);
+  if (data.metric !== 'visits') throw new Error('自建 API 尚未提供 visits，拒绝把历史 PV 当成去重访问');
   const acc = new Map((data.series ?? []).map((x) => [x.d, num(x.n)]));
   return {
     source: 'selfhosted',
+    metric: 'visits',
+    since: data.since ?? null,
     series: dayList.map((d) => ({ d, n: acc.get(d) ?? 0 })),   // 逐日补零，绝不缺日
     pages: data.pages ?? {},
     allTime: data.allTime === undefined ? null : num(data.allTime),
@@ -228,11 +229,14 @@ async function viaGoatCounter() {
 }
 
 /** 某一侧在这次窗口里的摘要（双跑对比用） */
-function sideSummary(label, r) {
+function sideSummary(label, r, comparisonSince = SELFHOSTED_SINCE) {
   const pages = r.pages || {};
-  const since = r.series.filter((x) => x.d >= SELFHOSTED_SINCE);
+  const since = r.series.filter((x) => x.d >= comparisonSince);
   return {
     label,
+    metric: 'visits',
+    since: comparisonSince,
+    comparableTotal: since.reduce((s, x) => s + x.n, 0),
     total: r.series.reduce((s, x) => s + x.n, 0),
     allTime: r.allTime,
     activeDays: r.series.filter((x) => x.n > 0).length,        // 窗口内有数的天
@@ -259,14 +263,15 @@ async function dualRun(gc, sh) {
     `gc_days=${gc ? gc.activeDays : '-'}`, `sh_days=${sh ? sh.activeDays : '-'}`,
     `sh_zero_since=${sh ? sh.zeroSince : '-'}`,
     `gc_pages=${gc ? `${gc.pagesWithData}/${gc.pages}` : '-'}`, `sh_pages=${sh ? `${sh.pagesWithData}/${sh.pages}` : '-'}`,
+    `sh_metric=${sh ? sh.metric : '-'}`, `sh_since=${sh ? sh.since : '-'}`,
+    `gc_comparable=${gc ? gc.comparableTotal : '-'}`, `sh_comparable=${sh ? sh.comparableTotal : '-'}`,
   ].join('\t');
 
   const LOG = new URL('./stat-dual-run.log', import.meta.url);
   try {
     const prevLog = await readFile(LOG, 'utf8').catch(() => '');
     const lines = prevLog.split('\n').filter(Boolean);
-    const header = lines.find((l) => l.startsWith('#'))
-      || '# 双跑日志（Phase 3 §6.1）：每天一行，两边的窗口总量/累计/有数天数；绝对值口径不同（gc=访客数 · sh=浏览量），看趋势与缺日';
+    const header = '# 双跑日志：新行 sh_metric=visits 为 8 小时同页去重；旧行未标 metric 的自建数据为 PV。gc_comparable/sh_comparable 从 sh_since 起比较，累计起点不同。';
     const body = lines.filter((l) => !l.startsWith('#') && !l.startsWith(day + '\t'));   // 同一天只留最新一条
     const nextLog = [header, ...body, line].join('\n') + '\n';
     if (nextLog !== prevLog) await writeFile(LOG, nextLog, 'utf8');
@@ -275,19 +280,20 @@ async function dualRun(gc, sh) {
   }
 
   const table = [
-    '| 指标 | GoatCounter（访客数 UV） | 自建 stat.x1shang.top（浏览量 PV） |',
+    '| 指标 | GoatCounter（按页 visits） | 自建 stat.x1shang.top（按页 visits） |',
     '|---|---|---|',
     `| 窗口内合计（近 ${DAYS} 天） | ${fmtSide(gc)} | ${fmtSide(sh)} |`,
     `| 终身累计 | ${fmtAllTime(gc)} | ${fmtAllTime(sh)} |`,
+    `| ${sh?.since ?? '自建 visits 启用日'} 起合计 | ${gc ? gc.comparableTotal : '—'} | ${sh ? sh.comparableTotal : '—'} |`,
     `| 窗口内有数的天 | ${gc ? gc.activeDays : '—'} | ${sh ? sh.activeDays : '—'} |`,
     `| 按页有数的页面 | ${gc ? `${gc.pagesWithData}/${gc.pages}` : '—'} | ${sh ? `${sh.pagesWithData}/${sh.pages}` : '—'} |`,
-    `| ${SELFHOSTED_SINCE} 起仍为 0 的天（缺日） | — | ${sh ? sh.zeroSince : '—'} |`,
+    `| 对比起点后仍为 0 的天（需检查采集） | — | ${sh ? sh.zeroSince : '—'} |`,
   ].join('\n');
   console.log(`[stats] 双跑：${line.split('\t').slice(1).join('  ')}`);
   if (process.env.GITHUB_STEP_SUMMARY) {
     try {
       await writeFile(process.env.GITHUB_STEP_SUMMARY,
-        `\n## 双跑对比（Phase 3 §6.1，**不进 stats.json**）\n\n${table}\n\n> 口径不同（UV vs PV），绝对值有差异是预期的；验收看的是**趋势一致 + 自建侧不缺日**。\n`,
+        `\n## 双跑对比（不进 stats.json）\n\n${table}\n\n> 两侧都按会话内同页去重，累计起点不同；从自建 visits 启用日比较趋势。它们都不是全站独立人数。启用当天只覆盖部分时段。\n`,
         { flag: 'a' });
     } catch { /* 摘要写不了就算了 */ }
   }
@@ -378,7 +384,9 @@ const total = series.reduce((s, x) => s + x.n, 0);
 const allTime = DEMO ? total : (allTimeFromApi ?? await fetchAllTime());
 const payload = {
   source,
-  site: BASE ? `${BASE}/` : '',
+  site: source === 'selfhosted' ? `${STATS_API_URL}/` : (BASE ? `${BASE}/` : ''),
+  metric: 'visits',
+  ...(source === 'selfhosted' ? { since: shSide.since, sessionHours: 8 } : {}),
   updated: new Date().toISOString(),
   days: DAYS,
   total,
@@ -410,15 +418,16 @@ if (prev && stable(prev) === stable(next)) {
   console.log('        要确认站点真的没人来了，加 --force 重跑；更靠谱的是给 GOATCOUNTER_TOKEN（见脚本头注释）。');
 } else {
   await writeFile(OUT, next, 'utf8');
-  const unit = source === 'selfhosted' ? '次浏览（PV）' : '位访客';
+  const unit = '次页面访问（会话内同页去重）';
   console.log(`✅ 已写入 ${OUT}：source=${source}，近 ${DAYS} 天 ${total} ${unit}` + (allTime === null ? '' : `，累计 ${allTime}`));
   console.log(`   按页数据：${Object.keys(pages).length} 页（其中 ${withData} 页有数据）—— 跑一次 npm run build 让文章热度生效。`);
 }
 /* 双跑对比（§6.1）：放在最后，且**只记录**，不影响上面的 stats.json 写入 */
 if (!DEMO) {
+  const comparisonSince = shSide?.since?.slice(0, 10) || SELFHOSTED_SINCE;
   await dualRun(
-    gcSide ? sideSummary('goatcounter', gcSide) : null,
-    shSide ? sideSummary('selfhosted', shSide) : null,
+    gcSide ? sideSummary('goatcounter', gcSide, comparisonSince) : null,
+    shSide ? sideSummary('selfhosted', shSide, comparisonSince) : null,
   );
 }
 if (DEMO) console.log('⚠️  这是演示数据，别提交（git checkout -- stats.json 可以还原）。');

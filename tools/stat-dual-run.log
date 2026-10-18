@@ -1,3 +1,4 @@
 # 双跑日志（Phase 3 §6.1）：每天一行，两边的窗口总量/累计/有数天数；绝对值口径不同（gc=访客数 · sh=浏览量），看趋势与缺日
 2026-10-16	gc_total=198	sh_total=54	gc_allTime=200	sh_allTime=54	gc_days=6	sh_days=1	sh_zero_since=0	gc_pages=20/20	sh_pages=2/2
 2026-10-17	gc_total=209	sh_total=86	gc_allTime=210	sh_allTime=86	gc_days=7	sh_days=2	sh_zero_since=0	gc_pages=20/20	sh_pages=4/4
+2026-10-18	gc_total=214	sh_total=96	gc_allTime=214	sh_allTime=96	gc_days=8	sh_days=3	sh_zero_since=0	gc_pages=20/20	sh_pages=4/4

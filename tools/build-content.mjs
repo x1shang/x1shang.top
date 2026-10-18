@@ -69,7 +69,7 @@ export function parseFrontMatter(text) {
     else if (/^-?\d+(\.\d+)?$/.test(value)) value = Number(value);
     data[key] = value;
   }
-  return { data, body: src.slice(m[0].length) };
+  return { data, body: src.slice(m[0].length).replace(/\r\n?/g, '\n') };
 }
 
 /** 文件名 → URL 安全的 id：去掉日期前缀，保留中日韩与字母数字 */

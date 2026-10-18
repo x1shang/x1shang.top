@@ -205,6 +205,8 @@ dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top
 .track strong{font-weight:500}
 .track small{display:block;color:var(--muted)}
 .track .track-play{margin-left:auto;color:var(--link);font-size:11px}
+/* 音乐页隐藏"播放"提示与日期，整行仍是可点击按钮 */
+.music-row .track-play,.music-row .date{display:none}
 .lyrics{position:relative;max-height:280px;overflow:auto;text-align:center;scroll-behavior:smooth;margin:30px 0;mask-image:linear-gradient(transparent,#000 15%,#000 85%,transparent);padding:70px 0;scrollbar-width:none;-ms-overflow-style:none}
 .lyrics::-webkit-scrollbar{width:0;height:0;display:none}
 .lyric{padding:8px;color:#98a0a7;transition:color .3s,transform .3s}

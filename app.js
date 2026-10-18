@@ -278,7 +278,11 @@
 
   /* 首页：仿 okmij.org Index —— 自适应均衡分栏链接 */
   const INDEX_LIMIT = 100;
+  const MOBILE_INDEX_LIMIT = 10;
+  /** 手机态每个板块只列 10 条，桌面仍是最多 100 条；以本次渲染时的视口宽度为准。 */
+  const indexLimit = () => (matchMedia('(max-width:760px)').matches ? MOBILE_INDEX_LIMIT : INDEX_LIMIT);
   function home() {
+    const limit = indexLimit();
     const articles = [...C.articles].sort(byHeatThenTime);
     const papers = [...C.papers].sort(byHeatThenTime);
     const assertions = [...C.assertions].sort(byHeatThenTime);
@@ -316,17 +320,17 @@
         ? joinRun(updates.map(updateRow), '—')
         : tr('<span class="meta">还没有更新：新发布的内容会自动出现在这里。</span>'),
         { short: true, note: updates.length ? tr('最近三条 · 不含测试样例') : '' }),
-      cat(tr('学术'), joinRun(papers.slice(0, INDEX_LIMIT).map((p) => runLink(ui`#academic/${encodeURIComponent(p.id)}`, p.title)), tr('论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行')),
+      cat(tr('学术'), joinRun(papers.slice(0, limit).map((p) => runLink(ui`#academic/${encodeURIComponent(p.id)}`, p.title)), tr('论文列表还是空的：把 .md/.tex 丢进 content/papers/ 就行')),
         { note: papers.length ? ui`${papers.length} 篇` : '' }),
-      cat(tr('摄影'), joinRun(photos.slice(0, INDEX_LIMIT).map((p) => runLink(ui`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || tr('照片'))), tr('还没有照片：丢进 inbox/photos/')),
+      cat(tr('摄影'), joinRun(photos.slice(0, limit).map((p) => runLink(ui`#photography/${encodeURIComponent(p.id)}`, p.title || p.location || tr('照片'))), tr('还没有照片：丢进 inbox/photos/')),
         { note: photos.length ? ui`${photos.length} 张 / 自动压缩为 WebP` : '' }),
-      cat(tr('音乐'), joinRun(tracks.slice(0, INDEX_LIMIT).map((t) => runLink(ui`#music/${encodeURIComponent(t.id)}`, t.title)), tr('还没有音乐：把音频放进 assets/music/'))),
+      cat(tr('音乐'), joinRun(tracks.slice(0, limit).map((t) => runLink(ui`#music/${encodeURIComponent(t.id)}`, t.title)), tr('还没有音乐：把音频放进 assets/music/'))),
 
-      cat(tr('文章'), joinRun(articles.slice(0, INDEX_LIMIT).map((a) => runLink(ui`#articles/${encodeURIComponent(a.id)}`, a.title)), tr('还没有文章：把 .md 丢进 content/articles/')),
+      cat(tr('文章'), joinRun(articles.slice(0, limit).map((a) => runLink(ui`#articles/${encodeURIComponent(a.id)}`, a.title)), tr('还没有文章：把 .md 丢进 content/articles/')),
         { note: articles.length ? ui`${articles.length} 篇` : '', more: articles.length ? tr('<a href="#articles">全部文章 →</a>') : '' }),
-      cat(tr('断言'), joinRun(assertions.slice(0, INDEX_LIMIT).map((a) => runLink(ui`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), tr('还没有断言：把短句丢进 content/assertions/')),
+      cat(tr('断言'), joinRun(assertions.slice(0, limit).map((a) => runLink(ui`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), tr('还没有断言：把短句丢进 content/assertions/')),
         { note: assertions.length ? ui`${assertions.length} 则` : '', more: assertions.length ? tr('<a href="#assertions">全部断言 →</a>') : '' }),
-      cat(tr('友链'), joinRun(friends.slice(0, INDEX_LIMIT).map((f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), tr('还没有友链：写进 content/friends/')),
+      cat(tr('友链'), joinRun(friends.slice(0, limit).map((f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), tr('还没有友链：写进 content/friends/')),
         { more: tr('<a href="#friends">友链 →</a>') }),
 
       cat(tr('作品'), ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">导航页</a>`,
@@ -370,7 +374,7 @@
     if (!p) return empty(tr('论文未找到'), tr('<a href="#academic">返回学术列表</a>'));
     return ui`<a class="backlink" href="#academic">← 学术</a>
       <div class="reading-head"><h1>${esc(p.title)}</h1>${testBadge(p)}
-      <div class="reading-meta"><span>${esc(fmt(p.date))}</span>${p.authors ? ui`<span>${esc(p.authors)}</span>` : ''}${p.venue ? ui`<span>${esc(p.venue)}</span>` : ''}${p.url ? ui`<span><a href="${safe(p.url)}" target="_blank" rel="noopener noreferrer">原文 ↗</a></span>` : ''}${p.file ? ui`<span>${esc(p.file)}</span>` : ''}</div></div>
+      <div class="reading-meta"><span>${esc(fmt(p.date))}</span>${p.authors ? ui`<span>${esc(p.authors)}</span>` : ''}${p.venue ? ui`<span>${esc(p.venue)}</span>` : ''}${p.url ? ui`<span><a href="${safe(p.url)}" target="_blank" rel="noopener noreferrer">原文 ↗</a></span>` : ''}</div></div>
       ${p.abstract ? ui`<p class="lead">${esc(p.abstract)}</p>` : ''}
       <article class="prose" data-format="${esc(p.format || 'md')}">${p.body ? R.renderFile({ format: p.format, body: p.body }) : tr('<p class="meta">这条记录没有正文，只有上面的信息。</p>')}</article>`;
   }
@@ -386,7 +390,7 @@
     if (!a) return empty(tr('文章未找到'), tr('<a href="#articles">返回文章列表</a>'));
     return ui`<a class="backlink" href="#articles">← 所有文章</a>
       <div class="reading-head"><h1>${esc(a.title)}</h1>${testBadge(a)}
-      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}<span>${esc(a.format || 'md')}</span>${a.file ? ui`<span>${esc(a.file)}</span>` : ''}</div></div>
+      <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}<span>${esc(a.format || 'md')}</span></div></div>
       <article class="prose" data-format="${esc(a.format || 'md')}">${R.renderFile({ format: a.format, body: a.body })}</article>`;
   }
 
@@ -429,7 +433,7 @@
       const src = trackSrc(t);
       const sub = [t.artist, t.album].filter(Boolean).join(' · ');
       const note = [sub, t.netease ? (t.playable === false ? tr('网易云 · 无直链（VIP / 独家 / 无版权）') : tr('网易云外链')) : '', t.test ? tr('测试样例') : ''].filter(Boolean).join(' · ');
-      return ui`<div class="idx-item${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
+      return ui`<div class="idx-item music-row${t.test ? ' is-test' : ''}" id="track-${esc(t.id)}">
         <span class="rank">${String(i + 1).padStart(2, '0')}</span>
         <button class="track" data-track="${esc(t.id)}" style="flex:1;border:0;padding:0"><span><strong>${esc(t.title)}</strong><small>${esc(note)}</small></span><span class="track-play">${src ? tr('播放 ↗') : tr('暂无音频')}</span></button>
         <span class="date">${esc(fmt(t.date))}</span></div>`;

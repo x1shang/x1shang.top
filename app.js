@@ -819,9 +819,12 @@
     nextTrack();
   });
   $('#play-toggle').onclick = () => (audio.paused ? play() : audio.pause());
-  $('#prev-track').onclick = prevTrack;
-  $('#next-track').onclick = nextTrack;
-  $('#play-mode').onclick = () => setPlayMode(PLAY_MODES[(PLAY_MODES.indexOf(playMode) + 1) % PLAY_MODES.length], { announce: true });
+  const prevButton = $('#prev-track');
+  if (prevButton) prevButton.onclick = prevTrack;
+  const nextButton = $('#next-track');
+  if (nextButton) nextButton.onclick = nextTrack;
+  const modeButton = $('#play-mode');
+  if (modeButton) modeButton.onclick = () => setPlayMode(PLAY_MODES[(PLAY_MODES.indexOf(playMode) + 1) % PLAY_MODES.length], { announce: true });
   $('#close-player').onclick = () => { audio.pause(); $('#player').hidden = true; };
   $('#seek').oninput = (e) => { if (Number.isFinite(audio.duration)) audio.currentTime = (Number(e.target.value) / 100) * audio.duration; };
   syncPlayerLabels();

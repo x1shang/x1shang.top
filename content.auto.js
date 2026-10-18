@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-18T09:24:23.654Z",
+ "generated": "2026-10-18T09:36:01.611Z",
  "recent": "2026-10-14",
  "site": {
   "name": "x1shang",
@@ -34,7 +34,6 @@ window.AUTO = {
    "id": "test-html",
    "date": "2026-10-11",
    "format": "html",
-   "file": "content/articles/2026-10-11-test-html.html",
    "title": "纯 HTML 文章测试（测试样例）",
    "tags": [
     "测试样例",
@@ -50,7 +49,6 @@ window.AUTO = {
    "id": "test-markdown",
    "date": "2026-10-11",
    "format": "md",
-   "file": "content/articles/2026-10-11-test-markdown.md",
    "title": "标记语言渲染测试（测试样例）",
    "tags": [
     "测试样例",
@@ -67,7 +65,6 @@ window.AUTO = {
    "id": "test-plain",
    "date": "2026-10-09",
    "format": "txt",
-   "file": "content/articles/2026-10-11-test-plain.txt",
    "title": "纯文本文章测试（测试样例）",
    "tags": [
     "测试样例",
@@ -83,7 +80,6 @@ window.AUTO = {
    "id": "test-latex",
    "date": "2026-10-08",
    "format": "tex",
-   "file": "content/articles/2026-10-11-test-latex.tex",
    "title": "LaTeX 文件测试（测试样例）",
    "tags": [
     "测试样例",
@@ -99,7 +95,6 @@ window.AUTO = {
    "id": "september-report",
    "date": "2026-09-29",
    "format": "md",
-   "file": "content/articles/2026-09-30-september-report.md",
    "title": "x1shang-9月份月报",
    "tags": [
     "月报",
@@ -115,7 +110,6 @@ window.AUTO = {
    "id": "到上海去",
    "date": "2026-09-15",
    "format": "md",
-   "file": "content/articles/到上海去.md",
    "title": "到上海去",
    "tags": [
     "日记",
@@ -131,7 +125,6 @@ window.AUTO = {
    "id": "大北线自驾",
    "date": "2026-07-22",
    "format": "md",
-   "file": "content/articles/大北线自驾.md",
    "title": "大北线自驾",
    "tags": [
     "游记",
@@ -149,7 +142,6 @@ window.AUTO = {
    "id": "这-才是最体面的",
    "date": "2026-06-05",
    "format": "md",
-   "file": "content/articles/这，才是最体面的.md",
    "title": "这，才是最体面的",
    "tags": [
     "记叙文",
@@ -165,7 +157,6 @@ window.AUTO = {
    "id": "此刻-我必须说",
    "date": "2026-04-08",
    "format": "md",
-   "file": "content/articles/此刻，我必须说.md",
    "title": "此刻，我必须说",
    "tags": [
     "记叙文",
@@ -182,7 +173,6 @@ window.AUTO = {
    "id": "回甘-二稿",
    "date": "2026-02-28",
    "format": "md",
-   "file": "content/articles/回甘（二稿）.md",
    "title": "回甘",
    "tags": [
     "记叙文",
@@ -200,7 +190,6 @@ window.AUTO = {
    "id": "那些温暖的印记",
    "date": "2026-02-22",
    "format": "md",
-   "file": "content/articles/那些温暖的印记.md",
    "title": "那些温暖的印记",
    "tags": [
     "记叙文",
@@ -217,7 +206,6 @@ window.AUTO = {
    "id": "点睛",
    "date": "2026-02-21",
    "format": "md",
-   "file": "content/articles/点睛.md",
    "title": "点睛",
    "tags": [
     "记叙文",
@@ -234,7 +222,6 @@ window.AUTO = {
    "id": "发一点光照一段路",
    "date": "2026-02-08",
    "format": "md",
-   "file": "content/articles/发一点光照一段路.md",
    "title": "发一点光，照一段路",
    "tags": [
     "记叙文",
@@ -252,7 +239,6 @@ window.AUTO = {
    "id": "结实地活在这片土地上",
    "date": "2026-01-19",
    "format": "md",
-   "file": "content/articles/结实地活在这片土地上.md",
    "title": "结实地活在这片土地上",
    "tags": [
     "记叙文",
@@ -270,7 +256,6 @@ window.AUTO = {
    "id": "有节的竹笛",
    "date": "2025-11-04",
    "format": "md",
-   "file": "content/articles/有节的竹笛.md",
    "title": "有节的竹笛",
    "tags": [
     "记叙文",
@@ -287,7 +272,6 @@ window.AUTO = {
    "id": "我为什么写记叙文-作文中的有用与无用",
    "date": "2024-11-29",
    "format": "md",
-   "file": "content/articles/我为什么写记叙文——作文中的有用与无用.md",
    "title": "我为什么写记叙文——作文中的有用和无用",
    "tags": [
     "随笔",
@@ -304,7 +288,6 @@ window.AUTO = {
    "id": "歌-天狼星的心脏-听后感",
    "date": "2024-11-09",
    "format": "md",
-   "file": "content/articles/歌——《天狼星的心脏》听后感.md",
    "title": "歌 ——《天狼星的心脏》听后感",
    "tags": [
     "随笔",
@@ -321,7 +304,6 @@ window.AUTO = {
    "id": "论红楼之残缺",
    "date": "2024-09-02",
    "format": "md",
-   "file": "content/articles/论红楼之残缺.md",
    "title": "论红楼之残缺",
    "tags": [
     "随笔",
@@ -338,7 +320,6 @@ window.AUTO = {
    "id": "那些美丽的桃花",
    "date": "2023-04-16",
    "format": "md",
-   "file": "content/articles/那些美丽的桃花.md",
    "title": "那些美丽的桃花",
    "tags": [
     "记叙文",
@@ -358,7 +339,6 @@ window.AUTO = {
    "id": "midnight",
    "date": "2026-10-14",
    "format": "md",
-   "file": "content/assertions/2026-10-14-midnight.md",
    "title": "午夜也要异化嘛",
    "tags": [
     "生活",
@@ -374,7 +354,6 @@ window.AUTO = {
    "id": "testingai",
    "date": "2026-10-14",
    "format": "md",
-   "file": "content/assertions/2026-10-14-testingai.md",
    "title": "关于AI能力衡量标准的讨论",
    "tags": [
     "AI",
@@ -389,7 +368,6 @@ window.AUTO = {
    "id": "dengqinwenwon",
    "date": "2026-10-11",
    "format": "md",
-   "file": "content/assertions/2026-10-10-dengqinwenwon.md",
    "title": "转发：高度专注，永不言弃所取得的努力。",
    "tags": [
     "转发",
@@ -406,7 +384,6 @@ window.AUTO = {
    "id": "test-paper",
    "date": "2026-10-11",
    "format": "md",
-   "file": "content/papers/2026-10-11-test-paper.md",
    "title": "学术条目测试样例：一个不太严肃的小问题",
    "tags": [
     "测试样例",
@@ -426,7 +403,6 @@ window.AUTO = {
    "id": "降水相态预测综述",
    "date": "2024-12-10",
    "format": "md",
-   "file": "content/papers/2024-12-10-降水相态预测综述.md",
    "title": "降水相态预测",
    "tags": [
     "文献综述",

@@ -144,7 +144,7 @@ async function collectText(kind, dir, seen) {
       : bodyRaw;
 
     const common = {
-      id, date, format, file: rel(file), title,
+      id, date, format, title,
       tags: Array.isArray(data.tags) ? data.tags : [],
       test: data.test === true,
       heat: Math.max(0, Number(data.heat ?? data.likes) || 0),

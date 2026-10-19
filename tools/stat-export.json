@@ -1,8 +1,8 @@
 {
   "source": "selfhosted",
-  "exported": "2026-10-18T08:42:04.688Z",
+  "exported": "2026-10-19T10:00:15.045Z",
   "schema": "hits(day TEXT, path TEXT, n INTEGER)",
-  "rows": 6,
+  "rows": 8,
   "data": [
     {
       "day": "2026-10-16",
@@ -32,6 +32,16 @@
     {
       "day": "2026-10-18",
       "path": "/",
+      "n": 28
+    },
+    {
+      "day": "2026-10-18",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 2
+    },
+    {
+      "day": "2026-10-19",
+      "path": "/",
       "n": 11
     }
   ],
@@ -40,7 +50,17 @@
     {
       "day": "2026-10-18",
       "path": "/",
-      "n": 1
+      "n": 12
+    },
+    {
+      "day": "2026-10-18",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 2
+    },
+    {
+      "day": "2026-10-19",
+      "path": "/",
+      "n": 11
     }
   ],
   "visitsSince": "2026-10-18T08:28:39.294Z"

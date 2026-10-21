@@ -2,15 +2,14 @@
 <rss version="2.0"><channel>
 <title>x1shang</title><link>https://x1shang.top</link>
 <description>x1shang 的文字与记录</description>
-<lastBuildDate>2026-10-13T16:00:00.000Z</lastBuildDate>
+<lastBuildDate>2026-10-20T16:00:00.000Z</lastBuildDate>
+<item><title>“第三次AI寒冬没有来，取而代之的是AI全球变暖。”（李飞飞）</title><link>https://x1shang.top/assertions/warmingai/</link><guid>https://x1shang.top/assertions/warmingai/</guid><pubDate>2026-10-20T16:00:00.000Z</pubDate><description>“*第三次AI寒冬没有来，取而代之的是AI全球变暖。*”（李飞飞）
+
+今天听了AI与数学的讲座，却对GPT的数学爆破只字未提，不禁有些失望。
+AI不止会创造junk data,它也可以完善你的作品。AI是一个工具，怎么使用，取决于我们自己。</description></item>
 <item><title>小的时候，午夜还是神秘的，想象着狼人与鬼怪；现在，午夜是亲切的，代码还在跑，ddl已经过了。大抵鬼怪们也同渡渡鸟一起绝灭了吧。</title><link>https://x1shang.top/assertions/midnight/</link><guid>https://x1shang.top/assertions/midnight/</guid><pubDate>2026-10-13T16:00:00.000Z</pubDate><description>小的时候，午夜还是神秘的，想象着狼人与鬼怪；现在，午夜是亲切的，代码还在跑，ddl已经过了。大抵鬼怪们也同渡渡鸟一起绝灭了吧。</description></item>
 <item><title>AGI时代已经不远，测试AI看的将不再是跑分，而是工程能力。很好的一个例子就是友链中的[711 Night](https://rain.ptsfdtz.top/)。</title><link>https://x1shang.top/assertions/testingai/</link><guid>https://x1shang.top/assertions/testingai/</guid><pubDate>2026-10-13T16:00:00.000Z</pubDate><description>AGI时代已经不远，测试AI看的将不再是跑分，而是工程能力。很好的一个例子就是友链中的[711 Night](https://rain.ptsfdtz.top/)。</description></item>
-<item><title>纯 HTML 文章测试（测试样例）</title><link>https://x1shang.top/articles/test-html/</link><guid>https://x1shang.top/articles/test-html/</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>直接把 .html 文件丢进 content/articles/，整页照原样渲染。</description></item>
-<item><title>标记语言渲染测试（测试样例）</title><link>https://x1shang.top/articles/test-markdown/</link><guid>https://x1shang.top/articles/test-markdown/</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。</description></item>
 <item><title>[郑钦文击败安德烈耶娃，生涯1000赛夺冠。](https://mp.weixin.qq.com/s/8DUe9k4tggiaUx3b42ITxQ)</title><link>https://x1shang.top/assertions/dengqinwenwon/</link><guid>https://x1shang.top/assertions/dengqinwenwon/</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>[郑钦文击败安德烈耶娃，生涯1000赛夺冠。](https://mp.weixin.qq.com/s/8DUe9k4tggiaUx3b42ITxQ)</description></item>
-<item><title>学术条目测试样例：一个不太严肃的小问题</title><link>https://x1shang.top/academic/test-paper/</link><guid>https://x1shang.top/academic/test-paper/</guid><pubDate>2026-10-10T16:00:00.000Z</pubDate><description>问题</description></item>
-<item><title>纯文本文章测试（测试样例）</title><link>https://x1shang.top/articles/test-plain/</link><guid>https://x1shang.top/articles/test-plain/</guid><pubDate>2026-10-08T16:00:00.000Z</pubDate><description>.txt 文件按等宽字体、保留换行地展示，不做 Markdown 解析。</description></item>
-<item><title>LaTeX 文件测试（测试样例）</title><link>https://x1shang.top/articles/test-latex/</link><guid>https://x1shang.top/articles/test-latex/</guid><pubDate>2026-10-07T16:00:00.000Z</pubDate><description>.tex 文件会剥掉导言区，正文交给 KaTeX 排版。</description></item>
 <item><title>x1shang-9月份月报</title><link>https://x1shang.top/articles/september-report/</link><guid>https://x1shang.top/articles/september-report/</guid><pubDate>2026-09-28T16:00:00.000Z</pubDate><description>九月的四件事：三体地表观测站动态壁纸、湿球计算器重写、Aippt v2.2.1、白河乡资讯插件。</description></item>
 <item><title>到上海去</title><link>https://x1shang.top/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB/</link><guid>https://x1shang.top/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB/</guid><pubDate>2026-09-14T16:00:00.000Z</pubDate><description>刚到上海的日记</description></item>
 <item><title>大北线自驾</title><link>https://x1shang.top/articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE/</link><guid>https://x1shang.top/articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE/</guid><pubDate>2026-07-21T16:00:00.000Z</pubDate><description>26年夏，第8次进藏自驾游游记。</description></item>

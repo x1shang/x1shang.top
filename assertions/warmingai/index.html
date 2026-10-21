@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f2f4f6">
 <!-- build:head:start（由 tools/build-content.mjs 为预渲染页生成，勿手改） -->
-<meta name="description" content="一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。">
-<title>标记语言渲染测试（测试样例） · x1shang</title>
-<link rel="canonical" href="https://x1shang.top/articles/test-markdown/">
+<meta name="description" content="“第三次AI寒冬没有来，取而代之的是AI全球变暖。”（李飞飞）">
+<title>AI GLOBAL WARMING PERIOD · x1shang</title>
+<link rel="canonical" href="https://x1shang.top/assertions/warmingai/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="x1shang">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:title" content="标记语言渲染测试（测试样例）">
-<meta property="og:description" content="一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。">
-<meta property="og:url" content="https://x1shang.top/articles/test-markdown/">
+<meta property="og:title" content="AI GLOBAL WARMING PERIOD">
+<meta property="og:description" content="“第三次AI寒冬没有来，取而代之的是AI全球变暖。”（李飞飞）">
+<meta property="og:url" content="https://x1shang.top/assertions/warmingai/">
 <meta property="og:image" content="https://x1shang.top/assets/og-cover.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="article:published_time" content="2026-10-11">
+<meta property="article:published_time" content="2026-10-21">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="标记语言渲染测试（测试样例）">
-<meta name="twitter:description" content="一页里同时验证 Markdown、LaTeX 与 HTML 的渲染效果，检查完删掉这个文件即可。">
+<meta name="twitter:title" content="AI GLOBAL WARMING PERIOD">
+<meta name="twitter:description" content="“第三次AI寒冬没有来，取而代之的是AI全球变暖。”（李飞飞）">
 <meta name="twitter:image" content="https://x1shang.top/assets/og-cover.jpg">
 <!-- build:head:end -->
 <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
@@ -65,74 +65,8 @@
 
 <div class="site-layout" id="content">
  <aside class="sidebar"><a class="site-name" href="#home">x1shang<span>个人索引 / PERSONAL INDEX</span></a><nav aria-label="主导航" id="navigation"></nav><div class="sidebar-bottom">因为山就在那里。<span id="local-clock"></span></div></aside>
- <main id="main" tabindex="-1"><article class="prose" data-prerendered="/articles/test-markdown/"><h1>标记语言渲染测试（测试样例）</h1><p>这一篇是<strong>测试样例</strong>：它故意把 Markdown、LaTeX、HTML 混在一起，用来检查渲染管线。删掉 <code>content/articles/2026-10-11-test-markdown.md</code> 这篇文章就会消失。</p>
-<h2>一、Markdown 基础</h2>
-<p><strong>粗体</strong>、<em>斜体</em>、<del>删除线</del>、行内代码 <code>const answer = 42</code>，以及一个<a href="https://okmij.org/ftp/" target="_blank" rel="noopener noreferrer">站外链接</a>（样式参考的就是这一页的 Index）。</p>
-<p>无序列表：</p>
-<ul>
-<li>第一项</li>
-<li>第二项
-<ul>
-<li>嵌套项</li>
-<li>另一个嵌套项</li>
-</ul></li>
-<li>第三项</li>
-</ul>
-<p>有序列表：</p>
-<ol>
-<li>先做这个</li>
-<li>再做那个</li>
-<li>最后检查</li>
-</ol>
-<p>任务列表：</p>
-<ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" disabled checked> 把文件拖进 <code>content/articles/</code></li>
-<li class="task-list-item"><input type="checkbox" disabled checked> 让它出现在索引里</li>
-<li class="task-list-item"><input type="checkbox" disabled> 检查完把自己的文章也丢进来</li>
-</ul>
-<blockquote>
-<p>引用块：排序 = 先热度（front matter 的 <code>heat</code>，作品用星数快照），后时间。</p>
-</blockquote>
-<p>表格：</p>
-<table>
-<thead>
-<tr><th>板块</th><th>投递目录</th><th>格式</th></tr>
-</thead>
-<tbody>
-<tr><td>文章</td><td><code>content/articles/</code></td><td>md / html / tex / txt</td></tr>
-<tr><td>断言</td><td><code>content/assertions/</code></td><td>同上</td></tr>
-<tr><td>学术</td><td><code>content/papers/</code></td><td>同上</td></tr>
-<tr><td>照片</td><td><code>inbox/photos/</code>（gitignore）</td><td>jpg / png / webp / heic</td></tr>
-<tr><td>音乐</td><td><code>assets/music/</code></td><td>mp3 / wav / m4a / flac</td></tr>
-</tbody>
-</table>
-<p>代码块：</p>
-<pre><code class="lang-js">// 代码块内容会被转义，不会被当成 HTML
-const ridge = (x) =&gt; 606 - x * 0.2;
-console.log(`&lt;/script&gt; 这种文本也不会破坏页面`);</code></pre>
-<h2>二、LaTeX</h2>
-<p>行内公式：质能方程 <span class="math-inline">$E = mc^2$</span>，求和 <span class="math-inline">$\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$</span>，矩阵 <span class="math-inline">$\begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}$</span>。</p>
-<p>独立公式：</p>
-<div class="math-block">$
-\int_{-\infty}^{\infty} e^{-x^2}\,\mathrm{d}x = \sqrt{\pi}
-$</div>
-<div class="math-block">$
-\hat{H}\psi = -\frac{\hbar^2}{2m}\nabla^2\psi + V\psi = E\psi
-$</div>
-<h2>三、原始 HTML</h2>
-<p>下面这段是直接写进 Markdown 的 HTML，应该照原样渲染：</p>
-<div style="border:1px solid #b9cdf2;border-radius:10px;padding:12px 14px;background:#f2f7ff">
-  <b>HTML 块</b>：可以放任意布局，<mark>高亮</mark>、<code>代码</code>、自定义颜色都行。
-</div>
-<details>
-  <summary>点开看折叠内容</summary>
-  折叠里也是一段 HTML，用来验证 <code>&lt;details&gt;</code> 能正常用。
-</details>
-
-<p>上面那行 <code>&lt;script&gt;</code> 会被清洗掉（打开控制台输入 <code>window.__xss_probe</code> 应该是 <code>undefined</code>）。</p>
-<h2>四、图片</h2>
-<p><img src="../../assets/mountain.jpg" alt="首页那张雪山" loading="lazy"></p>
-<p>渲染到这里说明 Markdown、LaTeX、HTML、图片、代码块都通了。</p></article></main>
+ <main id="main" tabindex="-1"><article class="prose" data-prerendered="/assertions/warmingai/"><h1>AI GLOBAL WARMING PERIOD</h1><p>“<em>第三次AI寒冬没有来，取而代之的是AI全球变暖。</em>”（李飞飞）</p>
+<p>今天听了AI与数学的讲座，却对GPT的数学爆破只字未提，不禁有些失望。 AI不止会创造junk data,它也可以完善你的作品。AI是一个工具，怎么使用，取决于我们自己。</p></article></main>
 </div>
 
 <footer><span>© <span id="year"></span> x1shang</span><span>文字、代码，与生活的切片。</span><a href="#home">回到山间 ↑</a></footer>

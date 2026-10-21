@@ -145,14 +145,12 @@ tags: [音乐]                 # 可选
 
 ## 测试样例
 
-每个板块都有一件带「测试样例」角标的样例，检查完删对应文件即可：
+测试样例已于 **2026-10-21** 全部清理，站上只剩真实内容：
 
-- 文章 4 篇（Markdown+LaTeX+HTML 混排 / 纯 HTML / `.tex` / 纯文本）
-- 断言 2 则、学术 1 篇、友链 1 条
-- 照片 2 张（`inbox/photos/test-sample-01.jpg` 带 sidecar；`inbox/photos/2026-test-album/test-sample-02.png` 验证相册与格式转换）
-- 音乐 0 首（原来的 `test-sample.wav/.lrc/.md` 与 `test-netease.md` 两个音乐样例 **2026-10-12 已删**；`assets/music/` 里现在都是真歌）
+- 文章 4 篇（Markdown+LaTeX+HTML 混排 / 纯 HTML / `.tex` / 纯文本）、学术 1 篇、照片 2 张已删
+- `test: true` 机制保留：以后临时加样例时，仍会让该条目永远排在列表最后并显示「测试样例」角标
 
-> 注意 `assets/music/` 里现在都是**真歌**：`我喜欢的音乐` 歌单导进来的 51 首（一行 `netease: <ID>` 的 .md）
+> 注意 `assets/music/` 里都是**真歌**：`我喜欢的音乐` 歌单导进来的 51 首（一行 `netease: <ID>` 的 .md）
 > 加 5 首本地音频（`夏目.mp3` / `life.mp3` / `灯火里的中国.mp3` / `波斯序曲.mp3` / `帕格尼尼随想曲_第24号.mp3`）。
 > 本地那几首是用户在 `E:\SJTU2026\threebody\gay\` 放的 wav/flac，用 ffmpeg 转成 VBR mp3 进仓库
 > （原文件 82/57/42/13.5 MB → 9.5/5.5/5.1/4.1 MB，原始 wav/flac 没进仓库）。

@@ -16,6 +16,10 @@ name: stats
 #     想切到自建就在 Settings → Variables 里设成 `selfhosted`（或用 `gh variable set STATS_PROVIDER --body selfhosted`），
 #     自建 v2 与 GoatCounter 均按页 visits（会话内同页去重），都不是全站独立人数；
 #     旧 PV 单独保留，自建 visits 从 API 的 since 起累计。
+#
+# 2026-10-21：同一 job 里顺带跑 tools/fetch-repos.mjs —— 读 GitHub 公开仓库数写 github.json，
+#   只有数字变化时才改文件（关于页「GitHub 仓库数」计数卡片用它）。
+#   它失败时只要已有旧快照就保留旧值、不把 job 变红。
 
 on:
   schedule:
@@ -49,17 +53,22 @@ jobs:
           STATS_PROVIDER: ${{ vars.STATS_PROVIDER }}
         run: node tools/fetch-stats.mjs
 
+      - name: 顺带刷新 GitHub 公开仓库数（数字没变就不写）
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node tools/fetch-repos.mjs
+
       - name: 重建内容包（把访客量写成文章热度）+ 预渲染页 + sitemap
         run: node tools/build-content.mjs
 
       - name: 有变化就提交
         run: |
-          if git diff --quiet -- stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic tools/stat-dual-run.log; then
+          if git diff --quiet -- stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic tools/stat-dual-run.log github.json; then
             echo "没有变化"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic tools/stat-dual-run.log
-          git commit -m "chore(stats): 刷新访客统计与文章热度 $(date -u +%Y-%m-%d)"
+          git add stats.json content.auto.js feed.xml atom.xml sitemap.xml articles assertions academic tools/stat-dual-run.log github.json
+          git commit -m "chore(stats): 刷新访客统计、文章热度与公开仓库数 $(date -u +%Y-%m-%d)"
           git push

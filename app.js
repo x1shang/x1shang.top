@@ -469,7 +469,8 @@
   function aboutPage() {
     const about = window.SiteLanguage.get() === 'en' ? (A.aboutEn || C.about) : C.about;
     const days = Math.max(1, Math.floor((Date.now() - new Date(ui`${S.since}T00:00:00+08:00`)) / 86400000) + 1);
-    const stats = [[days, tr('建站天数')], [C.articles.length + C.assertions.length + C.papers.length, tr('文字记录')], [C.photos.length, tr('摄影作品')], [C.tracks.length, tr('音乐')], [C.friends.length, tr('友链')]];
+    const repos = A.github && Number.isInteger(Number(A.github.publicRepos)) ? Number(A.github.publicRepos) : null;
+    const stats = [[days, tr('建站天数')], [C.articles.length + C.assertions.length + C.papers.length, tr('文字记录')], [C.photos.length, tr('摄影作品')], [C.tracks.length, tr('音乐')], [C.friends.length, tr('友链')], [repos ?? '—', tr('GitHub 仓库数')]];
     return head('about', tr('关于'))
       + ui`<div class="stats">${stats.map(([n, label]) => ui`<div class="stat glass"><strong>${n}</strong><span>${label}</span></div>`).join('')}</div>`
       + (about ? ui`<article class="prose" style="margin-top:32px">${R.renderFile({ format: 'md', body: about })}</article>` : '')
@@ -477,7 +478,7 @@
           <p>整站是纯静态的 HTML / CSS / JavaScript：文字丢进 <code>content/</code>（文章 / 断言 / 学术 / 友链）、照片丢进 <code>inbox/photos/</code>、音乐丢进 <code>assets/music/</code>，跑一次构建就编入索引。照片目录已被 gitignore，只有压缩后的 WebP 会进仓库。</p>
           <p>页面底部常驻一条命令行检索：按 <kbd>/</kbd> 或 <kbd>&gt;</kbd> 聚焦，↑↓ 选择，Enter 打开。文章、断言与论文正文用简约阅读版式，公式由 KaTeX 渲染。</p>
         </article>
-        <article class="row"><h3>订阅与统计</h3><p><a href="${safe(at('feed.xml'))}">RSS</a> · <a href="${safe(at('atom.xml'))}">Atom</a> · 内容数量来自站内数据，建站天数按设定日期计算。</p></article>
+        <article class="row"><h3>订阅与统计</h3><p><a href="${safe(at('feed.xml'))}">RSS</a> · <a href="${safe(at('atom.xml'))}">Atom</a> · 内容数量来自站内数据，GitHub 仓库数来自仓库快照，建站天数按设定日期计算。</p></article>
         <article class="row"><h3>访客</h3>
           <div class="visits" id="visits" data-state="loading"><p class="note">正在读取访客数据…</p></div>
           <p class="note">图表只读站内的静态快照 <code>stats.json</code>（由 <code>tools/fetch-stats.mjs</code> 刷新）；访客的浏览器不会为这张图请求任何统计服务。</p>

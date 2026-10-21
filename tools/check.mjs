@@ -20,7 +20,7 @@ const warn = (m) => console.log(`  ! ${m}`);
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
 
 console.log('\n■ 脚本语法');
-for (const f of ['app.js', 'language.js', 'translations.js', 'theme.js', 'terminal.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs', 'tools/fetch-stats.mjs', 'tools/build-index.mjs', 'tools/check-site.mjs', 'tools/check-layout.mjs']) {
+for (const f of ['app.js', 'language.js', 'translations.js', 'theme.js', 'terminal.js', 'render.js', 'content.js', 'content.auto.js', 'tools/build-content.mjs', 'tools/serve.mjs', 'tools/fetch-stats.mjs', 'tools/fetch-repos.mjs', 'tools/build-index.mjs', 'tools/check-site.mjs', 'tools/check-layout.mjs']) {
   const file = path.join(ROOT, f);
   if (!existsSync(file)) { no(`${f} 不存在`); continue; }
   const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -38,6 +38,9 @@ console.log('\n■ 内容包');
       const auto = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
       ok(`content.auto.js 可解析：文章 ${auto.articles.length} · 断言 ${auto.assertions.length} · 学术 ${auto.papers.length} · 摄影 ${auto.photos.length} · 音乐 ${auto.tracks.length} · 友链 ${auto.friends.length}`);
       for (const [k, v] of Object.entries(auto.stats || {})) if (typeof v !== 'number') no(`stats.${k} 不是数字`);
+      if (!auto.github) warn('content.auto.js 没有 GitHub 仓库数（先跑 npm run repos）——关于页卡片会显示「—」');
+      else if (!Number.isInteger(auto.github.publicRepos) || auto.github.publicRepos < 0) no(`github.publicRepos 不是非负整数：${auto.github.publicRepos}`);
+      else ok(`GitHub 公开仓库数：${auto.github.publicRepos}`);
       const ids = new Set();
       for (const [kind, list] of [['article', auto.articles], ['assertion', auto.assertions], ['paper', auto.papers], ['photo', auto.photos], ['track', auto.tracks]]) {
         for (const it of list) {
@@ -118,6 +121,16 @@ console.log('\n■ 分享卡片与统计');
       else if (!s.series.length) warn(`stats.json 可解析，但还没有数据（source=${s.source}）——跑 npm run stats 或配 GitHub secret`);
       else ok(`stats.json 可解析（source=${s.source}，${s.series.length} 天数据）`);
     } catch (e) { no(`stats.json 解析失败：${e.message}`); }
+  }
+
+  const ghFile = path.join(ROOT, 'github.json');
+  if (!existsSync(ghFile)) warn('github.json 不存在（关于页 GitHub 仓库数会显示「—」；跑 npm run repos）');
+  else {
+    try {
+      const g = JSON.parse(readFileSync(ghFile, 'utf8'));
+      if (!Number.isInteger(g.publicRepos) || g.publicRepos < 0) no(`github.json 的 publicRepos 不是非负整数：${g.publicRepos}`);
+      else ok(`github.json 可解析（${g.login || '?'} 的公开仓库 ${g.publicRepos} 个）`);
+    } catch (e) { no(`github.json 解析失败：${e.message}`); }
   }
 }
 

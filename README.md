@@ -15,13 +15,14 @@ feed.xml atom.xml  自动生成的 RSS / Atom
 robots.txt sitemap.xml  给爬虫的（sitemap 由构建生成，列出首页 + 每篇文字的真实路径）
 articles/ assertions/ academic/   预渲染产物：每篇文字一个真实路径的静态页（构建生成，别手改）
 stats.json         访客快照：日序列（关于页那张图）+ 按页总量（文章热度）
+github.json        GitHub 公开仓库数快照（关于页计数卡片；tools/fetch-repos.mjs 生成）
 content/           文字投递箱：articles/ assertions/ papers/ friends/ + about.md
 inbox/photos/      照片投递箱（gitignore，原始大图不进仓库，可建相册子目录）
 assets/photos/     照片产物：压缩后的 WebP + manifest.json（提交）
 assets/music/      音乐：音频 + 同名 .lrc 歌词 + 同名 .md/.json 元数据；只写 netease: <歌曲ID> 的 .md = 网易云外链曲目（见下文「音乐」）
 assets/og-cover.jpg  分享卡片封面（1200×630，别改比例）
-.github/workflows/  stats.yml：每天定时刷新 stats.json
-tools/             serve / build-content / build-photos / check / fetch-stats + 运维脚本（详见 tools/README.md）
+.github/workflows/  stats.yml：每天定时刷新 stats.json 与 github.json
+tools/             serve / build-content / build-photos / check / fetch-stats / fetch-repos + 运维脚本（详见 tools/README.md）
 ```
 
 ## 快速开始
@@ -34,6 +35,7 @@ npm run serve        # 本地预览：http://127.0.0.1:8080/
 npm run build        # 只重建：内容包 + 照片流水线
 npm run check        # 自检：语法 / 内容包 / 页面引用 / 订阅源 / 纯静态性 / 分享卡片 / robots / sitemap / stats
 npm run stats        # 抓访客量写 stats.json（--demo 可先看图表长什么样；需要 GOATCOUNTER_SITE）
+npm run repos        # 抓 GitHub 公开仓库数写 github.json（关于页计数卡片）
 npm run check:site   # 顺带给导航页仓库做上线前体检（工具全在 tools/，见 tools/README.md）
 ```
 
@@ -186,6 +188,7 @@ tags: [音乐]                 # 可选
   2. 官方文档给的计数脚本 `//gc.zgo.at/count.js` 在国内访客那里也加载不出来。所以本站 `index.html` 里用的是 **`//static.goatcounter.com/count.js`**（同一个脚本的可达镜像，2026-10-11 实测 200）；别再改回 `gc.zgo.at`。
 - **Cloudflare Web Analytics：已删除（2026-10-12 决定）**。原来 `index.html` 末尾插着官方 beacon 但 token 一直是占位符，等于一个发无效请求的死脚本；既然 GoatCounter 已经同时管着「关于页访客图 + 文章热度」，就不再另养一套。将来想启用：CF 后台 → Web Analytics → Add a site（hostname 填 `x1shang.top`）→ 取 token，把官方 `<script src=".../beacon.min.js" data-cf-beacon='{"token":"…"}'>` 贴回 `</body>` 前即可。
 
+- **关于页的 GitHub 仓库数**：读站内的 `github.json`（`tools/fetch-repos.mjs` 抓 GitHub 用户资料里的 `public_repos`）。`stats.yml` 每次跑完统计会顺带刷新它；数字没变就不改文件，因此不会每天白提交一次。卡片取不到数时显示「—」，不影响其他内容。
 - **访客图怎么刷新**：`.github/workflows/stats.yml` 每天 03:17 UTC 用仓库 Secrets（`GOATCOUNTER_SITE` / `GOATCOUNTER_TOKEN`）跑一次
   `fetch-stats.mjs` → 重建 `content.auto.js` → 有变化才提交。**本地没 token 是刷不出来的**：
   2026-10-12 实测，不带 token 走公开计数端点会全部返回 0（还会把 `stats.json` 里已有的真实数据刷没）。
@@ -193,7 +196,7 @@ tags: [音乐]                 # 可选
 
 ## 部署（GitHub Pages 等静态托管）
 
-把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `robots.txt` `sitemap.xml` `stats.json` `articles/` `assertions/` `academic/` `content/` `assets/`（含 `assets/photos/*.webp` 与 `assets/og-cover.jpg`）。`inbox/` 不提交（已在 `.gitignore`）。
+把仓库推上去即可，需要提交：`index.html` `style.css` `app.js` `render.js` `content.js` `content.auto.js` `feed.xml` `atom.xml` `robots.txt` `sitemap.xml` `stats.json` `github.json` `articles/` `assertions/` `academic/` `content/` `assets/`（含 `assets/photos/*.webp` 与 `assets/og-cover.jpg`）。`inbox/` 不提交（已在 `.gitignore`）。
 
 - 推之前先 `npm run build`，让 `content.auto.js` 带上最新文字与照片
 - 路由用 `#`，放域名根或子目录都行，不需要重写规则

@@ -333,6 +333,17 @@ try {
 const URL_KIND = { articles: 'articles', assertions: 'assertions', papers: 'academic' };
 const stats = await readJson(path.join(ROOT, 'stats.json'), {});
 const pageVisits = stats.pages && typeof stats.pages === 'object' ? stats.pages : {};
+/* GitHub 公开仓库数：tools/fetch-repos.mjs 的快照（Actions 每次跑 stats 时顺便刷新）。
+   没有快照 / 数字不合法就不写这个字段，关于页会显示「—」。 */
+const githubFile = await readJson(path.join(ROOT, 'github.json'), null);
+const githubRepos = githubFile ? Number(githubFile.publicRepos) : NaN;
+const github = Number.isInteger(githubRepos) && githubRepos >= 0
+  ? {
+    login: String(githubFile.login || siteCfg.github || ''),
+    publicRepos: githubRepos,
+    updated: String(githubFile.updated || ''),
+  }
+  : null;
 const pathOf = (kindKey, id) => `/${URL_KIND[kindKey]}/${encodeURIComponent(id)}/`;
 /** 查访客数：GoatCounter 会把路径结尾的斜杠去掉（存成 /articles/foo），所以两种写法都认 */
 const visitsOf = (kindKey, id) => {
@@ -360,6 +371,7 @@ const AUTO = {
   generated: new Date().toISOString(),
   recent: allDates.at(-1) || new Date().toISOString().slice(0, 10),
   site: siteCfg,
+  github,
   articles, assertions, papers, photos, tracks, friends, about, aboutEn,
   stats: {
     articles: articles.length, assertions: assertions.length, papers: papers.length,

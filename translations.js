@@ -110,6 +110,8 @@ window.SITE_TRANSLATIONS = {
   "名称：": "Name: ",
   "简介：": "Description: ",
   "链接：": "URL: ",
+  "RSS：": "RSS: ",
+  "Atom：": "Atom: ",
   "头像：": "Avatar: ",
   "山有轮廓，思绪没有": "Mountains have outlines; thoughts have none.",
   "建站天数": "Days online",

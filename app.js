@@ -448,6 +448,10 @@
       { sub: (f) => esc(f.description || host(f.url)) })
       : empty(tr('期待在这里，遇见同路人'));
     const avatar = 'https://x1shang.top/assets/img/x1shang-avatar.webp';
+    // 友链卡片给别人抄：订阅地址写成带域名的绝对地址，复制粘贴就能用
+    const home = String(S.url || 'https://x1shang.top').replace(/\/$/, '');
+    const feed = `${home}/feed.xml`;
+    const atomUrl = `${home}/atom.xml`;
     return head('friends', tr('友链')) + rows
       + ui`<div class="friend-apply glass">
           <p>${tr('如想添加请')}<a href="mailto:ciallo@x1shang.top">${tr('邮箱')}</a>${tr('联系，并使用以下信息添加我进入你的友链哦')}</p>
@@ -455,6 +459,8 @@
             <dt>${tr('名称：')}</dt><dd>x1shang-山与回响</dd>
             <dt>${tr('简介：')}</dt><dd>${tr('山有轮廓，思绪没有')}</dd>
             <dt>${tr('链接：')}</dt><dd><a href="https://www.x1shang.top" target="_blank" rel="noopener noreferrer">https://www.x1shang.top</a></dd>
+            <dt>${tr('RSS：')}</dt><dd><a href="${safe(feed)}" target="_blank" rel="noopener noreferrer">${esc(feed)}</a></dd>
+            <dt>${tr('Atom：')}</dt><dd><a href="${safe(atomUrl)}" target="_blank" rel="noopener noreferrer">${esc(atomUrl)}</a></dd>
             <dt>${tr('头像：')}</dt><dd><a href="${avatar}" target="_blank" rel="noopener noreferrer">${avatar}</a></dd>
           </dl>
         </div>`;

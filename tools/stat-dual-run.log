@@ -6,4 +6,4 @@
 2026-10-20	gc_total=237	sh_total=38	gc_allTime=237	sh_allTime=38	gc_days=10	sh_days=3	sh_zero_since=0	gc_pages=20/20	sh_pages=4/4	sh_metric=visits	sh_since=2026-10-18	gc_comparable=28	sh_comparable=38
 2026-10-21	gc_total=240	sh_total=44	gc_allTime=240	sh_allTime=44	gc_days=11	sh_days=4	sh_zero_since=0	gc_pages=20/20	sh_pages=4/4	sh_metric=visits	sh_since=2026-10-18	gc_comparable=31	sh_comparable=44
 2026-10-22	gc_total=241	sh_total=49	gc_allTime=242	sh_allTime=49	gc_days=12	sh_days=5	sh_zero_since=0	gc_pages=20/20	sh_pages=4/4	sh_metric=visits	sh_since=2026-10-18	gc_comparable=32	sh_comparable=49
-2026-10-23	gc_total=244	sh_total=52	gc_allTime=244	sh_allTime=52	gc_days=13	sh_days=6	sh_zero_since=0	gc_pages=21/21	sh_pages=5/5	sh_metric=visits	sh_since=2026-10-18	gc_comparable=35	sh_comparable=52
+2026-10-23	gc_total=249	sh_total=57	gc_allTime=249	sh_allTime=57	gc_days=13	sh_days=6	sh_zero_since=0	gc_pages=21/21	sh_pages=5/5	sh_metric=visits	sh_since=2026-10-18	gc_comparable=40	sh_comparable=57

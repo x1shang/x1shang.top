@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-21T14:16:04.465Z",
+ "generated": "2026-10-23T08:34:04.199Z",
  "recent": "2026-10-21",
  "site": {
   "name": "x1shang",
@@ -289,9 +289,9 @@ window.AUTO = {
     "技术"
    ],
    "test": false,
-   "heat": 0,
+   "heat": 1,
    "body": "“*第三次AI寒冬没有来，取而代之的是AI全球变暖。*”（李飞飞）\n\n今天听了AI与数学的讲座，却对GPT的数学爆破只字未提，不禁有些失望。\nAI不止会创造junk data,它也可以完善你的作品。AI是一个工具，怎么使用，取决于我们自己。",
-   "visits": 0
+   "visits": 1
   },
   {
    "id": "midnight",

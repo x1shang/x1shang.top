@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-23T19:19:06.768Z",
+ "generated": "2026-10-25T08:26:35.134Z",
  "recent": "2026-10-21",
  "site": {
   "name": "x1shang",
@@ -31,8 +31,8 @@ window.AUTO = {
  },
  "github": {
   "login": "x1shang",
-  "publicRepos": 13,
-  "updated": "2026-10-21"
+  "publicRepos": 12,
+  "updated": "2026-10-25"
  },
  "articles": [
   {

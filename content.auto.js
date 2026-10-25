@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-25T08:26:35.134Z",
+ "generated": "2026-10-25T15:02:54.579Z",
  "recent": "2026-10-21",
  "site": {
   "name": "x1shang",
@@ -2057,6 +2057,18 @@ window.AUTO = {
  ],
  "friends": [
   {
+   "id": "ai-model-world",
+   "date": "2026-10-25",
+   "name": "大模型世界图鉴",
+   "url": "https://www.bilibili.com/toy/ai-model-world/",
+   "description": "一眼看懂大模型的当下格局——用像素角色、能力条与排行榜，把能力、价格、上下文窗口，一张图排明白。",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
    "id": "3b1b",
    "date": "2026-10-14",
    "name": "3Blue1Brown",
@@ -2149,6 +2161,6 @@ window.AUTO = {
   "papers": 1,
   "photos": 37,
   "tracks": 56,
-  "friends": 7
+  "friends": 8
  }
 };

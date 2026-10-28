@@ -544,6 +544,23 @@
     try { return ui`${m[1]}/${decodeURIComponent(m[2])}`; } catch { return ui`${m[1]}/${m[2]}`; }
   }
 
+  /** 当前地址是「深层详情页」时，正文里的相对资源要补的前缀；否则空串 */
+  function relativePrefix() {
+    return /\/(?:articles|assertions|academic)\/[^/]+\/(?:index\.html)?$/.test(location.pathname) ? '../../' : '';
+  }
+
+  /** 给 root 内所有「相对」的 src/href 补前缀：协议地址、//、#锚点、/根路径都不动 */
+  function fixRelativeUrls(root, prefix) {
+    if (!root || !prefix) return;
+    root.querySelectorAll('[src],[href]').forEach((el) => {
+      for (const attr of ['src', 'href']) {
+        const v = el.getAttribute(attr);
+        if (!v || /^(?:[a-z][a-z0-9+.-]*:|\/\/|#|\/)/i.test(v)) continue;
+        el.setAttribute(attr, prefix + v);
+      }
+    });
+  }
+
   /**
    * 访客统计补报：GoatCounter 按 location.pathname 记账，哈希路由（#articles/x）原本全算在 / 上。
    * 因此站内跳转到文章 / 断言 / 论文时手工补一条真实路径的 pageview；直接从真实路径进来的
@@ -590,6 +607,10 @@
     if (reading && (currentPage === 'articles' || currentPage === 'academic')) {
       $('#main').insertAdjacentHTML('beforeend', shareBar(currentPage, detail));
     }
+    // 直接落在 /articles/<id>/、/academic/<id>/ 这类真实路径时（预渲染页 / 分享链接 / 搜索结果），
+    // 正文里的相对资源（assets/…）会被浏览器按当前目录解析，去找 /articles/<id>/assets/… 而 404。
+    // 这里补上 ../../，与 tools/build-content.mjs 给静态壳页做的是同一件事，只是发生在运行时。
+    fixRelativeUrls($('#main'), relativePrefix());
     if (R.math) { try { R.math($('#main')); } catch { /* 公式渲染失败不影响阅读 */ } }
     if (currentPage === 'about') hydrateVisits();
     if (currentPage === 'music') {

@@ -6,7 +6,8 @@
  *   Render.md(src[, opts])      Markdown(GFM 子集) → HTML；opts.rawHtml===false 时把 HTML 当纯文本
  *   Render.sanitizeHtml(html)   原始 HTML 白名单清洗（删 script/style/iframe/…、on*= 事件、javascript: 链接）
  *   Render.renderFile({format, body})  按格式分发：md/markdown、html/htm、tex/latex、txt（未知按 txt）
- *                                      tex 会先做 LaTeX→HTML 结构转换（章节/字体/列表/引用/居中），
+ *                                      tex 会先做 LaTeX→HTML 结构转换（章节/字体/列表/引用/居中/
+ *                                      图 figure+includegraphics、表 tabular、文献 thebibliography），
  *                                      数学片段原样保留交给 Render.math（KaTeX）
  *   Render.math(root)           异步懒加载 KaTeX 渲染 root 内 .math-inline/.math-block；失败加 .math-fallback
  *                               CDN 依次尝试 jsdelivr → unpkg → bootcdn（各 3s 超时，CSS/JS 同源）
@@ -919,7 +920,13 @@
 
   /** 文档层命令（连同参数一起剥掉，不进正文） */
   const TEX_PREAMBLE_CMDS = ['documentclass', 'documentstyle', 'usepackage', 'title', 'author', 'date',
-    'thanks', 'institute', 'subtitle', 'affil', 'affiliation', 'keywords', 'maketitle'];
+    'thanks', 'institute', 'subtitle', 'affil', 'affiliation', 'keywords', 'maketitle',
+    // 排版类：正文里出现也只是版式设置，否则会被当成未知命令、把参数当正文印出来
+    'graphicspath', 'geometry', 'hypersetup', 'captionsetup', 'pagestyle', 'thispagestyle',
+    'setlength', 'renewcommand', 'newcommand'];
+
+  /** 这些环境在 \begin{env} 之后还有「结构参数」（列格式 / 文献标签宽度），要从正文里跳过 */
+  const TEX_ARG_ENVS = new Set(['tabular', 'tabular*', 'tabularx', 'longtable', 'array', 'thebibliography']);
 
   /** {..} 配平（跳过 \{ \}）；找不到闭合返回 -1 */
   function matchBrace(s, at) {
@@ -1022,13 +1029,28 @@
       case 'textcolor': case 'colorbox': case 'fcolorbox': case 'fbox': case 'framebox': case 'makebox':
       case 'parbox': case 'resizebox': case 'scalebox': case 'raisebox': case 'rotatebox':
         return { html: arg(cmd.args.length - 1) };                       // 取最后一个参数作为正文
-      case 'label': case 'index': case 'includegraphics': case 'bibliography': case 'bibliographystyle':
+      case 'label': case 'index': case 'bibliography': case 'bibliographystyle':
       case 'addcontentsline': case 'pageref': case 'eqref': case 'ref':
         return { html: '' };                                            // 结构性参数，不显示为正文
-      case 'item': case 'begin': case 'end': case 'maketitle': case 'noindent': case 'centering':
-      case 'hfill': case 'smallskip': case 'medskip': case 'bigskip': case 'vspace': case 'hspace':
-      case 'vskip': case 'hskip': case 'clearpage': case 'pagebreak':
+      /* 插图：宽度等选项忽略（交给 CSS 自适应），路径按站点根解析 */
+      case 'includegraphics': {
+        const src = str(cmd.args[0]).trim();
+        if (!src) return { html: '' };
+        const alt = src.split(/[\\/]/).pop().replace(/\.[a-z0-9]+$/i, '');
+        return {
+          html: '<img src="' + escape(safeUrl(src)) + '" alt="' + escape(alt)
+            + '" loading="lazy" decoding="async">'
+        };
+      }
+      case 'multicolumn': return { html: arg(2) };                      // {列数}{对齐}{正文}
+      case 'item': case 'begin': case 'end': case 'maketitle':
+      case 'vspace': case 'hspace': case 'vskip': case 'hskip':
         return { html: '' };
+      /* 版式微调命令本身不出字，但它后面若紧跟一个花括号分组，那是「内容」不是参数：
+         \smallskip{注：…} 里的注文必须留下来（peekTexCommand 会把它当参数吃掉）。 */
+      case 'noindent': case 'centering': case 'hfill': case 'smallskip':
+      case 'medskip': case 'bigskip': case 'clearpage': case 'pagebreak':
+        return { html: cmd.args.map(a => texInline(a)).join('') };
       case 'newline': case 'linebreak': case 'newpage':
         return { html: '<br>' };
       case 'ldots': case 'dots': case 'textellipsis': return { html: '…' };
@@ -1082,6 +1104,13 @@
         continue;
       }
       if (c === '}') { i++; continue; }
+      if (c === '-') {                                                   // TeX 的 -- → –、--- → —
+        if (s[i + 1] === '-' && s[i + 2] === '-') { out += '—'; i += 3; continue; }
+        if (s[i + 1] === '-') { out += '–'; i += 2; continue; }
+        out += '-';
+        i++;
+        continue;
+      }
       if (c === '~') { out += '&nbsp;'; i++; continue; }
       if (c === '\n') { out += ' '; i++; continue; }
       out += escape(c);
@@ -1135,12 +1164,71 @@
     return items;
   }
 
+  /** tabular：按顶层 \\ 切行、顶层 & 切列；顶线/中线/底线只当「表头到此为止」的信号 */
+  function renderTexTable(body, ctx) {
+    const RULE = /\\(?:toprule|midrule|bottomrule|hline|addlinespace|cline|cmidrule)(?:\s*\([^)]*\))?(?:\s*\{[^}]*\})?/g;
+    const rows = [];
+    let cells = [];
+    let buf = '';
+    let depth = 0;
+    const endRow = () => { cells.push(buf); rows.push(cells); cells = []; buf = ''; };
+    for (let i = 0; i < body.length; i++) {
+      const c = body[i];
+      if (c === '\\') {
+        if (body[i + 1] === '\\') {
+          if (depth === 0) {
+            i++;
+            let k = i + 1;
+            while (k < body.length && /\s/.test(body[k])) k++;
+            if (body[k] === '[') { const e = body.indexOf(']', k); if (e > 0) i = e; }   // \\[2pt]
+            endRow();
+            continue;
+          }
+          buf += '\\\\';
+          i++;
+          continue;
+        }
+        buf += c;
+        continue;
+      }
+      if (c === '{') depth++;
+      else if (c === '}') depth = Math.max(0, depth - 1);
+      if (c === '&' && depth === 0) { cells.push(buf); buf = ''; continue; }
+      buf += c;
+    }
+    if (buf.trim() || cells.length) endRow();
+
+    const mid = rows.findIndex(raw => /\\midrule/.test(raw.join(' ')));
+    const split = mid < 0 ? 0 : mid;                                    // \midrule 所在行已是数据行
+    const clean = rows.map(raw => raw.map(c => c.replace(RULE, ' ').trim()));
+    const hasCell = row => row.some(c => c);
+    const rowHtml = (row, tag) => '<tr>'
+      + row.map(c => '<' + tag + '>' + texInline(c) + '</' + tag + '>').join('') + '</tr>';
+    const head = clean.slice(0, split).filter(hasCell);
+    const data = clean.slice(split).filter(hasCell);
+    let html = '<div class="table-scroll"><table>';
+    if (head.length) html += '<thead>' + head.map(r => rowHtml(r, 'th')).join('') + '</thead>';
+    html += '<tbody>' + data.map(r => rowHtml(r, 'td')).join('') + '</tbody></table></div>';
+    return html;
+  }
+
   /** 渲染 \begin{env}…\end{env}，返回「已消费到 \end 之后」的下标 */
   function renderTexEnv(s, start, cmd, out, ctx) {
     const env = str(cmd.args[0]).trim();
     const openTok = '\\begin{' + env + '}';
     const closeTok = '\\end{' + env + '}';
-    const from = start + openTok.length;
+    // 可选参数（\begin{table}[htbp]）与 tabular 的列格式、thebibliography 的标签宽度都在
+    // \begin{env} 之后，属于结构参数，要从正文里跳过
+    let from = start + openTok.length;
+    if (TEX_ARG_ENVS.has(env) && cmd.next > start) from = Math.max(from, cmd.next);
+    {                                                                   // 环境名后面的 [htbp] / [t]
+      let k = from;
+      while (k < s.length && (s[k] === ' ' || s[k] === '\t')) k++;
+      if (s[k] === '[') {
+        const close = s.indexOf(']', k);
+        if (close > k && close - k < 40) from = close + 1;
+      }
+    }
     let depth = 0;
     let i = from;
     let bodyEnd = s.length;
@@ -1165,8 +1253,20 @@
       out.push('<div class="tex-center">\n' + texBlocks(body, ctx) + '\n</div>');
     } else if (env === 'verbatim' || env === 'lstlisting' || env === 'minted') {
       out.push('<pre><code>' + escape(body.replace(/^\n+/, '').replace(/\n+$/, '')) + '</code></pre>');
+    } else if (env === 'figure' || env === 'figure*' || env === 'table' || env === 'table*') {
+      // 图/表环境：内部照常排版，只把「独占一段的 caption」提到 figure 顶层（<p> 里不能放 figcaption）
+      const inner = texBlocks(body, ctx)
+        .replace(/<p>\s*(<figcaption>[\s\S]*?<\/figcaption>)\s*<\/p>/g, '$1');
+      out.push('<figure>\n' + inner + '\n</figure>');
+    } else if (env === 'tabular' || env === 'tabular*' || env === 'tabularx'
+      || env === 'longtable' || env === 'array') {
+      out.push(renderTexTable(body, ctx));
+    } else if (env === 'thebibliography') {
+      const items = splitTexItems(body.replace(/\\bibitem(\[[^\]]*\])?\s*\{[^}]*\}/g, '\\item '))
+        .map(it => '<li>' + unwrapTexP(texBlocks(it, ctx)) + '</li>');
+      out.push('<ol class="tex-bib">\n' + items.join('\n') + '\n</ol>');
     } else {
-      out.push(texBlocks(body, ctx));                                     // figure/table/abstract：只留内部内容
+      out.push(texBlocks(body, ctx));                                     // 其余环境：只留内部内容
     }
     return end;
   }
@@ -1181,7 +1281,9 @@
       if (!text) return;
       const sole = FRAG_ONE.exec(text);
       if (sole && ctx.isBlock[Number(sole[1])]) { out.push(ctx.frag[Number(sole[1])]); return; }
-      out.push('<p>' + texInline(text) + '</p>');
+      const html = texInline(text);
+      if (!html.trim()) return;                                          // 整段只有 \centering / \label 之类的版式命令
+      out.push('<p>' + html + '</p>');
     };
     let i = 0;
     while (i < s.length) {
@@ -1219,6 +1321,12 @@
             flush();
             const lvl = cmd.name === 'section' ? 2 : cmd.name === 'subsection' ? 3 : 4;
             out.push('<h' + lvl + '>' + texInline(s.slice(cmd.spans[0][0] + 1, cmd.spans[0][1])) + '</h' + lvl + '>');
+            i = cmd.next;
+            continue;
+          }
+          if (cmd.name === 'caption' && cmd.spans.length) {               // 图/表题：独立成块，不塞进 <p>
+            flush();
+            out.push('<figcaption>' + texInline(s.slice(cmd.spans[0][0] + 1, cmd.spans[0][1])) + '</figcaption>');
             i = cmd.next;
             continue;
           }

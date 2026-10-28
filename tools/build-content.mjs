@@ -26,6 +26,7 @@
  */
 import { readdir, readFile, stat, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { resolveNetease, outerUrl, isSongId } from './fetch-netease.mjs';
@@ -436,7 +437,32 @@ if (!globalThis.Render) {
 const Render = globalThis.Render;
 const HEAD_BLOCK = /<!-- build:head:start[\s\S]*?<!-- build:head:end -->/;
 
-const template = await readFile(path.join(ROOT, 'index.html'), 'utf8');
+/* 静态资源版本戳
+   GitHub Pages 给根目录文件的是 Cache-Control: max-age=600 —— 改了 app.js / content.auto.js 之后，
+   浏览器按 F5 在 10 分钟内仍可能照用旧缓存，表现成「推了但站点没变」。
+   这里按文件内容给 index.html 里的本地 js/css 打 ?v=<sha1 前 8 位>：内容一变 URL 就变，浏览器必取新的；
+   内容没变则一个字不动，不产生无谓 diff。预渲染壳页复用同一份 template，也会带上同样的戳。 */
+async function stampAssetUrls(html) {
+  const re = /((?:src|href)\s*=\s*["'])((?!https?:|\/\/|data:)[^"'?#]+\.(?:js|css))(\?v=[0-9a-f]+)?(["'])/gi;
+  const targets = new Set();
+  for (const m of html.matchAll(re)) targets.add(m[2]);
+  const hashes = new Map();
+  for (const rel of targets) {
+    try {
+      hashes.set(rel, createHash('sha1').update(await readFile(path.join(ROOT, rel))).digest('hex').slice(0, 8));
+    } catch { /* 引用了不存在的文件：交给 check.mjs 去报，这里不拦 */ }
+  }
+  return html.replace(re, (all, pre, rel, _old, post) => (hashes.has(rel) ? `${pre}${rel}?v=${hashes.get(rel)}${post}` : all));
+}
+
+const indexFile = path.join(ROOT, 'index.html');
+const indexRaw = await readFile(indexFile, 'utf8');
+const indexHtml = await stampAssetUrls(indexRaw);
+if (indexHtml !== indexRaw) {
+  await writeFile(indexFile, indexHtml, 'utf8');
+  log('✅ index.html 静态资源版本戳已刷新（?v=内容哈希）');
+}
+const template = indexHtml;
 if (!HEAD_BLOCK.test(template)) log('⚠️  index.html 里找不到 build:head 标记：预渲染页会沿用整站卡片。');
 
 async function writeShell(kindKey, it) {

@@ -21,8 +21,8 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-28T11:33:54.935Z",
- "recent": "2026-10-28",
+ "generated": "2026-10-28T11:45:40.120Z",
+ "recent": "2026-10-21",
  "site": {
   "name": "x1shang",
   "url": "https://x1shang.top",
@@ -340,7 +340,7 @@ window.AUTO = {
  "papers": [
   {
    "id": "湿球融化层面积判断降水相态",
-   "date": "2026-10-28",
+   "date": "2025-05-22",
    "format": "tex",
    "title": "一种通过湿球融化层面积判断降水相态的研究",
    "tags": [

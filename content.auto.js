@@ -21,8 +21,8 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-31T10:51:13.212Z",
- "recent": "2026-10-21",
+ "generated": "2026-10-31T11:46:10.377Z",
+ "recent": "2026-10-30",
  "site": {
   "name": "x1shang",
   "url": "https://x1shang.top",
@@ -35,6 +35,22 @@ window.AUTO = {
   "updated": "2026-10-25"
  },
  "articles": [
+  {
+   "id": "2026-10月月报",
+   "date": "2026-10-30",
+   "format": "md",
+   "title": "x1shang -10月份月报",
+   "tags": [
+    "月报",
+    "项目",
+    "生活"
+   ],
+   "test": false,
+   "heat": 0,
+   "body": "> 上海的十月，夏天才刚刚落幕。\n\n来到上海读大学后的第一个秋天，日子在课业、折腾和新的相遇里一点点展开。这个月做了些事情，也想把它们和你分享。\n\n## 给自己留一个小站\n\n[x1shang.top](https://x1shang.top/) 是我搭建的个人站点。文章、照片、音乐、研究记录，以及一路做过的小项目，都会慢慢放进来。\n\n建站的一个念头很简单：以后我们或许会去往不同的地方，也会各自忙碌，但希望无论何时何地，朋友们都还有一个地方可以找到我。想联系我的话，也欢迎写信到 [ciallo@x1shang.top](mailto:ciallo@x1shang.top)。\n\n站里已经整理归档了不少高中的点滴。十班的回忆对我来说太珍贵，值得留一个位置好好珍藏；接下来的空间，则留给大学里继续遇见的人和事。\n\n小站的源码以 MIT 协议开源。如果你也想搭一个自己的博客，可以看看 [GitHub 仓库](https://github.com/x1shang/x1shang.top)，或从[发布页](https://github.com/x1shang/x1shang.top/releases)下载整理好的博客模板。\n\n## 公共笔记仓\n\n进入大学之后，我的笔记开始电子化，同时有大量自学的内容、想要讨论的话题，无法得到除了AI以外的反馈与声音。直到建立站点，我上传的几个学习可视化界面收到lmy的批评、建议，我才意识到一种信息化与智能化带来的全新可能。\n\n也是受到[传承·交大](https://share.dyweb.sjtu.cn)用自己的资料兑换别人上传的课程资料的启发，我在小站中开辟了[一块区域](https://x1shang.top/#notes)，你可以在这里分享你的笔记，也可以自由评论、指正别人的笔记。\n\n我后续也将会上传我自己完整版的笔记。遵从一些学院要求，它们将会在学期末之后与大家见面。\n\n## 机械赛：最后两天的飞轮\n\n很久没有做嵌入式开发了。软件和硬件一起调试，还是会让我头皮发麻，但最后我们把车做出来了，也有幸入围。\n\n这个过程有点狼狈，也很难忘：没有经验就边做边试，经费烧干了就自己垫一点；发射装置不行就改，动力不够就调高电压尝试，来不及 3D 打印就拿热熔胶粘，接口不够就用面包板扩展。\n\n离排位赛不到两天时，第一版驱动板烧了，第二版的电机也在负载下损坏。我们从废料堆里翻出一块 L298N 和两只轮胎，硬是拼出了一个飞轮发射装置。\n\n特别感谢我的两位舍友。为了这辆车，我们一起度过了好几个有点癫狂的白天和黑夜。最终的结果还无从得知，但这段经历已为传奇。\n\n## 湿球计算器：终于可以在网页上试用了\n\n之前发布 v1.2.0 时，湿球计算器还只有软件版，放在 GitHub 上下载也不算方便。现在可以直接打开[网页版](https://navi.x1shang.top/wetbulb/)试用；桌面版 v1.3.5 对应的网页版版本号是 v2.0.0。它支持湿球、露点和相对湿度之间的计算，也提供多种公式、批量处理与迭代过程可视化。\n\n这个工具源于我们高中降水相态研究中的需求。计算程序本身不一定复杂，真正需要谨慎的是公式、参数和适用范围：在 DSH 的帮助下，我对项目做了不少修订与复核，也把参考资料和已知限制整理进了文档。不同公式有各自的适用条件，使用结果时仍需要结合具体场景判断。\n\n本着科研共享的想法，项目也提供输出 JSON 的命令行版本，方便其他人通过脚本调用或接入自己的项目。网页版主要让体验更方便；如果需要命令行接口，可以在发行页下载桌面 CLI。\n\n- [在线体验](https://navi.x1shang.top/wetbulb/)\n- [源码与发行版](https://github.com/x1shang/Wetbulb-Calculator)\n- [精度、适用范围与参考文献](https://github.com/x1shang/Wetbulb-Calculator/blob/master/docs/%E7%B2%BE%E5%BA%A6%E4%B8%8E%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE.md)\n\n## DIYPCmarket：给装机行情留一份档案\n\n电脑硬件的价格居高不下，于是我尝试把自己关注的装机行情按月整理下来，做成 [frocloud · DIYPCmarket](https://github.com/x1shang/frocloud-DIYPCmarket)。\n\n这里有手工整理的 Excel 表，包括显卡、CPU、内存等价格资料和 GPU / CPU 天梯图；仓库里也有从表格导出的 CSV，方便进一步处理。十月版本可以在[发布页](https://github.com/x1shang/frocloud-DIYPCmarket/releases)查看。\n\n具体口径和数据截止时间请以仓库说明为准，欢迎发现问题后帮我指出。\n\n## 复扫雷助手：如果雷也有不同的数值\n\n[复扫雷](https://github.com/Yueqing-Chen/complexweeper-A-minesweeper-game)把经典扫雷变成了一个很有意思的问题：如果雷不再只有一种，而是可以沿两个方向取正负值，棋盘还可以怎样推理？圆复数模式中的雷可以是 +1、−1、+i、−i；闵可夫斯基模式则用 +1、−1、+j、−j，其中 j² = 1。不同的雷可能相互抵消，线索不再只是附近雷的数量。\n\n受[忘忧草的扫雷助手](https://github.com/wangyuanchuan2022/minesweeper_help)启发，我尝试为复扫雷做了一个[外部助手](https://github.com/x1shang/complex-sweeper-helper)，并使用了原项目的界面外壳。它会识别棋盘、根据线索推理，显示风险估计，也能在“点击确定方格”模式下只翻开已证明安全的格子。\n\n自动模式在没有确定安全格时可能需要猜测，因此不能保证通关；复杂局面的概率也还有改进空间。对我来说，它更像是一次把游戏里的数学问题变成程序的尝试。\n\n---\n\n十月就先记到这里。谢谢一路同行的朋友，也感谢你有空来小站逛逛。",
+   "summary": "上海的十月：给回忆安一个家，和室友一起赶机械赛，还有几个慢慢完善的小项目。",
+   "visits": 0
+  },
   {
    "id": "september-report",
    "date": "2026-09-29",
@@ -2101,6 +2117,18 @@ window.AUTO = {
  ],
  "friends": [
   {
+   "id": "sigma-lab",
+   "date": "2026-10-31",
+   "name": "SIGMA LAB",
+   "url": "https://www.haifeng-xu.com/sigma/people.html",
+   "description": "芝加哥大学教授，Haifeng Xu老师的研究所主页",
+   "avatar": "",
+   "status": "approved",
+   "source": "file",
+   "test": false,
+   "tags": []
+  },
+  {
    "id": "ai-model-world",
    "date": "2026-10-25",
    "name": "大模型世界图鉴",
@@ -2200,12 +2228,12 @@ window.AUTO = {
  "about": "*一个安静的个人空间，用来记录研究、创作和生活。*\n\n很简约的一座小站：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑；就连上传文章也简化到只用往仓库里丢一个文件——比如这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $\\LaTeX$。\n\n网站源码已在GitHub上以MIT协议开源，试试建设你的博客吧！\n\n### 关于我\n\n**2014-2020** 北京第二实验小学，学生。历任数学课代表，学习委员，班长，大队长，在乐团里拉低音提琴，一路做到了首席。很多路的起点都在那里，学习中对于科学的喜好、练琴时渐渐激发的感性、先后七次进藏旅行、两番赴美、尝试滑雪冲浪、在学校建立诗社萌发的诗心，这些事情已经很久远，但是直到现在都依然是不变的个人底色。\n\n**2020-2023** 人大附中分校，学生。任语文课代表、宣传委员。疫情和我的初中生活牢牢交织。没有大风大浪，但居家学习、在随笔本上写下无数文字，在线上第一次领略AI的神力，生活既是平凡的，也是数字的。\n\n**2023-2026** 人大附中，第二届基础科学实验班，学生。任卫生委员。从分校升入本部，震撼是毋庸置疑的。社团活动、班级活动、竞赛、挑战赛、研究性学习、游学突如其来并一下充满了我的高中生活；身边的同学，每一个人都保持着鲜明的个人特色，在自己的领域坚持热爱、绽放异彩。在和他们的交往中、在挑战物理竞赛的过程中、在参加电影节并写作片尾曲歌词的晚上，我必须常常突破自我的极限。在这里我留下了许多遗憾，也逐渐看清了自己想做的事。\n\n**2026-今** 上海交通大学，学生。计算机科学专业，志于 AI + 物理方面研究。\n\n**联系方式**：[ciallo@x1shang.top](mailto:ciallo@x1shang.top)。\n\n**学术联系**：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。\n\n### 荣誉墙\n\n- *2025.11 & 2026.4* 海淀区高三期中&一模 记叙文标杆文 一类中标杆\n- *2025.5* 人大附中研究性学习成果《一种通过湿球融化层面积判断降水相态的研究》获得一等奖\n- *2025.4* 人大附中国家安全知识竞赛冠军\n- *2024.11* 获41st全国中学生物理竞赛（CPhO）省级二等奖（北京赛区）\n- *2024.7* 全国青少年劳动技能与智能设计大赛（AILD） 创意结构 普高组铜牌\n\n### 快速开始\n\n试试页面底部的搜索框，或许能找到同频电波——\n\n- 摄影佬？看看我的[相片墙](https://x1shang.top/#photography)✅\n- 自驾玩家？可以看看[大北线游记](https://x1shang.top/#articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE)哦\n- 气象爱好者？这里有我手搓的[湿球计算器](https://navi.x1shang.top/wetbulb/)，在[友链](https://x1shang.top/#friends)中还可以找到[RDFZ气象社官网](https://rmc.beijingxuemi.top/)！\n\n或许，点开一首音乐慢慢浏览，会多几许惬意。\n\n也可以试试点击搜索框左侧的“>”，猜猜看会发生什么。",
  "aboutEn": "*A quiet personal space for research, creative work, and everyday life.*\n\nThis is a simple little site: no comments, likes, submission forms, or backend. The command-line search at the bottom runs entirely in your browser. Even publishing a post is as simple as dropping a file into the repository. This page, for instance, lives in `content/about.en.md`; edit that file to update it. Markdown and $\\LaTeX$ are both supported.\n\nThe site's source code is on GitHub under the MIT license. Why not try building a blog of your own?\n\n### About me\n\n**2014–2020 · Beijing No. 2 Experimental Primary School.** I served as math class representative, class committee member for studies, class monitor, and head of the school's Young Pioneers. I also played double bass in the orchestra, eventually becoming principal bassist. So many things began there: a love of science in the classroom, a growing sensitivity to music through hours of practice, seven trips to Tibet and two to the United States, my first attempts at skiing and surfing, and a taste for poetry that led me to start a poetry club at school. Those years feel distant now, but they still shape who I am.\n\n**2020–2023 · Branch of RDFZ.** I was the Chinese class representative and helped with class publicity. The pandemic was woven into my middle-school years. There were no great upheavals in my own life, just studying from home, filling notebook after notebook with thoughts, and discovering online, for the first time, what AI could do. Life was ordinary, and increasingly digital.\n\n**2023–2026 · The High School Affiliated to Renmin University of China (RDFZ).** I was the member of the second cohort of the Basic Science Experimental Class. Moving from the branch school to the main school was an eye-opening experience. Clubs, class events, competitions, challenges, research projects, and study trips suddenly filled my days. My classmates each had a distinct character and pursued their own interests with dedication. Getting to know them, taking on physics competitions, and spending evenings writing lyrics for a closing-credits song for the school film festival often pushed me beyond what I thought I could do. I left with plenty of regrets, but also a clearer sense of what I wanted to pursue.\n\n**2026–present · Shanghai Jiao Tong University.** I'm studying computer science, with the aim of doing research at the intersection of AI and physics.\n\n**Get in touch:** [ciallo@x1shang.top](mailto:ciallo@x1shang.top).\n\n**Academic contact:** [zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn).\n\n### Honors & Awards\n\n- *Nov 2025 & Apr 2026* — Benchmark Essay (Category I, Middle Band), Narrative Writing, Haidian District Senior Year 3 Midterm Examination and First Mock Examination\n- *May 2025* — First Prize, Research-Based Learning Project, RDFZ — \"A Study on Determining Precipitation Type from the Area of the Wet-Bulb Melting Layer\"\n- *Apr 2025* — Champion, National Security Knowledge Competition, The High School Affiliated to Renmin University of China (RDFZ)\n- *Nov 2024* — Provincial Second Prize (Beijing Division), 41st Chinese Physics Olympiad (CPhO)\n- *Jul 2024* — Bronze Award, Creative Structure Event, Regular Senior High School Division, National Youth Labor Skills and Intelligent Design Competition (AILD)\n\n### Take a look around\n\nTry the search box at the bottom of the page. You might find something on your wavelength.\n\n- Into photography? Have a look at my [photo wall](#photography).\n- Love a road trip? Come along on my [journey along Tibet's Great Northern Route](#articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE).\n- Interested in weather? Try the [Wetbulb Calculator](https://navi.x1shang.top/wetbulb/) I built. You'll also find the [RDFZ Meteorology Club](https://rmc.beijingxuemi.top/) among my [friends' sites](#friends).\n\nPut on a song and take your time browsing. It's a nice way to spend a moment here.\n\nOr try clicking the “>” to the left of the search box. See what happens.",
  "stats": {
-  "articles": 15,
+  "articles": 16,
   "assertions": 4,
   "papers": 2,
   "notes": 1,
   "photos": 37,
   "tracks": 56,
-  "friends": 8
+  "friends": 9
  }
 };

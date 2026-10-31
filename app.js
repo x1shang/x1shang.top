@@ -68,18 +68,19 @@
 
   const sections = [
     ['home', '主页', 'Home'], ['academic', '学术', 'Academic'], ['articles', '文章', 'Articles'],
-    ['assertions', '断言', 'Thoughts'], ['photography', '摄影', 'Photography'],
+    ['assertions', '断言', 'Thoughts'], ['notes', '笔记', 'Notes'], ['photography', '摄影', 'Photography'],
     ['music', '音乐', 'Music'], ['friends', '友链', 'Friends'], ['about', '关于', 'About'],
   ];
   /** 作品不再由本站承载：侧栏「作品」直接外链到导航页（磁贴 + 作品区都在那边） */
   const WORKS_URL = 'https://navi.x1shang.top/';
   const NAV = [
-    ['home', '主页'], ['academic', '学术'], ['articles', '文章'], ['assertions', '断言'],
+    ['home', '主页'], ['academic', '学术'], ['articles', '文章'], ['assertions', '断言'], ['notes', '笔记'],
     ['__works', '作品'], ['photography', '摄影'], ['music', '音乐'], ['friends', '友链'], ['about', '关于'],
   ];
   const descriptions = {
     academic: '论文、研究，与尚未解答的问题。', articles: '给值得展开的想法，留一整页的空间。',
     assertions: '短一点的文字，未必轻一点。',
+    notes: '任何人可以投稿，任何人可以指正。',
     photography: '快门落下时，留住片刻的光。', music: '让旋律继续，让思绪慢下来。',
     friends: '互联网很大，很高兴与你相遇。', about: '这座小站的记录与刻度。',
   };
@@ -95,6 +96,7 @@
     articles: normalize('article', A.articles, S.articles),
     assertions: normalize('assertion', A.assertions, S.assertions),
     papers: normalize('paper', A.papers, S.papers),
+    notes: normalize('note', A.notes, S.notes),
     photos: normalize('photo', A.photos, S.photos),
     tracks: normalize('track', A.tracks, S.tracks),
     friends: normalize('friend', A.friends, S.friends),
@@ -141,16 +143,17 @@
     for (const a of C.articles) push('article', tr('文章'), a, ui`#articles/${encodeURIComponent(a.id)}`);
     for (const a of C.assertions) push('assertion', tr('断言'), { ...a, title: assertionLabel(a, 42) }, ui`#assertions/${encodeURIComponent(a.id)}`);
     for (const p of C.papers) push('paper', tr('学术'), p, ui`#academic/${encodeURIComponent(p.id)}`);
+    for (const n of C.notes) push('note', tr('笔记'), n, ui`#notes/${encodeURIComponent(n.id)}`, n.nickname || '');
     for (const p of C.photos) push('photo', tr('摄影'), p, ui`#photography/${encodeURIComponent(p.id)}`);
     for (const t of C.tracks) push('track', tr('音乐'), t, ui`#music/${encodeURIComponent(t.id)}`, t.artist || '');
     for (const f of C.friends) push('friend', tr('友链'), f, f.url || '#friends', f.url || '');
     searchIndex.push({ kind: 'page', label: tr('作品'), route: WORKS_URL, title: tr('作品导航'), date: '', text: tr('作品 导航 磁贴') });
   }
 
-  const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', photo: '摄影', track: '音乐', friend: '友链', page: '页面' };
+  const KIND_PREFIX = { article: '文章', assertion: '断言', paper: '学术', note: '笔记', photo: '摄影', track: '音乐', friend: '友链', page: '页面' };
   function search(raw) {
     let q = String(raw || '').trim(), filter = '';
-    const m = q.match(/^(?:([a-z]+)|(文章|断言|学术|论文|摄影|照片|音乐|友链|页面))[:：]\s*(.*)$/);
+    const m = q.match(/^(?:([a-z]+)|(文章|断言|学术|论文|笔记|摄影|照片|音乐|友链|页面))[:：]\s*(.*)$/);
     if (m) {
       const key = m[1] || Object.keys(KIND_PREFIX).find((k) => KIND_PREFIX[k] === m[2]);
       if (KIND_PREFIX[key]) { filter = key; q = m[3].trim(); }
@@ -188,11 +191,11 @@
   }
 
   /* ------------------------------------------------------------------ 搜索与导航命令 */
-  const ENTRY_ALIASES = { '/': 'pages', home: 'pages', index: 'pages', 主页: 'pages', a: 'articles', 文章: 'articles', papers: 'academic', 学术: 'academic', t: 'assertions', 断言: 'assertions', p: 'photography', photos: 'photography', 摄影: 'photography', m: 'music', 音乐: 'music', f: 'friends', 友链: 'friends', 关于: 'about', w: 'works', 作品: 'works' };
+  const ENTRY_ALIASES = { '/': 'pages', home: 'pages', index: 'pages', 主页: 'pages', a: 'articles', 文章: 'articles', papers: 'academic', 学术: 'academic', t: 'assertions', 断言: 'assertions', n: 'notes', 笔记: 'notes', p: 'photography', photos: 'photography', 摄影: 'photography', m: 'music', 音乐: 'music', f: 'friends', 友链: 'friends', 关于: 'about', w: 'works', 作品: 'works' };
   function commandEntries(scope) {
     scope = ENTRY_ALIASES[scope.toLowerCase()] || scope.toLowerCase();
     if (scope === 'all') return [...searchIndex];
-    const kinds = { articles: 'article', academic: 'paper', assertions: 'assertion', photography: 'photo', music: 'track', friends: 'friend' };
+    const kinds = { articles: 'article', academic: 'paper', assertions: 'assertion', notes: 'note', photography: 'photo', music: 'track', friends: 'friend' };
     const rows = scope === 'pages' ? searchIndex.filter(x => x.kind === 'page') : kinds[scope] ? searchIndex.filter(x => x.kind === kinds[scope]).sort(byHeatThenTime) : searchIndex.filter(x => x.kind === 'page' && x.route === ui`#${scope}`);
     // 当页渲染出的正文链接、播放器及照片操作也能按编号访问。
     if (scope === currentPage || (scope === 'pages' && currentPage === 'home')) {
@@ -235,9 +238,10 @@
      只做一件事——点一下把「标题 + 链接」复制到剪贴板，用户自己粘。文章与论文的详情页末尾各一个。
      站内 SPA 与预渲染的真实路径页共用这段逻辑（预渲染页也会被 app.js 接管）。 */
   function shareBar(kind, id) {
-    const it = (kind === 'academic' ? C.papers : C.articles).find((x) => String(x.id) === id);
+    const pool = kind === 'academic' ? C.papers : kind === 'notes' ? C.notes : C.articles;
+    const it = pool.find((x) => String(x.id) === id);
     if (!it) return '';
-    const dir = kind === 'academic' ? 'academic' : 'articles';
+    const dir = kind === 'academic' ? 'academic' : kind === 'notes' ? 'notes' : 'articles';
     const base = ((A.site && A.site.url) || location.origin).replace(/\/$/, '');
     const url = ui`${base}/${dir}/${encodeURIComponent(id)}/`;
     return ui`<div class="share" data-share data-title="${esc(it.title || id)}" data-url="${esc(url)}">
@@ -286,16 +290,17 @@
     const articles = [...C.articles].sort(byHeatThenTime);
     const papers = [...C.papers].sort(byHeatThenTime);
     const assertions = [...C.assertions].sort(byHeatThenTime);
+    const notes = [...C.notes].sort(byHeatThenTime);
     const photos = [...C.photos].sort(byHeatThenTime);
     const tracks = musicList();
     const friends = [...C.friends].sort(byHeatThenTime);
     const cat = (title, rows, opts = {}) => ui`<section class="idx-cat${opts.short ? ' short' : ''}"><h3>${esc(title)}</h3><p class="idx-run">${rows}</p>${opts.note ? ui`<p class="idx-sub">${opts.note}</p>` : ''}${opts.more ? ui`<p class="idx-more">${opts.more}</p>` : ''}</section>`;
 
     const shortcuts = [
-      ['#articles', tr('文章')], ['#assertions', tr('断言')], ['#academic', tr('学术')],
+      ['#articles', tr('文章')], ['#assertions', tr('断言')], ['#notes', tr('笔记')], ['#academic', tr('学术')],
       ['#photography', tr('摄影')], ['#music', tr('音乐')], ['#friends', tr('友链')], ['#about', tr('关于')],
     ].map(([h, l]) => runLink(h, l));
-    shortcuts.splice(3, 0, ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
+    shortcuts.splice(4, 0, ui`<a href="${WORKS_URL}" target="_blank" rel="noopener noreferrer">作品</a>`);
     shortcuts.push(ui`<a href="${safe(at('feed.xml'))}" type="application/rss+xml">RSS</a>`, ui`<a href="${safe(at('atom.xml'))}" type="application/atom+xml">Atom</a>`,
       ui`<a href="https://github.com/${encodeURIComponent(S.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>`);
 
@@ -330,6 +335,8 @@
         { note: articles.length ? ui`${articles.length} 篇` : '', more: articles.length ? tr('<a href="#articles">全部文章 →</a>') : '' }),
       cat(tr('断言'), joinRun(assertions.slice(0, limit).map((a) => runLink(ui`#assertions/${encodeURIComponent(a.id)}`, assertionLabel(a, 26))), tr('还没有断言：把短句丢进 content/assertions/')),
         { note: assertions.length ? ui`${assertions.length} 则` : '', more: assertions.length ? tr('<a href="#assertions">全部断言 →</a>') : '' }),
+      cat(tr('笔记'), joinRun(notes.slice(0, limit).map((n) => runLink(ui`#notes/${encodeURIComponent(n.id)}`, n.title)), tr('笔记库还空着：去 submit.x1shang.top 投第一篇')),
+        { note: notes.length ? ui`${notes.length} 篇 · 公开投稿` : '', more: notes.length ? tr('<a href="#notes">全部笔记 →</a>') : '' }),
       cat(tr('友链'), joinRun(friends.slice(0, limit).map((f) => ui`<a href="${safe(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`), tr('还没有友链：写进 content/friends/')),
         { more: tr('<a href="#friends">友链 →</a>') }),
 
@@ -346,7 +353,7 @@
         <p class="idx-recent"><b>最近更新：</b> ${esc(fmtCn(newestDate()))}<span class="sep">|</span><a href="${safe(at('feed.xml'))}">RSS</a><span class="sep">|</span><a href="${safe(at('atom.xml'))}">Atom</a></p>
       </div>
       <div class="idx-columns">${categories.join('')}</div>
-      <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ui` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
+      <p class="idx-foot">共 ${C.articles.length} 篇文章 · ${C.assertions.length} 则断言 · ${C.papers.length} 篇论文 · ${C.notes.length} 篇笔记 · ${C.photos.length} 张照片 · ${C.tracks.length} 首音乐 · ${C.friends.length} 个友链${C.generated ? ui` · 内容包生成于 ${esc(fmt(C.generated))}` : ''}</p>`;
   }
 
   /* 板块列表：密集索引行 */
@@ -410,6 +417,40 @@
       <div class="reading-head"><h1>${esc(assertionLabel(a, 46) || tr('断言'))}</h1>${testBadge(a)}
       <div class="reading-meta"><span>${esc(fmt(a.date))}</span>${(a.tags || []).map((t) => ui`<span>#${esc(t)}</span>`).join('')}</div></div>
       <article class="prose" data-format="${esc(a.format || 'md')}">${R.renderFile({ format: a.format, body: a.body })}</article>`;
+  }
+
+  /* 笔记：公开投稿的条目。热度全是 0（不按访客排），于是 byHeatThenTime 退化成按日期倒序，
+     测试样例仍然永远置底。正文一律走 Render.renderNote：md 关 raw HTML、tex 只做结构转换、
+     其余格式原样 <pre>，永不编译、永不执行。 */
+  function notesList() {
+    const list = [...C.notes].sort(byHeatThenTime);
+    return head('notes', tr('笔记'))
+      + ui`<p class="note note-submit">投稿入口：<a href="https://submit.x1shang.top/" target="_blank" rel="noopener noreferrer">submit.x1shang.top</a>。同一昵称 + 同一标题再次投稿＝覆盖原文（不删除、可回溯）；新笔记每天统一编入一次。</p>`
+      + idxList(list, (n) => ui`<a href="#notes/${encodeURIComponent(n.id)}">${esc(n.title)}</a>${testBadge(n)}`,
+        {
+          sub: (n) => [n.nickname ? '投稿：' + n.nickname : '', ...(n.tags || []).map((t) => '#' + t), (n.ext || n.format || '').toUpperCase()]
+            .filter(Boolean).map(esc).join(' · '),
+          emptyTitle: tr('笔记库还空着'),
+          emptyText: tr('去 submit.x1shang.top 投第一篇；通过每日流水线进入这里。'),
+        });
+  }
+
+  function noteDetail(id) {
+    const n = C.notes.find((x) => String(x.id) === id);
+    if (!n) return empty(tr('笔记未找到'), tr('<a href="#notes">返回笔记列表</a>'));
+    const meta = [
+      fmt(n.date),
+      n.nickname ? '投稿：' + n.nickname : '',
+      ...(n.tags || []).map((t) => '#' + t),
+      (n.ext || n.format || '').toUpperCase(),
+      n.updated ? '更新于 ' + fmt(n.updated) : '',
+    ].filter(Boolean);
+    return ui`<a class="backlink" href="#notes">← 笔记</a>
+      <div class="reading-head"><h1>${esc(n.title)}</h1>${testBadge(n)}
+      <div class="reading-meta">${meta.map((m) => ui`<span>${esc(m)}</span>`).join('')}</div></div>
+      <p class="note">公开投稿，不代表本站观点。同一昵称 + 同一标题再次投稿会覆盖原文，旧版本可在仓库历史里回溯。</p>
+      ${n.source ? ui`<p class="note">原文件：<code>${esc(n.source)}</code></p>` : ''}
+      <article class="prose" data-format="${esc(n.format || 'md')}">${n.body ? R.renderNote({ format: n.format, body: n.body }) : tr('<p class="meta">这条笔记没有正文。</p>')}</article>`;
   }
 
   function worksPage() {
@@ -537,16 +578,16 @@
    * 预渲染的真实路径 → 站内路由：/articles/<id>/ 这类地址（爬虫、分享、搜索结果来的）
    * 也能落到对应文章；本地双击 articles/<id>/index.html 同样认得（file:// 也能用）。
    */
-  const DETAIL_KIND = { articles: 1, assertions: 1, academic: 1 };
+  const DETAIL_KIND = { articles: 1, assertions: 1, academic: 1, notes: 1 };
   function routeFromPath() {
-    const m = location.pathname.match(/\/(articles|assertions|academic)\/([^/]+)\/(?:index\.html)?$/);
+    const m = location.pathname.match(/\/(articles|assertions|academic|notes)\/([^/]+)\/(?:index\.html)?$/);
     if (!m) return '';
     try { return ui`${m[1]}/${decodeURIComponent(m[2])}`; } catch { return ui`${m[1]}/${m[2]}`; }
   }
 
   /** 当前地址是「深层详情页」时，正文里的相对资源要补的前缀；否则空串 */
   function relativePrefix() {
-    return /\/(?:articles|assertions|academic)\/[^/]+\/(?:index\.html)?$/.test(location.pathname) ? '../../' : '';
+    return /\/(?:articles|assertions|academic|notes)\/[^/]+\/(?:index\.html)?$/.test(location.pathname) ? '../../' : '';
   }
 
   /** 给 root 内所有「相对」的 src/href 补前缀：协议地址、//、#锚点、/根路径都不动 */
@@ -580,7 +621,7 @@
     if (!options.languageOnly && detail && !(fromPath && fromPath === raw)) trackVisit(route, detail);
     const isSection = sections.some((x) => x[0] === route);
     currentPage = isSection ? route : 'home';
-    const reading = (currentPage === 'articles' && detail) || (currentPage === 'academic' && detail) || (currentPage === 'assertions' && detail);
+    const reading = (currentPage === 'articles' && detail) || (currentPage === 'academic' && detail) || (currentPage === 'assertions' && detail) || (currentPage === 'notes' && detail);
     document.body.classList.toggle('reading', !!reading);
     $('#hero').hidden = currentPage !== 'home' || !!detail;
     $$('[data-page]').forEach((a) => {
@@ -596,6 +637,7 @@
     else if (currentPage === 'academic') body = detail ? academicDetail(detail) : academicList();
     else if (currentPage === 'articles') body = detail ? articlesDetail(detail) : articlesList();
     else if (currentPage === 'assertions') body = detail ? assertionDetail(detail) : assertionsList();
+    else if (currentPage === 'notes') body = detail ? noteDetail(detail) : notesList();
     else if (currentPage === 'photography') body = photographyPage(detail);
     else if (currentPage === 'music') body = musicPage(detail);
     else if (currentPage === 'friends') body = friendsPage();
@@ -604,7 +646,7 @@
 
     $('#main').innerHTML = body;
     // 文章 / 论文详情页末尾挂一个"复制标题与链接"（预渲染页与站内 SPA 都会走到这里）
-    if (reading && (currentPage === 'articles' || currentPage === 'academic')) {
+    if (reading && (currentPage === 'articles' || currentPage === 'academic' || currentPage === 'notes')) {
       $('#main').insertAdjacentHTML('beforeend', shareBar(currentPage, detail));
     }
     // 直接落在 /articles/<id>/、/academic/<id>/ 这类真实路径时（预渲染页 / 分享链接 / 搜索结果），

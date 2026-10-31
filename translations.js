@@ -4,6 +4,7 @@ window.SITE_TRANSLATIONS = {
   "学术": "Academic",
   "文章": "Articles",
   "断言": "Thoughts",
+  "笔记": "Notes",
   "摄影": "Photography",
   "音乐": "Music",
   "友链": "Friends",

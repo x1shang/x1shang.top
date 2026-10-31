@@ -36,13 +36,13 @@ console.log('\n■ 内容包');
     const raw = readFileSync(file, 'utf8');
     try {
       const auto = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
-      ok(`content.auto.js 可解析：文章 ${auto.articles.length} · 断言 ${auto.assertions.length} · 学术 ${auto.papers.length} · 摄影 ${auto.photos.length} · 音乐 ${auto.tracks.length} · 友链 ${auto.friends.length}`);
+      ok(`content.auto.js 可解析：文章 ${auto.articles.length} · 断言 ${auto.assertions.length} · 学术 ${auto.papers.length} · 笔记 ${(auto.notes || []).length} · 摄影 ${auto.photos.length} · 音乐 ${auto.tracks.length} · 友链 ${auto.friends.length}`);
       for (const [k, v] of Object.entries(auto.stats || {})) if (typeof v !== 'number') no(`stats.${k} 不是数字`);
       if (!auto.github) warn('content.auto.js 没有 GitHub 仓库数（先跑 npm run repos）——关于页卡片会显示「—」');
       else if (!Number.isInteger(auto.github.publicRepos) || auto.github.publicRepos < 0) no(`github.publicRepos 不是非负整数：${auto.github.publicRepos}`);
       else ok(`GitHub 公开仓库数：${auto.github.publicRepos}`);
       const ids = new Set();
-      for (const [kind, list] of [['article', auto.articles], ['assertion', auto.assertions], ['paper', auto.papers], ['photo', auto.photos], ['track', auto.tracks]]) {
+      for (const [kind, list] of [['article', auto.articles], ['assertion', auto.assertions], ['paper', auto.papers], ['note', auto.notes || []], ['photo', auto.photos], ['track', auto.tracks]]) {
         for (const it of list) {
           if (!it.id) no(`${kind} 有条目缺 id`);
           if (ids.has(`${kind}:${it.id}`)) no(`${kind}:${it.id} 重复`);
@@ -52,6 +52,12 @@ console.log('\n■ 内容包');
       }
       const photoFiles = [...auto.photos.map((p) => p.src), ...auto.photos.map((p) => p.thumb)];
       for (const f of photoFiles) if (f && !existsSync(path.join(ROOT, f))) no(`照片产物缺失：${f}`);
+      /* 笔记是公开投稿：必填字段缺一个就会在列表页露出破绽，构建期直接拦住 */
+      for (const n of auto.notes || []) {
+        for (const k of ['title', 'nickname']) if (!n[k]) no(`note:${n.id} 缺 ${k}`);
+        if (!Array.isArray(n.tags) || !n.tags.length) no(`note:${n.id} 缺 tags`);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(n.date || ''))) no(`note:${n.id} 日期异常：${n.date}`);
+      }
     } catch (e) { no(`content.auto.js 解析失败：${e.message}`); }
   }
 }
@@ -148,7 +154,7 @@ console.log('\n■ 预渲染与热度');
   if (auto) {
     const sitemap = existsSync(path.join(ROOT, 'sitemap.xml')) ? readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
     let shells = 0, missing = 0, absent = 0;
-    for (const [key, dir] of [['articles', 'articles'], ['assertions', 'assertions'], ['papers', 'academic']]) {
+    for (const [key, dir] of [['articles', 'articles'], ['assertions', 'assertions'], ['papers', 'academic'], ['notes', 'notes']]) {
       for (const it of auto[key] || []) {
         const rel = `${dir}/${it.id}/index.html`;
         if (existsSync(path.join(ROOT, rel))) shells++;
@@ -156,7 +162,7 @@ console.log('\n■ 预渲染与热度');
         if (!sitemap.includes(`/${dir}/${encodeURIComponent(it.id)}/`)) { absent++; no(`sitemap.xml 里没有 /${dir}/${it.id}/`); }
       }
     }
-    if (shells && !missing) ok(`预渲染页齐全：${shells} 个（articles/ · assertions/ · academic/）`);
+    if (shells && !missing) ok(`预渲染页齐全：${shells} 个（articles/ · assertions/ · academic/ · notes/）`);
     if (shells && !absent) ok('sitemap.xml 覆盖了全部预渲染页');
     const first = (auto.articles || [])[0];
     if (first) {

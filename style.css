@@ -164,6 +164,10 @@ body.reading .site-name{font-size:19px}
 .reading-head h1{font-size:clamp(26px,3.4vw,36px);font-weight:600;letter-spacing:-1px;line-height:1.35;margin:12px 0 12px}
 .reading-meta{font-size:11px;color:var(--faint);font-family:var(--mono);display:flex;gap:14px;flex-wrap:wrap}
 .backlink{font-size:11px;color:var(--muted)}
+/* 笔记：投稿署名 + 纯文本正文（不高亮，只保证换行与缩进） */
+.byline{font-size:11px;color:var(--faint);font-family:var(--mono);margin:-4px 0 6px}
+.note-submit{margin:2px 0 20px;font-size:13px;line-height:1.85}
+.note-plain{font-family:var(--mono);font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--cloud-2);border:1px solid var(--cloud-line);border-radius:12px;padding:16px 18px;overflow-x:auto;color:var(--ink);margin:1.2em 0}
 .prose{font-size:16px;line-height:1.95;max-width:72ch;color:#242c33}
 .prose>*:first-child{margin-top:0}
 .prose p{margin:0 0 1.25em}

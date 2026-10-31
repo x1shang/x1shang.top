@@ -1367,6 +1367,22 @@
 
   const FORMATS = { md: 'md', markdown: 'md', html: 'html', htm: 'html', tex: 'tex', latex: 'tex', txt: 'txt' };
 
+  /**
+   * 笔记正文：给「陌生投稿」用的渲染入口，规则比 renderFile 严：
+   *   - md：rawHtml:false，用户写的 HTML 一律当文本，不让 sanitizeHtml 白名单去赌
+   *   - tex：仍走 texToHtml（站点已有的结构转换），但永不编译
+   *   - 其余（py/json/yaml/txt…）：<pre> 原样输出，不做语法高亮
+   * 普通文章 / 论文不要用这个函数（它们允许作者写 HTML）。
+   */
+  function renderNote(file) {
+    const f = file && typeof file === 'object' ? file : {};
+    const kind = FORMATS[str(f.format).trim().toLowerCase().replace(/^\./, '')] || 'txt';
+    const body = str(f.body);
+    if (kind === 'md') return md(body, { rawHtml: false });
+    if (kind === 'tex') return texToHtml(body);
+    return '<pre class="note-plain">' + escape(body) + '</pre>';
+  }
+
   function renderFile(file, opts) {
     const f = file && typeof file === 'object' ? file : {};
     const format = str(f.format).trim().toLowerCase().replace(/^\./, '');
@@ -1504,6 +1520,7 @@
     md: md,
     math: math,
     sanitizeHtml: sanitizeHtml,
-    renderFile: renderFile
+    renderFile: renderFile,
+    renderNote: renderNote
   };
 })(typeof window !== 'undefined' ? window : globalThis);

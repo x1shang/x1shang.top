@@ -11,6 +11,7 @@
  *   content/articles/**   文章     .md .markdown .html .htm .tex .latex .txt
  *   content/assertions/** 断言     同上
  *   content/papers/**     学术     同上
+ *   content/notes/**      笔记     同上；额外认 .py .json .yaml .m 等纯文本（详情页原样展示，不做高亮）
  *   content/friends/**    友链（站长手写，直接算已通过）
  *   content/about.md      关于页正文
  *   assets/music/**       音乐     .mp3 .wav .m4a .ogg .opus .flac（同名 .lrc 作歌词，.md/.json 作元数据）
@@ -41,7 +42,13 @@ const WITH_PHOTOS = flag('--photos');
 const QUIET = flag('--quiet');
 const log = (...a) => { if (!QUIET) console.log(...a); };
 
-const TEXT_EXT = new Set(['.md', '.markdown', '.html', '.htm', '.tex', '.latex', '.txt']);
+/* 笔记栏目收「纯文本」：这些扩展名只做原样展示（render.js 的 Render.renderNote 用 <pre> 输出），不做语法高亮 */
+const PLAIN_EXT = ['.py', '.json', '.yaml', '.yml', '.m', '.js', '.ts', '.css', '.c', '.h', '.cpp',
+  '.java', '.rs', '.go', '.sh', '.ini', '.toml', '.lua', '.sql', '.r', '.jl', '.rb', '.php',
+  '.swift', '.kt', '.cs', '.hs', '.ex', '.exs', '.scala', '.pl'];
+const TEXT_EXT = new Set(['.md', '.markdown', '.html', '.htm', '.tex', '.latex', '.txt', ...PLAIN_EXT]);
+/* 文件名去扩展名用：显式列出，避免 `.py` 被 slugify 当成「点 + 字母」折成 `-py` */
+const TEXT_EXT_RE = new RegExp(`\\.(?:md|markdown|html?|tex|latex|txt|${PLAIN_EXT.map((e) => e.slice(1)).join('|')})$`, 'i');
 const AUDIO_EXT = new Set(['.mp3', '.wav', '.m4a', '.ogg', '.oga', '.opus', '.flac']);
 const FORMAT = {
   '.md': 'md', '.markdown': 'md', '.html': 'html', '.htm': 'html',
@@ -76,7 +83,7 @@ export function parseFrontMatter(text) {
 /** 文件名 → URL 安全的 id：去掉日期前缀，保留中日韩与字母数字 */
 export function slugify(name) {
   return String(name)
-    .replace(/\.(md|markdown|html?|tex|latex|txt)$/i, '')
+    .replace(TEXT_EXT_RE, '')
     .replace(/^\d{4}-\d{2}-\d{2}[-_ ]*/, '')
     .trim()
     .toLowerCase()
@@ -163,6 +170,17 @@ async function collectText(kind, dir, seen) {
         venue: String(data.venue || ''),
         url: String(data.url || ''),
         abstract: String(data.abstract || firstLine(body)),
+      });
+    } else if (kind === 'notes') {
+      /* 笔记：昵称 / 原始文件名 / 原始扩展名 / 投稿号 / 覆盖时间，都由每日流水线写进 front matter。
+         `ext` 决定详情页怎么展示（md 渲染、tex 结构转换、其余原样 <pre>）。 */
+      rows.push({
+        ...common,
+        nickname: String(data.nickname || data.author || '匿名'),
+        source: String(data.source || ''),
+        ext: String(data.ext || path.extname(file).slice(1) || 'txt').toLowerCase(),
+        submission: String(data.submission || ''),
+        updated: normDate(data.updated) || '',
       });
     } else if (kind === 'friends') {
       rows.push({
@@ -297,6 +315,7 @@ const seenIds = new Set();
 const articles = await collectText('articles', path.join(ROOT, 'content/articles'), seenIds);
 const assertions = await collectText('assertions', path.join(ROOT, 'content/assertions'), seenIds);
 const papers = await collectText('papers', path.join(ROOT, 'content/papers'), seenIds);
+const notes = await collectText('notes', path.join(ROOT, 'content/notes'), seenIds);
 const friendsFile = await collectText('friends', path.join(ROOT, 'content/friends'), seenIds);
 const localTracks = await collectMusic(path.join(ROOT, 'assets/music'));
 const remoteTracks = await collectNetease(path.join(ROOT, 'assets/music'), new Set(localTracks.map((t) => t.id)));
@@ -331,7 +350,7 @@ try {
 
 /* 热度：文章 / 断言 / 论文 = 该页「访客总量」；照片 / 音乐 / 友链仍用 front matter 的 heat。
    访客数据由 tools/fetch-stats.mjs 抓进 stats.json 的 pages 表（键 = 预渲染的真实路径）。 */
-const URL_KIND = { articles: 'articles', assertions: 'assertions', papers: 'academic' };
+const URL_KIND = { articles: 'articles', assertions: 'assertions', papers: 'academic', notes: 'notes' };
 const stats = await readJson(path.join(ROOT, 'stats.json'), {});
 const pageVisits = stats.pages && typeof stats.pages === 'object' ? stats.pages : {};
 /* GitHub 公开仓库数：tools/fetch-repos.mjs 的快照（Actions 每次跑 stats 时顺便刷新）。
@@ -373,9 +392,9 @@ const AUTO = {
   recent: allDates.at(-1) || new Date().toISOString().slice(0, 10),
   site: siteCfg,
   github,
-  articles, assertions, papers, photos, tracks, friends, about, aboutEn,
+  articles, assertions, papers, notes, photos, tracks, friends, about, aboutEn,
   stats: {
-    articles: articles.length, assertions: assertions.length, papers: papers.length,
+    articles: articles.length, assertions: assertions.length, papers: papers.length, notes: notes.length,
     photos: photos.length, tracks: tracks.length, friends: friends.length,
   },
 };
@@ -428,7 +447,7 @@ await writeFile(path.join(ROOT, 'atom.xml'), atom, 'utf8');
    为什么：哈希路由（#articles/x）爬虫不认、每篇没有自己的分享卡片，访问统计也会全记在 / 上。
    做法：拿 index.html 当模板，整段替换 <!-- build:head:start -->…<!-- build:head:end --> 之间的
         头部（标题 / description / canonical / og / twitter）与该页正文，输出到
-        articles/<id>/index.html（断言、学术同理）；相对引用改成 ../../，
+        articles/<id>/index.html（断言、学术、笔记同理）；相对引用改成 ../../，
         于是 http 与本机 file:// 双击都能打开。站内交互仍由 app.js 接管，URL 不跳转。
 */
 if (!globalThis.Render) {
@@ -489,15 +508,21 @@ async function writeShell(kindKey, it) {
 <meta name="twitter:description" content="${xml(desc)}">
 <meta name="twitter:image" content="${xml(siteCfg.url)}/assets/og-cover.jpg">
 <!-- build:head:end -->`;
+  /* 笔记正文：md 关掉 raw HTML（陌生投稿不能走白名单清洗）、tex 走结构转换、其余原样 <pre>。
+     普通文章 / 论文仍走 renderFile，行为不变。 */
   const bodyHtml = Render
-    ? Render.renderFile({ format: it.format, body: it.body })
+    ? (kindKey === 'notes' ? Render.renderNote({ format: it.format, body: it.body }) : Render.renderFile({ format: it.format, body: it.body }))
     : `<pre>${xml(it.body)}</pre>`;
-  const main = `<article class="prose" data-prerendered="${xml(urlPath)}">${it.title ? `<h1>${xml(it.title)}</h1>` : ''}${bodyHtml}</article>`;
+  const byline = kindKey === 'notes' && it.nickname
+    ? `<p class="byline">投稿：${xml(it.nickname)}${it.updated ? ` · 更新于 ${xml(it.updated)}` : ''}${it.ext ? ` · ${xml(String(it.ext).toUpperCase())}` : ''}</p>`
+    : '';
+  const main = `<article class="prose" data-prerendered="${xml(urlPath)}">${it.title ? `<h1>${xml(it.title)}</h1>` : ''}${byline}${bodyHtml}</article>`;
   let html = template.replace(HEAD_BLOCK, head);
   html = html.replace('<body>', '<body class="reading">');
   html = html.replace('<main id="main" tabindex="-1"></main>', `<main id="main" tabindex="-1">${main}</main>`);
   // 子目录页面：相对引用补上 ../../，这样 http 与 file:// 都能找到站点根目录的资源
-  html = html.replace(/(\s(?:src|href)=")(?!https?:|data:|mailto:|tel:|javascript:|#|\/\/|\/)([^"]*)(")/g, '$1../../$2$3');
+  // `[^"<>]` 是防呆：正文里被转义成文本的 `&lt;iframe src="…"&gt;` 不能让这条正则跨过标签边界去改写
+  html = html.replace(/(\s(?:src|href)=")(?!https?:|data:|mailto:|tel:|javascript:|#|\/\/|\/)([^"<>]*)(")/g, '$1../../$2$3');
   const dir = path.join(ROOT, URL_KIND[kindKey], it.id);
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, 'index.html'), html, 'utf8');
@@ -507,14 +532,14 @@ async function writeShell(kindKey, it) {
 // 每次重建都先清空这三棵生成目录，避免删掉的文章留下僵尸页
 for (const dir of Object.values(URL_KIND)) await rm(path.join(ROOT, dir), { recursive: true, force: true });
 const shells = [];
-for (const [kindKey, list] of [['articles', articles], ['assertions', assertions], ['papers', papers]]) {
+for (const [kindKey, list] of [['articles', articles], ['assertions', assertions], ['papers', papers], ['notes', notes]]) {
   for (const it of list) shells.push(await writeShell(kindKey, it));
 }
 
 /* sitemap：首页 + 全部预渲染页（自动生成，别手改） */
 const sitemapUrls = [
   { loc: `${siteCfg.url}/`, lastmod: AUTO.recent, changefreq: 'weekly', priority: '1.0' },
-  ...shells.map((s) => ({ loc: siteCfg.url + s.urlPath, lastmod: s.lastmod, changefreq: 'monthly', priority: s.kindKey === 'assertions' ? '0.6' : '0.8' })),
+  ...shells.map((s) => ({ loc: siteCfg.url + s.urlPath, lastmod: s.lastmod, changefreq: 'monthly', priority: s.kindKey === 'assertions' ? '0.6' : s.kindKey === 'notes' ? '0.7' : '0.8' })),
 ];
 await writeFile(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <!-- 自动生成，请勿手改：由 tools/build-content.mjs 扫描 content/ 产出。 -->
@@ -523,7 +548,7 @@ ${sitemapUrls.map((u) => `  <url>\n    <loc>${xml(u.loc)}</loc>\n    <lastmod>${
 </urlset>
 `, 'utf8');
 
-log(`✅ content.auto.js：文章 ${articles.length} · 断言 ${assertions.length} · 学术 ${papers.length} · 摄影 ${photos.length} · 音乐 ${tracks.length} · 友链 ${friends.length}` +
+log(`✅ content.auto.js：文章 ${articles.length} · 断言 ${assertions.length} · 学术 ${papers.length} · 笔记 ${notes.length} · 摄影 ${photos.length} · 音乐 ${tracks.length} · 友链 ${friends.length}` +
   (about ? ' · 关于页来自 content/about.md' : '') + `（最近更新 ${AUTO.recent}）`);
-log(`✅ 预渲染 ${shells.length} 个真实路径页（articles/ · assertions/ · academic/）+ sitemap.xml（${sitemapUrls.length} 条）` +
+log(`✅ 预渲染 ${shells.length} 个真实路径页（articles/ · assertions/ · academic/ · notes/）+ sitemap.xml（${sitemapUrls.length} 条）` +
   (Render ? '' : '（⚠️ 渲染器没加载上，正文以纯文本兜底）'));

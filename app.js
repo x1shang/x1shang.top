@@ -424,6 +424,13 @@
   /* 笔记：公开投稿的条目。热度全是 0（不按访客排），于是 byHeatThenTime 退化成按日期倒序，
      测试样例仍然永远置底。正文一律走 Render.renderNote：md 关 raw HTML、tex 只做结构转换、
      其余格式原样 <pre>，永不编译、永不执行。 */
+  /* 投稿按钮只出现在「笔记」页内部：跟着 #main 一起渲染，切到别的栏目就消失。
+     线上指 submit 子域；本地（file:// 或 localhost）指本地 Node 服务，方便自测。 */
+  const submitHref = () => (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname))
+    ? 'http://127.0.0.1:8787/'
+    : 'https://submit.x1shang.top/';
+  const submitFab = () => ui`<a class="fab" href="${safe(submitHref())}" target="_blank" rel="noopener noreferrer" aria-label="投稿笔记" title="投稿笔记"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>`;
+
   function notesList() {
     const list = [...C.notes].sort(byHeatThenTime);
     return head('notes', tr('笔记'))
@@ -434,7 +441,8 @@
             .filter(Boolean).map(esc).join(' · '),
           emptyTitle: tr('笔记库还空着'),
           emptyText: tr('去 submit.x1shang.top 投第一篇；通过每日流水线进入这里。'),
-        });
+        })
+      + submitFab();
   }
 
   function noteDetail(id) {
@@ -452,7 +460,8 @@
       <div class="reading-meta">${meta.map((m) => ui`<span>${esc(m)}</span>`).join('')}</div></div>
       <p class="note">公开投稿，不代表本站观点。同一昵称 + 同一标题再次投稿会覆盖原文，旧版本可在仓库历史里回溯。</p>
       ${n.source ? ui`<p class="note">原文件：<code>${esc(n.source)}</code></p>` : ''}
-      <article class="prose" data-format="${esc(n.format || 'md')}">${n.body ? R.renderNote({ format: n.format, body: n.body }) : tr('<p class="meta">这条笔记没有正文。</p>')}</article>`;
+      <article class="prose" data-format="${esc(n.format || 'md')}">${n.body ? R.renderNote({ format: n.format, body: n.body }) : tr('<p class="meta">这条笔记没有正文。</p>')}</article>`
+      + submitFab();
   }
 
   function worksPage() {
@@ -985,12 +994,6 @@
 
   /* ------------------------------------------------------------------ 启动 */
   $('#year').textContent = new Date().getFullYear();
-  /* 投稿按钮：线上指 submit 子域；本地（file:// 或 localhost）指本地 Node 服务，方便自测。 */
-  const submitUrl = (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname))
-    ? 'http://127.0.0.1:8787/'
-    : 'https://submit.x1shang.top/';
-  const submitFab = document.getElementById('submit-fab');
-  if (submitFab) submitFab.href = submitUrl;
   $('#profile-github').href = ui`https://github.com/${encodeURIComponent(S.github)}`;
   function renderNavigation() { $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
     ? ui`<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${tr(label)}</a>`

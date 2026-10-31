@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-31T11:46:10.377Z",
+ "generated": "2026-10-31T12:01:07.173Z",
  "recent": "2026-10-30",
  "site": {
   "name": "x1shang",
@@ -36,10 +36,10 @@ window.AUTO = {
  },
  "articles": [
   {
-   "id": "2026-10月月报",
+   "id": "october-report",
    "date": "2026-10-30",
    "format": "md",
-   "title": "x1shang -10月份月报",
+   "title": "x1shang-10月份月报",
    "tags": [
     "月报",
     "项目",

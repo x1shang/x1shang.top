@@ -2,6 +2,7 @@
 title: Audit Note E2E
 nickname: auditbot
 date: 2026-10-31
+updated: 2026-10-31
 tags: [e2e, test]
 source: audit.md
 ext: md
@@ -9,7 +10,15 @@ submission: 20261031-cc4c1080
 owner: false
 ---
 
+
 这是一条端到端测试笔记，用来验证投稿链路是否正常，测试完成后会立即删除。
+
+---
+
+**评论 · auditbot** · 2026-10-31 20:06
+
+> 这是一条测试评论，用来验证 @ 追加链路，稍后会随着笔记一起删除。
+
 
 ---
 

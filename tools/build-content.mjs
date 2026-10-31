@@ -181,6 +181,7 @@ async function collectText(kind, dir, seen) {
         ext: String(data.ext || path.extname(file).slice(1) || 'txt').toLowerCase(),
         submission: String(data.submission || ''),
         updated: normDate(data.updated) || '',
+        owner: data.owner === true,
       });
     } else if (kind === 'friends') {
       rows.push({
@@ -514,7 +515,7 @@ async function writeShell(kindKey, it) {
     ? (kindKey === 'notes' ? Render.renderNote({ format: it.format, body: it.body }) : Render.renderFile({ format: it.format, body: it.body }))
     : `<pre>${xml(it.body)}</pre>`;
   const byline = kindKey === 'notes' && it.nickname
-    ? `<p class="byline">投稿：${xml(it.nickname)}${it.updated ? ` · 更新于 ${xml(it.updated)}` : ''}${it.ext ? ` · ${xml(String(it.ext).toUpperCase())}` : ''}</p>`
+    ? `<p class="byline">投稿：${xml(it.nickname)}${it.owner ? ' · <span class="badge owner" title="站长发布">站长</span>' : ''}${it.updated ? ` · 更新于 ${xml(it.updated)}` : ''}${it.ext ? ` · ${xml(String(it.ext).toUpperCase())}` : ''}</p>`
     : '';
   const main = `<article class="prose" data-prerendered="${xml(urlPath)}">${it.title ? `<h1>${xml(it.title)}</h1>` : ''}${byline}${bodyHtml}</article>`;
   let html = template.replace(HEAD_BLOCK, head);

@@ -48,6 +48,8 @@
   const fmtCn = (d) => { if (window.SiteLanguage.get() === 'en') return fmt(d); const m = fmt(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? ui`${m[1]}年${Number(m[2])}月${Number(m[3])}日` : fmt(d); };
   const host = (u) => { try { return new URL(u).host.replace(/^www\./, ''); } catch { return ''; } };
   const testBadge = (it) => (it && it.test ? tr('<span class="badge" title="测试样例：检查完可以删掉对应文件">测试样例</span>') : '');
+  /** 站长标识：与「测试样例」同一种胶囊，蓝一点 */
+  const ownerBadge = (it) => (it && it.owner ? tr('<span class="badge owner" title="站长发布">站长</span>') : '');
   /** 搜索 / 摘要用的可读纯文本：剥掉 HTML 标签与 Markdown、LaTeX 记号 */
   const plain = (s) => String(s ?? '')
     .replace(/<[^>]*>/g, ' ')
@@ -425,8 +427,8 @@
   function notesList() {
     const list = [...C.notes].sort(byHeatThenTime);
     return head('notes', tr('笔记'))
-      + ui`<p class="note note-submit">投稿入口：<a href="https://submit.x1shang.top/" target="_blank" rel="noopener noreferrer">submit.x1shang.top</a>。同一昵称 + 同一标题再次投稿＝覆盖原文（不删除、可回溯）；新笔记每天统一编入一次。</p>`
-      + idxList(list, (n) => ui`<a href="#notes/${encodeURIComponent(n.id)}">${esc(n.title)}</a>${testBadge(n)}`,
+      + ui`<p class="note note-submit">投稿入口：<a href="https://submit.x1shang.top/" target="_blank" rel="noopener noreferrer">submit.x1shang.top</a>。同一昵称 + 同一标题再次投稿＝覆盖原文（不删除、可回溯）；标题写 <code>@某篇笔记</code> 就是在那篇末尾追加评论。</p>`
+      + idxList(list, (n) => ui`<a href="#notes/${encodeURIComponent(n.id)}">${esc(n.title)}</a>${ownerBadge(n)}${testBadge(n)}`,
         {
           sub: (n) => [n.nickname ? '投稿：' + n.nickname : '', ...(n.tags || []).map((t) => '#' + t), (n.ext || n.format || '').toUpperCase()]
             .filter(Boolean).map(esc).join(' · '),
@@ -446,7 +448,7 @@
       n.updated ? '更新于 ' + fmt(n.updated) : '',
     ].filter(Boolean);
     return ui`<a class="backlink" href="#notes">← 笔记</a>
-      <div class="reading-head"><h1>${esc(n.title)}</h1>${testBadge(n)}
+      <div class="reading-head"><h1>${esc(n.title)}</h1>${ownerBadge(n)}${testBadge(n)}
       <div class="reading-meta">${meta.map((m) => ui`<span>${esc(m)}</span>`).join('')}</div></div>
       <p class="note">公开投稿，不代表本站观点。同一昵称 + 同一标题再次投稿会覆盖原文，旧版本可在仓库历史里回溯。</p>
       ${n.source ? ui`<p class="note">原文件：<code>${esc(n.source)}</code></p>` : ''}
@@ -983,6 +985,12 @@
 
   /* ------------------------------------------------------------------ 启动 */
   $('#year').textContent = new Date().getFullYear();
+  /* 投稿按钮：线上指 submit 子域；本地（file:// 或 localhost）指本地 Node 服务，方便自测。 */
+  const submitUrl = (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname))
+    ? 'http://127.0.0.1:8787/'
+    : 'https://submit.x1shang.top/';
+  const submitFab = document.getElementById('submit-fab');
+  if (submitFab) submitFab.href = submitUrl;
   $('#profile-github').href = ui`https://github.com/${encodeURIComponent(S.github)}`;
   function renderNavigation() { $('#navigation').innerHTML = NAV.map(([id, label], i) => (id === '__works'
     ? ui`<a class="is-out" href="${WORKS_URL}" target="_blank" rel="noopener noreferrer"><span>${String(i + 1).padStart(2, '0')}</span>${tr(label)}</a>`

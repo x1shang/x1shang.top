@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-31T09:21:23.767Z",
+ "generated": "2026-10-31T10:26:14.327Z",
  "recent": "2026-10-21",
  "site": {
   "name": "x1shang",
@@ -383,40 +383,24 @@ window.AUTO = {
  ],
  "notes": [
   {
-   "id": "笔记库开张",
+   "id": "现代ai算法导论",
    "date": "2026-10-31",
    "format": "md",
-   "title": "笔记库开张",
+   "title": "现代AI算法导论",
    "tags": [
-    "公告",
-    "示例"
+    "AI",
+    "算法",
+    "笔记"
    ],
-   "test": true,
+   "test": false,
    "heat": 0,
-   "body": "这是「笔记」栏目的第一篇示例，用来检查列表、详情与投稿链路。\n\n- 列表按日期倒序，`test: true` 的样例永远置底；\n- 详情复用文章的阅读版式，顶部会显示投稿人与原始格式；\n- 投稿入口是 [submit.x1shang.top](https://submit.x1shang.top/)（还没上线）。\n\n行内公式 $e^{i\\pi}+1=0$，块级公式：\n\n$$\n\\int_0^1 x^2\\,\\mathrm{d}x = \\frac{1}{3}\n$$\n\n代码块也照常渲染：\n\n```js\nconst note = { nickname: 'x1shang', tags: ['公告'] };\nconsole.log(note);\n```\n\n> 这段引用用来确认块级样式没有被笔记的 `rawHtml: false` 规则误伤。",
+   "body": "# 第一讲 AI 的背景和经典技术\n\n- 什么才算是人工智能？\n    - 不是越像人越好，因为人会犯错误\n    - AI 是设计能够针对目标**合理行动**的计算机算法。一个例子：导航。\n\t- 智能体感知环境，根据获得的信息采取行动，行动又会改变环境。\n\t- 要素：状态，动作，转移，代价，目标\n\t- 举例：CSP（类似数独的约束问题），概率推理，机器学习\n- 机器学习\n\t- 无监督学习：k-means(聚类)\n\t- 监督学习：回归、分类\n\n## K-means\n\n$$\n\\phi(\\{x_i\\},\\{a_i\\},\\{c_k\\}) = \\sum_i \\operatorname{dist}(x_i,c_{a_i})\n$$\n它的意思是：**把每个数据点到它所属类别中心的距离加起来，K-means 尝试让这个总和尽可能小。**\n\n### 公式里的符号\n\n假设我们有一堆数据点，想把它们分成 $K$ 类：\n\n- $x_i$：第 $i$个数据点。例如，一个人的身高和体重可以组成一个二维点。\n- $c_k$：第$k$ 类的中心，也叫**聚类中心**或均值。\n- $a_i$：第$i$ 个点被分到的类别编号，取值为 $1,\\ldots,K$。\n- $c_{a_i}$：第 $i$ 个点所属类别的中心。比如 $a_i=2$，那么它对应的中心就是 $c_2$。\n- $\\operatorname{dist}(x_i,c_{a_i})$：点 $x_i$ 与其所属中心之间的距离。\n- $\\sum_i$：把所有数据点对应的距离加起来。\n- $\\phi$：衡量当前聚类结果的一个数，越小说明各点总体上越靠近各自的中心。\n\n$\\operatorname{dist}$ 表示距离，标准 K-means 通常采用**欧氏距离的平方**：\n$$\n\\boxed{ \\min_{\\{a_i\\},\\{c_k\\}} \\phi = \\min_{\\{a_i\\},\\{c_k\\}} \\sum_{i=1}^{n} \\left\\|x_i-c_{a_i}\\right\\|_2^2 }\n$$\n其中 $n$ 是数据点的数量，$\\min$ 表示寻找使目标值尽可能小的分类方式和中心位置。\n\n如果 $x_i=(x_{i1},x_{i2})$，中心 $c_{a_i}=(c_1,c_2)$，那么平方欧氏距离是：\n\n$$\n \\left\\|x_i-c_{a_i}\\right\\|_2^2 = (x_{i1}-c_1)^2+(x_{i2}-c_2)^2 \n$$\n\n例如点 $(2,3)$ 到中心 $(1,1)$ 的平方距离是：\n\n$$\n (2-1)^2+(3-1)^2=5 \n$$\n\n### 这个公式怎么用？\n\n通过反复交替执行两步，来降低上面的目标值：\n\n**第一步：固定中心，重新分组。**\n\n每个点被分给离它最近的中心：\n$$\n a_i=\\underset{k\\in\\{1,\\ldots,K\\}}{\\arg\\min} \\left\\|x_i-c_k\\right\\|_2^2 \n$$\n这里的 $\\arg\\min$ 表示“使距离最小的那个 $k$”。例如，一个点离第 2 个中心最近，就令 $a_i=2$。\n\n**第二步：固定分组，重新计算中心。**\n\n对每个类别，把分到这一类的所有点取平均：\n$$\n c_k= \\frac{1}{|C_k|} \\sum_{i\\in C_k}x_i, \\qquad C_k=\\{i:a_i=k\\} \n$$\n然后重复“**分给最近的中心 → 重新计算平均值**”，直到点的类别不再变化。\n这两步各自都不会让平方距离总和变大：第一步让每个点选择最近的中心，第二步让每类的中心移动到该类点的平均位置。不过，最终结果**不一定是全局最优**；初始中心选得不同，结果也可能不同。\n\n```python\nimport random\ndef kmeans(points, k, max_iter=300, random_state=None):\n    \"\"\"\n    points: 点的列表，例如 [[1, 1], [2, 3], [8, 9]]\n    k: 想分成的组数\n    返回 k 个中心，每个中心是一个坐标列表。\n    \"\"\"\n    if not points or not 1 \u003c= k \u003c= len(points):\n        raise ValueError(\"points 不能为空，且 k 必须在 1 和点数之间\")\n\n    dimension = len(points[0])\n    if dimension == 0 or any(len(point) != dimension for point in points):\n        raise ValueError(\"所有点必须有相同且非零的维度\")\n    if max_iter \u003c 1:\n        raise ValueError(\"max_iter 必须至少为 1\")\n\n    rng = random.Random(random_state)\n\n    # 随机选择 k 个点作为初始中心\n    centers = [list(point) for point in rng.sample(points, k)]\n    previous_labels = None\n\n    for _ in range(max_iter):\n        labels = []\n\n        # 1. 对每个点，找距离它最近的中心\n        for point in points:\n            distances = [\n                sum((point[d] - center[d]) ** 2 for d in range(dimension))\n                for center in centers\n            ]\n            closest_center = min(range(k), key=lambda j: distances[j])\n            labels.append(closest_center)\n\n        # 分组不变，停止\n        if labels == previous_labels:\n            break\n\n        # 2. 每个中心更新为对应组中所有点的平均值\n        for j in range(k):\n            group = [\n                point for point, label in zip(points, labels)\n                if label == j\n            ]\n\n            if group:\n                centers[j] = [\n                    sum(point[d] for point in group) / len(group)\n                    for d in range(dimension)\n                ]\n\n        previous_labels = labels\n\n    return centers\n```\n\n## 线性回归（linear Regression）：最小二乘法\n\n模型学习到一个拟合函数，设计奖惩函数，根据近似程度做出反馈。\n假设模型得到函数：\n$$\n \\hat y=\\theta_1x+\\theta_2 \n$$\n假设我们有 $n$ 组历史数据：\n$$\n (x_1,y_1),(x_2,y_2),\\ldots,(x_n,y_n) \n$$\n对于第 $i$ 组数据，预测误差是：\n$$\n \\hat y_i-y_i \n$$\n\n损失：\n$$\n L(\\theta_1,\\theta_2) = \\sum_{i=1}^{n} (\\theta_1x_i+\\theta_2-y_i)^2 \n$$\n\n这里是平方损失惩罚，除此之外，常见的还有以下几种：\n\n| 损失   | 公式                       | 解释                                |\n| ---- | ------------------------ | --------------------------------- |\n| 平方损失 | $(\\hat y-y)^2$           | 大错误罚得特别重。和除以n就得到MSE均方误差。          |\n| 绝对损失 | $\\lvert  \\hat y-y\\rvert$ | 错多少罚多少，不让正负错误抵消                   |\n| 零一损失 | $\\mathbf1[\\hat y\\ne y]$  | 分类错了记 1，对了记 0；不表示“差一点”和“差很多”      |\n| 对数损失 | $-\\log p_y$              | $p_y$ 是模型给正确类别的概率；给正确答案的概率越小，惩罚越大 |\n\n使得损失最小的过程就是最小二乘法：\n$$\n \\boxed{ \\min_{\\theta} L(\\theta) = \\min_{\\theta} \\sum_{i=1}^{n}(f_i^{T}\\theta-y_i)^2 } \n$$\n\n求最小二乘解：\n对原函数求导：$\\nabla L(\\theta)=0$\n矩阵可逆的情况下：一种闭式解\n$$\n \\boxed{\\theta=(X^TX)^{-1}X^Ty} \n$$\n\n---\n\n© 2026 x1shang。除另有注明外，本笔记中的原创内容采用 [知识共享署名 4.0 国际许可协议（CC BY 4.0）](https://creativecommons.org/licenses/by/4.0/deed.zh-hans)授权。转载或改编时，请合理署名、附上原文及协议链接，并标明修改情况。第三方材料的权利归其各自权利人所有。",
    "nickname": "x1shang",
-   "source": "笔记库开张.md",
+   "source": "现代AI算法导论.md",
    "ext": "md",
-   "submission": "20261031-demo-0001",
-   "updated": ""
-  },
-  {
-   "id": "纯文本示例",
-   "date": "2026-10-31",
-   "format": "txt",
-   "title": "纯文本示例",
-   "tags": [
-    "示例",
-    "代码"
-   ],
-   "test": true,
-   "heat": 0,
-   "body": "def greet(name: str) -> str:\n    \"\"\"纯文本展示：保留缩进与换行，不做语法高亮。\"\"\"\n    return f\"hello, {name}\"\n\n\nif __name__ == \"__main__\":\n    print(greet(\"x1shang\"))",
-   "nickname": "x1shang",
-   "source": "plain.py",
-   "ext": "py",
-   "submission": "20261031-demo-0002",
-   "updated": ""
+   "submission": "20261031-ce23f702",
+   "updated": "",
+   "owner": true
   }
  ],
  "photos": [
@@ -2219,7 +2203,7 @@ window.AUTO = {
   "articles": 15,
   "assertions": 4,
   "papers": 2,
-  "notes": 2,
+  "notes": 1,
   "photos": 37,
   "tracks": 56,
   "friends": 8

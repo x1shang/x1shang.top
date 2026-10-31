@@ -116,6 +116,8 @@ main:focus,main:focus-visible{outline:none}
 .friend-apply dd{margin:0;color:var(--ink);overflow-wrap:anywhere}
 .friend-apply a{overflow-wrap:anywhere}
 .badge{display:inline-block;font-size:9px;letter-spacing:1px;padding:1px 7px;border-radius:99px;border:1px solid var(--cloud-line);background:var(--cloud);color:#6b747c;margin-left:8px;vertical-align:2px;font-weight:600}
+.badge.owner{border-color:#2f6fb54d;background:#2f6fb50f;color:var(--link)}
+[data-theme="dark"] .badge.owner{border-color:#87b9f34d;background:#87b9f314;color:var(--link)}
 .tag{font-size:9.5px;color:#818a92;border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-right:6px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .stat{padding:20px;border-radius:14px}
@@ -168,6 +170,13 @@ body.reading .site-name{font-size:19px}
 .byline{font-size:11px;color:var(--faint);font-family:var(--mono);margin:-4px 0 6px}
 .note-submit{margin:2px 0 20px;font-size:13px;line-height:1.85}
 .note-plain{font-family:var(--mono);font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--cloud-2);border:1px solid var(--cloud-line);border-radius:12px;padding:16px 18px;overflow-x:auto;color:var(--ink);margin:1.2em 0}
+/* 右下角投稿按钮：默认贴在底栏上方；窄屏播放器展开时再上移一档，避免被盖住 */
+.fab{position:fixed;right:20px;bottom:calc(var(--dock-h) + 18px);z-index:44;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--cloud);box-shadow:0 12px 30px #233b5233;transition:transform .18s,box-shadow .18s,background-color .18s}
+.fab:hover{transform:translateY(-2px);box-shadow:0 16px 38px #233b5240;color:var(--cloud)}
+.fab:focus-visible{outline:2px solid var(--link);outline-offset:3px}
+.fab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+@media(max-width:1100px){body:has(#player:not([hidden])) .fab{bottom:calc(var(--dock-h) + 100px)}}
+@media(max-width:760px){.fab{width:48px;height:48px;right:14px;bottom:calc(var(--dock-h) + 14px)}body:has(#player:not([hidden])) .fab{bottom:calc(var(--dock-h) + 92px)}}
 .prose{font-size:16px;line-height:1.95;max-width:72ch;color:#242c33}
 .prose>*:first-child{margin-top:0}
 .prose p{margin:0 0 1.25em}
@@ -298,7 +307,7 @@ dialog figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top
 
 /* ---------------------------------------------------------- 页脚 / 光效 */
 /* 页脚宽度跟版心的内容盒对齐（1440 − 55×2 = 1330），换了版心就要跟着换，否则宽屏上左右对不上 */
-footer{max-width:1330px;margin:0 auto;padding:25px 0 70px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8c949b;font-size:10px}
+footer{max-width:1330px;margin:0 auto;padding:25px 78px 70px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8c949b;font-size:10px}
 .pointer-light{position:fixed;inset:0;pointer-events:none;z-index:10;background:radial-gradient(380px circle at var(--x,-1000px) var(--y,-1000px),#ffffff2e,transparent 80%)}
 
 /* ---------------------------------------------------------- 响应式 */
@@ -342,7 +351,7 @@ footer{max-width:1330px;margin:0 auto;padding:25px 0 70px;border-top:1px solid v
   .stats{gap:8px}
   .stat{padding:12px}
   .stat strong{font-size:23px}
-  footer{margin:0 24px;padding-bottom:60px;gap:20px}
+  footer{margin:0 24px;padding-bottom:60px;padding-right:64px;gap:20px}
   footer>span:nth-child(2){display:none}
 }
 @media(max-width:480px){

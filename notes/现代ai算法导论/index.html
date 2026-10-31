@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2f4f6">
+<!-- build:head:start（由 tools/build-content.mjs 为预渲染页生成，勿手改） -->
+<meta name="description" content="第一讲 AI 的背景和经典技术">
+<title>现代AI算法导论 · x1shang</title>
+<link rel="canonical" href="https://x1shang.top/notes/%E7%8E%B0%E4%BB%A3ai%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="x1shang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="现代AI算法导论">
+<meta property="og:description" content="第一讲 AI 的背景和经典技术">
+<meta property="og:url" content="https://x1shang.top/notes/%E7%8E%B0%E4%BB%A3ai%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/">
+<meta property="og:image" content="https://x1shang.top/assets/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-10-31">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="现代AI算法导论">
+<meta name="twitter:description" content="第一讲 AI 的背景和经典技术">
+<meta name="twitter:image" content="https://x1shang.top/assets/og-cover.jpg">
+<!-- build:head:end -->
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="../../feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Atom" href="../../atom.xml">
+<link rel="stylesheet" href="../../style.css?v=a504af24">
+<script src="../../translations.js?v=c9d67c33"></script>
+<script src="../../language.js?v=3ac7922e"></script>
+<script src="../../theme.js?v=d1776925"></script>
+</head>
+<body class="reading">
+<a class="skip" href="#content">跳到正文</a><div class="pointer-light" aria-hidden="true"></div>
+
+<header class="hero" id="hero">
+ <div class="landscape"><img class="mountain" src="../../assets/mountain.jpg" alt="蓝天下的雪山与云海"><h1>x1shang</h1><img class="foreground" src="../../assets/mountain.jpg" alt="" aria-hidden="true"></div>
+ <div class="hero-top"><a href="#home" class="wordmark">x1 /</a><span>A PERSONAL SPACE</span><a href="#content" class="explore">向下探索 ↘</a></div>
+ <div class="hero-caption">山有轮廓，思绪没有。<span>THOUGHTS BEYOND THE HORIZON</span></div>
+ <aside class="identity glass">
+  <span class="card-label">HELLO, WORLD <span>↗</span></span>
+  <strong>x1shang<span class="status-dot"></span></strong>
+  <p class="bio">major in computer science at SJTU, passionate about AI + physics</p>
+  <p class="mail"><a href="mailto:ciallo@x1shang.top">ciallo@x1shang.top</a></p>
+  <div class="card-links">
+   <a class="card-icon" href="https://space.bilibili.com/695603904" target="_blank" rel="noopener noreferrer" title="b 站主页" aria-label="b 站主页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="15" width="36" height="23" rx="4"/><path d="M17 15l-5-7"/><path d="M31 15l5-7"/><circle cx="18" cy="26" r="1.9" fill="currentColor" stroke="none"/><circle cx="30" cy="26" r="1.9" fill="currentColor" stroke="none"/></svg>
+    <span>b 站</span>
+   </a>
+   <a class="card-icon" id="profile-github" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    <span>GitHub</span>
+   </a>
+   <a class="card-icon" href="https://navi.x1shang.top" target="_blank" rel="noopener noreferrer" title="导航页" aria-label="导航页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 24l34-15-9 33-8-12z"/><path d="M24 30l17-21"/></svg>
+    <span>导航页</span>
+   </a>
+  </div>
+ </aside>
+ <a href="#content" class="scroll-cue" aria-label="向下进入正文">↓</a>
+ <span class="sky-credit">@STAR素材(CC0)</span>
+</header>
+
+<div class="site-layout" id="content">
+ <aside class="sidebar"><a class="site-name" href="#home">x1shang<span>个人索引 / PERSONAL INDEX</span></a><nav aria-label="主导航" id="navigation"></nav><div class="sidebar-bottom">因为山就在那里。<span id="local-clock"></span></div></aside>
+ <main id="main" tabindex="-1"><article class="prose" data-prerendered="/notes/%E7%8E%B0%E4%BB%A3ai%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA/"><h1>现代AI算法导论</h1><p class="byline">投稿：x1shang · <span class="badge owner" title="站长发布">站长</span> · MD</p><h1>第一讲 AI 的背景和经典技术</h1>
+<ul>
+<li>什么才算是人工智能？
+<ul>
+<li>不是越像人越好，因为人会犯错误</li>
+<li>AI 是设计能够针对目标<strong>合理行动</strong>的计算机算法。一个例子：导航。</li>
+<li>智能体感知环境，根据获得的信息采取行动，行动又会改变环境。</li>
+<li>要素：状态，动作，转移，代价，目标</li>
+<li>举例：CSP（类似数独的约束问题），概率推理，机器学习</li>
+</ul></li>
+<li>机器学习
+<ul>
+<li>无监督学习：k-means(聚类)</li>
+<li>监督学习：回归、分类</li>
+</ul></li>
+</ul>
+<h2>K-means</h2>
+<div class="math-block">$
+\phi(\{x_i\},\{a_i\},\{c_k\}) = \sum_i \operatorname{dist}(x_i,c_{a_i})
+$</div>
+<p>它的意思是：<strong>把每个数据点到它所属类别中心的距离加起来，K-means 尝试让这个总和尽可能小。</strong></p>
+<h3>公式里的符号</h3>
+<p>假设我们有一堆数据点，想把它们分成 <span class="math-inline">$K$</span> 类：</p>
+<ul>
+<li><span class="math-inline">$x_i$</span>：第 <span class="math-inline">$i$</span>个数据点。例如，一个人的身高和体重可以组成一个二维点。</li>
+<li><span class="math-inline">$c_k$</span>：第<span class="math-inline">$k$</span> 类的中心，也叫<strong>聚类中心</strong>或均值。</li>
+<li><span class="math-inline">$a_i$</span>：第<span class="math-inline">$i$</span> 个点被分到的类别编号，取值为 <span class="math-inline">$1,\ldots,K$</span>。</li>
+<li><span class="math-inline">$c_{a_i}$</span>：第 <span class="math-inline">$i$</span> 个点所属类别的中心。比如 <span class="math-inline">$a_i=2$</span>，那么它对应的中心就是 <span class="math-inline">$c_2$</span>。</li>
+<li><span class="math-inline">$\operatorname{dist}(x_i,c_{a_i})$</span>：点 <span class="math-inline">$x_i$</span> 与其所属中心之间的距离。</li>
+<li><span class="math-inline">$\sum_i$</span>：把所有数据点对应的距离加起来。</li>
+<li><span class="math-inline">$\phi$</span>：衡量当前聚类结果的一个数，越小说明各点总体上越靠近各自的中心。</li>
+</ul>
+<p><span class="math-inline">$\operatorname{dist}$</span> 表示距离，标准 K-means 通常采用<strong>欧氏距离的平方</strong>：</p>
+<div class="math-block">$
+\boxed{ \min_{\{a_i\},\{c_k\}} \phi = \min_{\{a_i\},\{c_k\}} \sum_{i=1}^{n} \left\|x_i-c_{a_i}\right\|_2^2 }
+$</div>
+<p>其中 <span class="math-inline">$n$</span> 是数据点的数量，<span class="math-inline">$\min$</span> 表示寻找使目标值尽可能小的分类方式和中心位置。</p>
+<p>如果 <span class="math-inline">$x_i=(x_{i1},x_{i2})$</span>，中心 <span class="math-inline">$c_{a_i}=(c_1,c_2)$</span>，那么平方欧氏距离是：</p>
+<div class="math-block">$
+ \left\|x_i-c_{a_i}\right\|_2^2 = (x_{i1}-c_1)^2+(x_{i2}-c_2)^2 
+$</div>
+<p>例如点 <span class="math-inline">$(2,3)$</span> 到中心 <span class="math-inline">$(1,1)$</span> 的平方距离是：</p>
+<div class="math-block">$
+ (2-1)^2+(3-1)^2=5 
+$</div>
+<h3>这个公式怎么用？</h3>
+<p>通过反复交替执行两步，来降低上面的目标值：</p>
+<p><strong>第一步：固定中心，重新分组。</strong></p>
+<p>每个点被分给离它最近的中心：</p>
+<div class="math-block">$
+ a_i=\underset{k\in\{1,\ldots,K\}}{\arg\min} \left\|x_i-c_k\right\|_2^2 
+$</div>
+<p>这里的 <span class="math-inline">$\arg\min$</span> 表示“使距离最小的那个 <span class="math-inline">$k$</span>”。例如，一个点离第 2 个中心最近，就令 <span class="math-inline">$a_i=2$</span>。</p>
+<p><strong>第二步：固定分组，重新计算中心。</strong></p>
+<p>对每个类别，把分到这一类的所有点取平均：</p>
+<div class="math-block">$
+ c_k= \frac{1}{|C_k|} \sum_{i\in C_k}x_i, \qquad C_k=\{i:a_i=k\} 
+$</div>
+<p>然后重复“<strong>分给最近的中心 → 重新计算平均值</strong>”，直到点的类别不再变化。 这两步各自都不会让平方距离总和变大：第一步让每个点选择最近的中心，第二步让每类的中心移动到该类点的平均位置。不过，最终结果<strong>不一定是全局最优</strong>；初始中心选得不同，结果也可能不同。</p>
+<pre><code class="lang-python">import random
+def kmeans(points, k, max_iter=300, random_state=None):
+    &quot;&quot;&quot;
+    points: 点的列表，例如 [[1, 1], [2, 3], [8, 9]]
+    k: 想分成的组数
+    返回 k 个中心，每个中心是一个坐标列表。
+    &quot;&quot;&quot;
+    if not points or not 1 &lt;= k &lt;= len(points):
+        raise ValueError(&quot;points 不能为空，且 k 必须在 1 和点数之间&quot;)
+
+    dimension = len(points[0])
+    if dimension == 0 or any(len(point) != dimension for point in points):
+        raise ValueError(&quot;所有点必须有相同且非零的维度&quot;)
+    if max_iter &lt; 1:
+        raise ValueError(&quot;max_iter 必须至少为 1&quot;)
+
+    rng = random.Random(random_state)
+
+    # 随机选择 k 个点作为初始中心
+    centers = [list(point) for point in rng.sample(points, k)]
+    previous_labels = None
+
+    for _ in range(max_iter):
+        labels = []
+
+        # 1. 对每个点，找距离它最近的中心
+        for point in points:
+            distances = [
+                sum((point[d] - center[d]) ** 2 for d in range(dimension))
+                for center in centers
+            ]
+            closest_center = min(range(k), key=lambda j: distances[j])
+            labels.append(closest_center)
+
+        # 分组不变，停止
+        if labels == previous_labels:
+            break
+
+        # 2. 每个中心更新为对应组中所有点的平均值
+        for j in range(k):
+            group = [
+                point for point, label in zip(points, labels)
+                if label == j
+            ]
+
+            if group:
+                centers[j] = [
+                    sum(point[d] for point in group) / len(group)
+                    for d in range(dimension)
+                ]
+
+        previous_labels = labels
+
+    return centers</code></pre>
+<h2>线性回归（linear Regression）：最小二乘法</h2>
+<p>模型学习到一个拟合函数，设计奖惩函数，根据近似程度做出反馈。 假设模型得到函数：</p>
+<div class="math-block">$
+ \hat y=\theta_1x+\theta_2 
+$</div>
+<p>假设我们有 <span class="math-inline">$n$</span> 组历史数据：</p>
+<div class="math-block">$
+ (x_1,y_1),(x_2,y_2),\ldots,(x_n,y_n) 
+$</div>
+<p>对于第 <span class="math-inline">$i$</span> 组数据，预测误差是：</p>
+<div class="math-block">$
+ \hat y_i-y_i 
+$</div>
+<p>损失：</p>
+<div class="math-block">$
+ L(\theta_1,\theta_2) = \sum_{i=1}^{n} (\theta_1x_i+\theta_2-y_i)^2 
+$</div>
+<p>这里是平方损失惩罚，除此之外，常见的还有以下几种：</p>
+<table>
+<thead>
+<tr><th>损失</th><th>公式</th><th>解释</th></tr>
+</thead>
+<tbody>
+<tr><td>平方损失</td><td><span class="math-inline">$(\hat y-y)^2$</span></td><td>大错误罚得特别重。和除以n就得到MSE均方误差。</td></tr>
+<tr><td>绝对损失</td><td><span class="math-inline">$\lvert  \hat y-y\rvert$</span></td><td>错多少罚多少，不让正负错误抵消</td></tr>
+<tr><td>零一损失</td><td><span class="math-inline">$\mathbf1[\hat y\ne y]$</span></td><td>分类错了记 1，对了记 0；不表示“差一点”和“差很多”</td></tr>
+<tr><td>对数损失</td><td><span class="math-inline">$-\log p_y$</span></td><td><span class="math-inline">$p_y$</span> 是模型给正确类别的概率；给正确答案的概率越小，惩罚越大</td></tr>
+</tbody>
+</table>
+<p>使得损失最小的过程就是最小二乘法：</p>
+<div class="math-block">$
+ \boxed{ \min_{\theta} L(\theta) = \min_{\theta} \sum_{i=1}^{n}(f_i^{T}\theta-y_i)^2 } 
+$</div>
+<p>求最小二乘解： 对原函数求导：<span class="math-inline">$\nabla L(\theta)=0$</span> 矩阵可逆的情况下：一种闭式解</p>
+<div class="math-block">$
+ \boxed{\theta=(X^TX)^{-1}X^Ty} 
+$</div>
+<hr>
+<p>© 2026 x1shang。除另有注明外，本笔记中的原创内容采用 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hans" target="_blank" rel="noopener noreferrer">知识共享署名 4.0 国际许可协议（CC BY 4.0）</a>授权。转载或改编时，请合理署名、附上原文及协议链接，并标明修改情况。第三方材料的权利归其各自权利人所有。</p></article></main>
+</div>
+
+<footer><span>© <span id="year"></span> x1shang</span><span>文字、代码，与生活的切片。</span><a href="#home">回到山间 ↑</a></footer>
+
+<section id="player" class="player glass" aria-label="音乐播放器" hidden>
+ <img id="now-cover" class="now-cover" alt="" referrerpolicy="no-referrer" hidden>
+ <div class="player-transport" role="group" aria-label="播放控制">
+  <button type="button" id="prev-track" class="player-btn" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6z"/><path d="M19 5.5v13L8.6 12z"/></svg></button>
+  <button type="button" id="play-toggle" class="player-play" aria-label="播放" title="播放"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.4v13.2L19 12z"/></svg></button>
+  <button type="button" id="next-track" class="player-btn" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5h2.4v13H16z"/><path d="M5 5.5v13L15.4 12z"/></svg></button>
+ </div>
+ <div class="player-copy"><strong id="now-title"></strong><span id="now-lyric">等待播放</span></div>
+ <span id="time">0:00 / 0:00</span>
+ <input id="seek" type="range" min="0" max="100" value="0" aria-label="播放进度">
+ <button type="button" id="play-mode" class="player-btn" aria-label="播放模式：顺序播放（点击切换）" title="播放模式：顺序播放（点击切换）"></button>
+ <span id="play-mode-tip" class="player-mode-tip" role="status" aria-live="polite"></span>
+ <button type="button" id="close-player" class="player-btn player-close" aria-label="停止并关闭" title="停止并关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z"/></svg></button>
+</section>
+<audio id="audio" preload="metadata"></audio>
+
+<dialog id="photo-dialog"><button id="close-photo" aria-label="关闭照片">×</button><figure><img id="large-photo" alt=""><figcaption id="photo-caption"></figcaption></figure></dialog>
+
+<!-- 常驻底栏：命令行样式的全站检索 -->
+<form class="dock" id="dock" role="search" aria-label="全站检索">
+ <div class="dock-line">
+  <button type="button" class="dock-prompt" id="command-toggle" aria-label="进入命令模式" aria-pressed="false">&gt;</button>
+  <input id="dock-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="全站检索：标题 / 正文 / 标签 / 照片 / 音乐 / 友链…" aria-label="全站检索" aria-expanded="false" aria-controls="dock-results" role="combobox">
+  <span class="dock-hint" id="dock-hint" aria-label="Tips">/ 命令模式 · ↑↓ 选择 · Enter 打开</span>
+  <button type="button" id="theme-toggle" aria-label="切换暗色模式" aria-pressed="false" title="切换主题；命令 theme system 跟随系统">☾</button>
+  <button type="button" id="language-toggle" aria-label="Switch to English" title="Switch to English" lang="en">EN</button>
+ </div>
+ <div class="dock-results" id="dock-results" role="listbox" aria-label="检索结果" hidden></div>
+</form>
+
+<a class="fab" id="submit-fab" href="https://submit.x1shang.top/" target="_blank" rel="noopener noreferrer" aria-label="投稿笔记" title="投稿笔记"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+
+<script src="../../content.js?v=ebb77046"></script>
+<script src="../../content.auto.js?v=00cbb5f5"></script>
+<script src="../../render.js?v=3638a688"></script>
+<script src="../../terminal.js?v=958556a3"></script>
+<script src="../../app.js?v=bfe9f9ff"></script>
+<!-- GoatCounter：文章 / 断言 / 论文的「热度」= 访客总量，就是靠它按真实路径记账的。
+     去 goatcounter.com 注册一个免费站点，把短代码填到下面；不填的话热度恒为 0（排序退化成按时间）。
+     注意脚本地址用的是 static.goatcounter.com 而不是官方文档里的 gc.zgo.at：
+     实测 gc.zgo.at / static.zgo.at 在国内 DNS 不解析（连 GoatCounter 后台自己的 JS 都加载不出来），
+     而 static.goatcounter.com 是同一个 count.js 的可达镜像（2026-10-11 实测 200 / 9213 B）。 -->
+<script data-goatcounter="https://x1shang.goatcounter.com/count" async src="//static.goatcounter.com/count.js"></script>
+<!-- 自建统计（Phase 2，计划 §5.2 第 6 步）：beacon 由自己的 Worker 托管（stat.x1shang.top = Workers + D1），
+     精确计数、无采样、数据在自己库里。**与上面的 GoatCounter 双跑 2 周**（§6.1），退役前两者都留着。
+     口径是「页面浏览量（PV）」不是「访客数（UV）」，双跑期数值有差异是正常的。
+     这一行写在 index.html 就够：预渲染页（articles/*/index.html）是拿 index.html 当模板生成的（tools/build-content.mjs）。 -->
+<script defer src="https://stat.x1shang.top/s.js"></script>
+</body></html>

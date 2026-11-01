@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-10-31T19:21:06.329Z",
+ "generated": "2026-11-01T10:29:33.624Z",
  "recent": "2026-10-30",
  "site": {
   "name": "x1shang",
@@ -46,10 +46,10 @@ window.AUTO = {
     "生活"
    ],
    "test": false,
-   "heat": 3,
+   "heat": 4,
    "body": "> 上海的十月，夏天才刚刚落幕。\n\n来到上海读大学后的第一个秋天，日子在课业、折腾和新的相遇里一点点展开。这个月做了些事情，也想把它们和你分享。\n\n## 给自己留一个小站\n\n[x1shang.top](https://x1shang.top/) 是我搭建的个人站点。文章、照片、音乐、研究记录，以及一路做过的小项目，都会慢慢放进来。\n\n建站的一个念头很简单：以后我们或许会去往不同的地方，也会各自忙碌，但希望无论何时何地，朋友们都还有一个地方可以找到我。想联系我的话，也欢迎写信到 [ciallo@x1shang.top](mailto:ciallo@x1shang.top)。\n\n站里已经整理归档了不少高中的点滴。十班的回忆对我来说太珍贵，值得留一个位置好好珍藏；接下来的空间，则留给大学里继续遇见的人和事。\n\n小站的源码以 MIT 协议开源。如果你也想搭一个自己的博客，可以看看 [GitHub 仓库](https://github.com/x1shang/x1shang.top)，或从[发布页](https://github.com/x1shang/x1shang.top/releases)下载整理好的博客模板。\n\n## 公共笔记仓\n\n进入大学之后，我的笔记开始电子化，同时有大量自学的内容、想要讨论的话题，无法得到除了AI以外的反馈与声音。直到建立站点，我上传的几个学习可视化界面收到lmy的批评、建议，我才意识到一种信息化与智能化带来的全新可能。\n\n也是受到[传承·交大](https://share.dyweb.sjtu.cn)用自己的资料兑换别人上传的课程资料的启发，我在小站中开辟了[一块区域](https://x1shang.top/#notes)，你可以在这里分享你的笔记，也可以自由评论、指正别人的笔记。\n\n我后续也将会上传我自己完整版的笔记。遵从一些学院要求，它们将会在学期末之后与大家见面。\n\n## 机械赛：最后两天的飞轮\n\n很久没有做嵌入式开发了。软件和硬件一起调试，还是会让我头皮发麻，但最后我们把车做出来了，也有幸入围。\n\n这个过程有点狼狈，也很难忘：没有经验就边做边试，经费烧干了就自己垫一点；发射装置不行就改，动力不够就调高电压尝试，来不及 3D 打印就拿热熔胶粘，接口不够就用面包板扩展。\n\n离排位赛不到两天时，第一版驱动板烧了，第二版的电机也在负载下损坏。我们从废料堆里翻出一块 L298N 和两只轮胎，硬是拼出了一个飞轮发射装置。\n\n特别感谢我的两位舍友。为了这辆车，我们一起度过了好几个有点癫狂的白天和黑夜。最终的结果还无从得知，但这段经历已为传奇。\n\n## 湿球计算器：终于可以在网页上试用了\n\n之前发布 v1.2.0 时，湿球计算器还只有软件版，放在 GitHub 上下载也不算方便。现在可以直接打开[网页版](https://navi.x1shang.top/wetbulb/)试用；桌面版 v1.3.5 对应的网页版版本号是 v2.0.0。它支持湿球、露点和相对湿度之间的计算，也提供多种公式、批量处理与迭代过程可视化。\n\n这个工具源于我们高中降水相态研究中的需求。计算程序本身不一定复杂，真正需要谨慎的是公式、参数和适用范围：在 DSH 的帮助下，我对项目做了不少修订与复核，也把参考资料和已知限制整理进了文档。不同公式有各自的适用条件，使用结果时仍需要结合具体场景判断。\n\n本着科研共享的想法，项目也提供输出 JSON 的命令行版本，方便其他人通过脚本调用或接入自己的项目。网页版主要让体验更方便；如果需要命令行接口，可以在发行页下载桌面 CLI。\n\n- [在线体验](https://navi.x1shang.top/wetbulb/)\n- [源码与发行版](https://github.com/x1shang/Wetbulb-Calculator)\n- [精度、适用范围与参考文献](https://github.com/x1shang/Wetbulb-Calculator/blob/master/docs/%E7%B2%BE%E5%BA%A6%E4%B8%8E%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE.md)\n\n## DIYPCmarket：给装机行情留一份档案\n\n电脑硬件的价格居高不下，于是我尝试把自己关注的装机行情按月整理下来，做成 [frocloud · DIYPCmarket](https://github.com/x1shang/frocloud-DIYPCmarket)。\n\n这里有手工整理的 Excel 表，包括显卡、CPU、内存等价格资料和 GPU / CPU 天梯图；仓库里也有从表格导出的 CSV，方便进一步处理。十月版本可以在[发布页](https://github.com/x1shang/frocloud-DIYPCmarket/releases)查看。\n\n具体口径和数据截止时间请以仓库说明为准，欢迎发现问题后帮我指出。\n\n## 复扫雷助手：如果雷也有不同的数值\n\n[复扫雷](https://github.com/Yueqing-Chen/complexweeper-A-minesweeper-game)把经典扫雷变成了一个很有意思的问题：如果雷不再只有一种，而是可以沿两个方向取正负值，棋盘还可以怎样推理？圆复数模式中的雷可以是 +1、−1、+i、−i；闵可夫斯基模式则用 +1、−1、+j、−j，其中 j² = 1。不同的雷可能相互抵消，线索不再只是附近雷的数量。\n\n受[忘忧草的扫雷助手](https://github.com/wangyuanchuan2022/minesweeper_help)启发，我尝试为复扫雷做了一个[外部助手](https://github.com/x1shang/complex-sweeper-helper)，并使用了原项目的界面外壳。它会识别棋盘、根据线索推理，显示风险估计，也能在“点击确定方格”模式下只翻开已证明安全的格子。\n\n自动模式在没有确定安全格时可能需要猜测，因此不能保证通关；复杂局面的概率也还有改进空间。对我来说，它更像是一次把游戏里的数学问题变成程序的尝试。\n\n---\n\n十月就先记到这里。谢谢一路同行的朋友，也感谢你有空来小站逛逛。",
    "summary": "上海的十月：给回忆安一个家，和室友一起赶机械赛，还有几个慢慢完善的小项目。",
-   "visits": 3
+   "visits": 4
   },
   {
    "id": "september-report",
@@ -61,10 +61,10 @@ window.AUTO = {
     "项目"
    ],
    "test": false,
-   "heat": 4,
+   "heat": 5,
    "body": "## 🔥 三体 · 地表观测站\n\n三体世界地表观测站 · Three.js 单文件三体模拟器：飞星与巨日、乱纪元判定、三维轨道图、毁灭重启\n\n\n\n**墙裂推荐 √** —— 我的第一次 PR，和[忘忧草](https://github.com/wangyuanchuan2022) 🥰 两个人烧了小一亿 token 做的动态壁纸。2024 年那个 2 维模拟项目，如今终于补完圆梦。\n\n程序实现、初版.html、githubpage全部由[忘忧草](https://github.com/wangyuanchuan2022)完成，但是我把它变成了动态壁纸，上传了小红车、在[youtube](https://www.youtube.com/watch?v=KDGZ5QodyZU)上做了宣发！\n\n- [小红车（Steam 创意工坊）](https://steamcommunity.com/sharedfiles/filedetails/?id=3808366479)\n- [在线体验](https://wangyuanchuan2022.github.io/threebody-simulator/)\n- [GitHub Repo](https://github.com/wangyuanchuan2022/threebody-simulator)\n- [youtube宣传视频](https://www.youtube.com/watch?v=KDGZ5QodyZU)\n\n## 🌀 WetBulb-Calculator（湿球计算器）\n\n**核心优势 ｜ 军工级容错 ｜ 科研级精度**\n\n一款由*RDFZ降水相态研究小组*开发的科研级气象工具，专为气象学、工程及环境研究设计。支持湿球与露点温度双向计算，集成Magnus、Goff、Wexler等**14种**国际权威公式，**覆盖-150℃至200℃极端环境**。通过动态可视化迭代过程，直观展示算法收敛性，提供**20+扩展气象参数**（如焓值、虚温、位温）的实时计算\n\n这个 25 年 4 月的软件经过重写脱胎换骨 ：\n\n> 校正了计算准确性，现在最小极端误差可达到0.02%以内 ✅\n>\n> 增加CLI发行版，可以直接在您的程序中接入！✅\n>\n> 计算引擎与页面分离，引擎采用注册表模式 ✅\n>\n> 现在可以自定义主题色！ ✅\n>\n> 批量模式支持中文了 ✅\n>\n> 修复了远古 bug，删除冗余依赖 ✅\n>\n> 增加CI与自动化发布，向专业产品看齐 ✅\n\n未来我们还会上线网页版，敬请期待~\n\n\n- [GitHub Repo](https://github.com/x1shang/Wetbulb-Calculator)\n\n## 🌟 Aippt\n\nBeamer 的学术体验，PPT 的交付形态。\n\nAippt v2.2.1 —— 把 Markdown 变成公式可编辑、有动画的 PPT。\n\n- [立即下载 ⬇️](https://wwbfg.lanzouu.com/i5czW4a0ggjg) 密码：`6xgm`\n- [GitHub Repo](https://github.com/x1shang/Aippt)\n\n## ⚡『菲尔兹奖级』DSH 插件\n\ndsh 白河乡资讯插件。\n\n- [GitHub Repo](https://github.com/x1shang/dsh-koin-lily-news)",
    "summary": "九月的四件事：三体地表观测站动态壁纸、湿球计算器重写、Aippt v2.2.1、白河乡资讯插件。",
-   "visits": 4
+   "visits": 5
   },
   {
    "id": "到上海去",
@@ -76,10 +76,10 @@ window.AUTO = {
     "上海"
    ],
    "test": false,
-   "heat": 8,
+   "heat": 9,
    "body": "## 2026.8.25\n去上海的火车。\n\n## 2026.9.4\n寄给马老师的一封长信，没想到那么多思绪会忽然猝不及防地倾泻在几页纸上。\n\n![寄给马老师的三页手写信](assets/img/shanghai-0904.webp)\n\n## 2026.9.11\n\n军训结束，和xjc骑车去外滩\n\n![从上海中心俯瞰陆家嘴与黄浦江](assets/img/shanghai-0911.webp)\n\n上海的城市风格和城市文化和北京迥异。不知道在这里久待会给我带来什么影响。\n我真的被分配到了超级好的舍友！！一个愿意接受新事物，有积极性去学习的人，相处下来真心舒服。\n\n## 2026.9.14\n\n选课结束，基本上能选到的都选到了。我还单独又关注了一个科研课程。希望这次可以通过。最近的事项真的非常多，以此图为证。我本来觉得其实挺有压力，想想我暑假的痛苦，我觉得应该适应这种节奏。给自己提出更高要求。\n\n![九月中旬那几天的待办清单](assets/img/shanghai-0914.webp)",
    "summary": "刚到上海的日记",
-   "visits": 8
+   "visits": 9
   },
   {
    "id": "大北线自驾",

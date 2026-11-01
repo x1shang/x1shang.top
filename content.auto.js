@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-11-01T10:29:33.624Z",
+ "generated": "2026-11-01T16:00:15.930Z",
  "recent": "2026-10-30",
  "site": {
   "name": "x1shang",
@@ -227,6 +227,22 @@ window.AUTO = {
    "body": "放在竹笛上的手突然停住了，也不知因痛苦还是悲戚，昊然的手略略颤抖着，放下竹笛，站起身。\n\n“我不能演奏这样的东西，请允许我重新抽签。”\n\n音乐学院考核室中的人都愣住了，抬起头来。坐在首席的是著名作曲家安涅索夫，身材微胖、须发灰白的他此前一直默不作声，此刻也抬起头，看向站在他面前站着的这位清瘦矮小的亚裔男子。\n\n“为什么？” 安涅索夫晃了晃手中的签，朗然念道：“‘即兴’‘欢悦’，有什么问题吗？”\n\n昊然不再颤抖，手中紧紧握住他那柄有节的竹笛，脸上像是轻轻笼了一层霜：“安先生，我明白题目要求，但是今天是 12 月 13 日，我们国家的南京大屠杀死难者公祭日。我……我奏不出欢悦的歌曲。”\n\n考官们有些茫然地看向安涅索夫——此前还从未有人这样做过，而这所音乐学院的入学资格，又是多少异国学子奔赴艺术殿堂求而不得的捷径。\n\n安涅索夫仍摇了摇头：“这是规则。”\n\n昊然神情有些怆然，他收起竹笛，深深地鞠了一躬，走了出去。\n\n12 月的多伦多飘着大雪，广场上已杳无人迹，唯有路灯偶尔洒下黯淡的光芒。安涅索夫结束了一天的评审工作正向前走去，却听见了广场上空飘荡着的幽咽哀伤的笛音。安涅索夫循着声音走去，却看到了一个熟悉的身影。\n\n那里有两尊孩子们造的雪人，而昊然一袭黑衣，正端立在雪人之前，唯有翩飞的手指与一行清泪能将他与这个寂静的冷夜区分开来。显然，这两尊雪人便是他的听众。安涅索夫伫立在那里，静静地听着，他恍惚听见了一个民族不屈的气节，在悲怆的历史中不断被掩盖，又挣脱、被埋藏，却从未消失。他听着听着，直到面前的小伙子乌黑的秀发，渐渐同落雪一样白了。\n\n这是一首即兴。\n\n笛音渐熄，安涅索夫走来，他那双谱过无数乐曲的大手不知因寒冷还是用力而通红。\n\n“大师，您为何为我鼓掌？”\n\n“因为你的竹笛是有节的。”\n\n---\n**后记**\n\n本文原稿:《意外的掌声》\n\ncredit: 海淀区26期中一类中（47分）标杆文，RDFZ26期中全校最高分\n\n当时作者还没有完全掌握记叙文的要领，这篇文章多少带了《木笛》（赵恺）的影子（原文是我小学读的，不知为何一直给我留下了极其深刻的印象），回看也并非十全十美。但是这一篇的成功直接促使我25年底记叙文写作综合水平得到飞跃，是启发我的第一块砖石。",
    "summary": "安涅索夫与李昊然",
    "visits": 3
+  },
+  {
+   "id": "随笔残片",
+   "date": "2025-05-01",
+   "format": "md",
+   "title": "随笔残片",
+   "tags": [
+    "随笔",
+    "生活",
+    "思考"
+   ],
+   "test": false,
+   "heat": 0,
+   "body": "*原稿已佚，此处据现存残片整理，写作日期不详。*\n\n\n获得的前提是不害怕失去；拥有的先决是知终有一别而仍然持之以恒——既不因为忧其失去而过分宠爱，亦不由于听任天命而消极对待。不患得，不患失，善终有成。\n\n常置于安乐中会使人退步，常居于忧患中会使人曲步。居安思危，戒骄以静，能守恒焉。\n\n## 六\n\n悟已往之不谏，知来者之可追。实迷途其未远，觉今是而昨非。\n\n那么如何改正自己的错误呢？\n\n子贡曰：“君子之过也，如日月之食焉：过也，人皆见之；更也，人皆仰之。”\n\n## 七\n\n“你所见的，是两个生命力旺盛的人，\n\n是两个清楚明白生活意义的人。\n\n在任何情况下，她们不会倦怠，也不会百无聊赖，更不至于从胡闹中求刺激。她们能从任何情况下，拿出她们那一套来，怡然自得。”（摘自茅盾《风景谈》）\n\n真正的朋友，是明确知道互相波段的不同，却总能在傅利叶变换中找到与之波形相同的片段。\n\n## 八\n\n当我们在寻找意义的时候，一定要注意：生活的意义，和生命的意义，全然是两个东西。\n\n当我们无论是立志戍守边疆，还是持起柳叶刀，抑或是发愤赚钱，想给孩子以一个更好的成长环境，这是生命的意义。我愿为此付出生命，是可歌可泣的。然而，陶渊明提醒我们，无论是当我们退休，还是归隐，生命的意义消失的时候，需要有生活的意义支撑我们前行。\n\n生命的意义可以为公，但生活的意义必须为私——心灵中的三间小屋，柱础必须立于自我的磐石上，其才能做到不随情迁事迁，风雨不动安如山。确定生活的意义既要符合外在，也要顺应内在。于陶潜，他在田园中找到了属于他的伊甸园，找到了生命的安全、良心的平静、人性的完整，那么归于自然便就是他生活的意义。\n\n**要爱生活，胜于爱生活的意义。**\n\n于我，我认为生活的意义是去体验——既体验好、美，也刺入恶、丑；既要幸福与温暖，也要孤独与绝望。用感性的双眼，去替不能看者看，去替莫能听者听，然后找一片旷野，得一枝笔，去创作。\n\n## 九\n\n人性的复杂远超二元对立。或许真正纯粹的并非关系本身，而是出现问题后，及时解决，越过阈值后，重守界限的诚意。如果这段关系注定无法回到从前，请相信那是生命在为你筛选更契合的同行者。\n\n## 十\n\n很多问题的答案就是没有答案。真正的执著也不一定有原因。",
+   "summary": "得与失、居安思危、改过，以及「生活的意义」和「生命的意义」——据残片整理的一份随笔。",
+   "visits": 0
   },
   {
    "id": "我为什么写记叙文-作文中的有用与无用",
@@ -1015,6 +1031,66 @@ window.AUTO = {
  ],
  "tracks": [
   {
+   "id": "cipher-ctymax-tetrajectory",
+   "src": "https://music.163.com/song/media/outer/url?id=1326235692.mp3",
+   "title": "Cipher : /2&//\u003c|0",
+   "artist": "Ctymax / Tetrajectory",
+   "album": "Cipher : /2&//\u003c|0",
+   "cover": "https://p2.music.126.net/JLNJrtUwTALG_E7BgO2Mqg==/109951163671917568.jpg",
+   "date": "2026-11-01",
+   "lyrics": "[00:00.00] 作词 : 无\n[00:01.00] 作曲 : 无\n[00:05.00]纯音乐，请欣赏\n",
+   "tags": [
+    "音乐",
+    "我喜欢的音乐"
+   ],
+   "test": false,
+   "heat": 998,
+   "netease": "1326235692",
+   "remote": true,
+   "playable": true,
+   "bytes": 0
+  },
+  {
+   "id": "pragmatism-resurrection",
+   "src": "https://music.163.com/song/media/outer/url?id=1907125216.mp3",
+   "title": "PRAGMATISM -RESURRECTION-",
+   "artist": "Laur",
+   "album": "CELESTIAL",
+   "cover": "https://p1.music.126.net/TyhOfIS34c1YLrTshe1YWg==/109951166856274537.jpg",
+   "date": "2026-11-01",
+   "lyrics": "[00:00.00] 作曲 : Laur\n[00:05.00]纯音乐，请欣赏\n",
+   "tags": [
+    "音乐",
+    "我喜欢的音乐"
+   ],
+   "test": false,
+   "heat": 999,
+   "netease": "1907125216",
+   "remote": true,
+   "playable": true,
+   "bytes": 0
+  },
+  {
+   "id": "そらごと-虚言",
+   "src": "https://music.163.com/song/media/outer/url?id=2666691929.mp3",
+   "title": "そらごと（虚言）",
+   "artist": "100Fullmarks",
+   "album": "聆听",
+   "cover": "https://p2.music.126.net/eB4VeUDHuE2cVUSjFlIarw==/109951170388912840.jpg",
+   "date": "2026-11-01",
+   "lyrics": "[00:05.00]纯音乐，请欣赏\n",
+   "tags": [
+    "音乐",
+    "我喜欢的音乐"
+   ],
+   "test": false,
+   "heat": 1000,
+   "netease": "2666691929",
+   "remote": true,
+   "playable": true,
+   "bytes": 0
+  },
+  {
    "id": "life",
    "src": "assets/music/life.mp3",
    "title": "life",
@@ -1675,26 +1751,6 @@ window.AUTO = {
    "bytes": 0
   },
   {
-   "id": "夜明けと蛍",
-   "src": "https://music.163.com/song/media/outer/url?id=33367345.mp3",
-   "title": "夜明けと蛍",
-   "artist": "n-buna / 初音ミク",
-   "album": "花と水飴、最終電車",
-   "cover": "https://p1.music.126.net/HmBB9fECQ8DCCnrxYzYwWA==/109951172804116153.jpg",
-   "date": "2026-10-12",
-   "lyrics": "[00:00.000] 编曲 : n-buna\n[00:01.000] 作词 : n-buna\n[00:02.000] 作曲 : n-buna\n[00:36.800]淡い月に見とれてしまうから\n[00:42.540]暗い足元も見えずに\n[00:47.590]\n[00:49.060]転んだことに気がつけないまま\n[00:54.940]遠い夜の星が滲む\n[00:59.360]\n[01:12.970]したいことが見つけられないから\n[01:19.010]急いだ振り 俯くまま\n[01:23.630]\n[01:25.000]転んだ後に笑われてるもの\n[01:30.610]気づかない振りをするのだ\n[01:35.580]\n[01:36.430]形のない歌で朝を描いたまま\n[01:42.880]浅い浅い夏の向こうに\n[01:47.780]\n[01:48.060]冷たくない君の手のひらが見えた\n[01:54.930]淡い空 明けの蛍\n[01:59.670]\n[02:12.860]自分がただの染みに見えるほど\n[02:18.710]嫌いなものが増えたので\n[02:23.480]\n[02:24.970]地球の裏側へ飛びたいのだ\n[02:30.620]無人の駅に届くまで\n[02:35.440]\n[02:36.940]昨日の僕に出会うまで\n[02:41.480]\n[02:42.100]胸が痛いから下を向くたびに\n[02:48.810]君がまた遠くを征くんだ\n[02:53.950]\n[02:54.130]夢を見たい僕らを汚せ\n[02:59.390]さらば 昨日夜に咲く火の花\n[03:05.570]\n[03:30.120]水に映る花を 花を見ていた\n[03:37.090]\n[03:42.240]水に霞む月を 月を見ていたから\n[03:54.670]\n[03:57.240]夏が来ないままの空を描いたなら\n[04:03.930]君は僕を笑うだろうか\n[04:08.750]\n[04:09.110]明け方の夢 浮かぶ月が見えた空\n[04:17.630]\n[04:18.210]朝が来ないままで息が出来たなら\n[04:24.830]遠い遠い夏の向こうへ\n[04:30.060]\n[04:30.260]冷たくない君の手のひらが見えた\n[04:36.840]淡い朝焼けの夜空\n[04:41.690]\n[04:54.600]夏がこないままの街を今\n[05:00.230]あぁ 藍の色 夜明けと蛍\n[05:05.740]\n",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 992,
-   "netease": "33367345",
-   "remote": true,
-   "playable": true,
-   "bytes": 0
-  },
-  {
    "id": "威风堂堂进行曲",
    "src": "https://music.163.com/song/media/outer/url?id=435592218.mp3",
    "title": "威风堂堂进行曲",
@@ -2228,12 +2284,12 @@ window.AUTO = {
  "about": "*一个安静的个人空间，用来记录研究、创作和生活。*\n\n很简约的一座小站：没有留言、点赞、在线申请，也没有后端；页面底部那条命令行检索在浏览器里跑；就连上传文章也简化到只用往仓库里丢一个文件——比如这个文件就是「关于」页的正文：编辑 `content/about.md` 即可，支持 Markdown 与 $\\LaTeX$。\n\n网站源码已在GitHub上以MIT协议开源，试试建设你的博客吧！\n\n### 关于我\n\n**2014-2020** 北京第二实验小学，学生。历任数学课代表，学习委员，班长，大队长，在乐团里拉低音提琴，一路做到了首席。很多路的起点都在那里，学习中对于科学的喜好、练琴时渐渐激发的感性、先后七次进藏旅行、两番赴美、尝试滑雪冲浪、在学校建立诗社萌发的诗心，这些事情已经很久远，但是直到现在都依然是不变的个人底色。\n\n**2020-2023** 人大附中分校，学生。任语文课代表、宣传委员。疫情和我的初中生活牢牢交织。没有大风大浪，但居家学习、在随笔本上写下无数文字，在线上第一次领略AI的神力，生活既是平凡的，也是数字的。\n\n**2023-2026** 人大附中，第二届基础科学实验班，学生。任卫生委员。从分校升入本部，震撼是毋庸置疑的。社团活动、班级活动、竞赛、挑战赛、研究性学习、游学突如其来并一下充满了我的高中生活；身边的同学，每一个人都保持着鲜明的个人特色，在自己的领域坚持热爱、绽放异彩。在和他们的交往中、在挑战物理竞赛的过程中、在参加电影节并写作片尾曲歌词的晚上，我必须常常突破自我的极限。在这里我留下了许多遗憾，也逐渐看清了自己想做的事。\n\n**2026-今** 上海交通大学，学生。计算机科学专业，志于 AI + 物理方面研究。\n\n**联系方式**：[ciallo@x1shang.top](mailto:ciallo@x1shang.top)。\n\n**学术联系**：[zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn)。\n\n### 荣誉墙\n\n- *2025.11 & 2026.4* 海淀区高三期中&一模 记叙文标杆文 一类中标杆\n- *2025.5* 人大附中研究性学习成果《一种通过湿球融化层面积判断降水相态的研究》获得一等奖\n- *2025.4* 人大附中国家安全知识竞赛冠军\n- *2024.11* 获41st全国中学生物理竞赛（CPhO）省级二等奖（北京赛区）\n- *2024.7* 全国青少年劳动技能与智能设计大赛（AILD） 创意结构 普高组铜牌\n\n### 快速开始\n\n试试页面底部的搜索框，或许能找到同频电波——\n\n- 摄影佬？看看我的[相片墙](https://x1shang.top/#photography)✅\n- 自驾玩家？可以看看[大北线游记](https://x1shang.top/#articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE)哦\n- 气象爱好者？这里有我手搓的[湿球计算器](https://navi.x1shang.top/wetbulb/)，在[友链](https://x1shang.top/#friends)中还可以找到[RDFZ气象社官网](https://rmc.beijingxuemi.top/)！\n\n或许，点开一首音乐慢慢浏览，会多几许惬意。\n\n也可以试试点击搜索框左侧的“>”，猜猜看会发生什么。",
  "aboutEn": "*A quiet personal space for research, creative work, and everyday life.*\n\nThis is a simple little site: no comments, likes, submission forms, or backend. The command-line search at the bottom runs entirely in your browser. Even publishing a post is as simple as dropping a file into the repository. This page, for instance, lives in `content/about.en.md`; edit that file to update it. Markdown and $\\LaTeX$ are both supported.\n\nThe site's source code is on GitHub under the MIT license. Why not try building a blog of your own?\n\n### About me\n\n**2014–2020 · Beijing No. 2 Experimental Primary School.** I served as math class representative, class committee member for studies, class monitor, and head of the school's Young Pioneers. I also played double bass in the orchestra, eventually becoming principal bassist. So many things began there: a love of science in the classroom, a growing sensitivity to music through hours of practice, seven trips to Tibet and two to the United States, my first attempts at skiing and surfing, and a taste for poetry that led me to start a poetry club at school. Those years feel distant now, but they still shape who I am.\n\n**2020–2023 · Branch of RDFZ.** I was the Chinese class representative and helped with class publicity. The pandemic was woven into my middle-school years. There were no great upheavals in my own life, just studying from home, filling notebook after notebook with thoughts, and discovering online, for the first time, what AI could do. Life was ordinary, and increasingly digital.\n\n**2023–2026 · The High School Affiliated to Renmin University of China (RDFZ).** I was the member of the second cohort of the Basic Science Experimental Class. Moving from the branch school to the main school was an eye-opening experience. Clubs, class events, competitions, challenges, research projects, and study trips suddenly filled my days. My classmates each had a distinct character and pursued their own interests with dedication. Getting to know them, taking on physics competitions, and spending evenings writing lyrics for a closing-credits song for the school film festival often pushed me beyond what I thought I could do. I left with plenty of regrets, but also a clearer sense of what I wanted to pursue.\n\n**2026–present · Shanghai Jiao Tong University.** I'm studying computer science, with the aim of doing research at the intersection of AI and physics.\n\n**Get in touch:** [ciallo@x1shang.top](mailto:ciallo@x1shang.top).\n\n**Academic contact:** [zhu_jiahe2008@sjtu.edu.cn](mailto:zhu_jiahe2008@sjtu.edu.cn).\n\n### Honors & Awards\n\n- *Nov 2025 & Apr 2026* — Benchmark Essay (Category I, Middle Band), Narrative Writing, Haidian District Senior Year 3 Midterm Examination and First Mock Examination\n- *May 2025* — First Prize, Research-Based Learning Project, RDFZ — \"A Study on Determining Precipitation Type from the Area of the Wet-Bulb Melting Layer\"\n- *Apr 2025* — Champion, National Security Knowledge Competition, The High School Affiliated to Renmin University of China (RDFZ)\n- *Nov 2024* — Provincial Second Prize (Beijing Division), 41st Chinese Physics Olympiad (CPhO)\n- *Jul 2024* — Bronze Award, Creative Structure Event, Regular Senior High School Division, National Youth Labor Skills and Intelligent Design Competition (AILD)\n\n### Take a look around\n\nTry the search box at the bottom of the page. You might find something on your wavelength.\n\n- Into photography? Have a look at my [photo wall](#photography).\n- Love a road trip? Come along on my [journey along Tibet's Great Northern Route](#articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE).\n- Interested in weather? Try the [Wetbulb Calculator](https://navi.x1shang.top/wetbulb/) I built. You'll also find the [RDFZ Meteorology Club](https://rmc.beijingxuemi.top/) among my [friends' sites](#friends).\n\nPut on a song and take your time browsing. It's a nice way to spend a moment here.\n\nOr try clicking the “>” to the left of the search box. See what happens.",
  "stats": {
-  "articles": 16,
+  "articles": 17,
   "assertions": 4,
   "papers": 2,
   "notes": 1,
   "photos": 37,
-  "tracks": 56,
+  "tracks": 58,
   "friends": 9
  }
 };

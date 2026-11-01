@@ -64,7 +64,9 @@ function Sync-ToRemote {
   }
   for ($i = 0; $i -lt 30; $i++) {
     if (-not (Test-RebaseInProgress)) { return }
-    $unmerged = @(git diff --name-only --diff-filter=U)
+    # core.quotePath=false：否则中文路径会被 git 输出成 "academic/\346..." 这种带引号的转义形式，
+    # 下面的 Test-Generated 就认不出来，生成物冲突会被误当成"需要人工处理"而白白中止
+    $unmerged = @(git -c core.quotePath=false diff --name-only --diff-filter=U)
     if ($unmerged.Count -gt 0) {
       $manual = @($unmerged | Where-Object { -not (Test-Generated $_) })
       if ($manual.Count -gt 0) {

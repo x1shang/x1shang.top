@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-11-02T13:59:34.631Z",
+ "generated": "2026-11-02T23:08:21.647Z",
  "recent": "2026-11-02",
  "site": {
   "name": "x1shang",
@@ -336,9 +336,9 @@ window.AUTO = {
     "学习"
    ],
    "test": false,
-   "heat": 1,
+   "heat": 2,
    "body": "小的时候，午夜还是神秘的，想象着狼人与鬼怪；现在，午夜是亲切的，代码还在跑，ddl已经过了。大抵鬼怪们也同渡渡鸟一起绝灭了吧。",
-   "visits": 1
+   "visits": 2
   },
   {
    "id": "testingai",
@@ -350,9 +350,9 @@ window.AUTO = {
     "技术"
    ],
    "test": false,
-   "heat": 3,
+   "heat": 4,
    "body": "AGI时代已经不远，测试AI看的将不再是跑分，而是工程能力。很好的一个例子就是友链中的[711 Night](https://rain.ptsfdtz.top/)。",
-   "visits": 3
+   "visits": 4
   },
   {
    "id": "dengqinwenwon",

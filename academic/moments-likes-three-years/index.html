@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2f4f6">
+<!-- build:head:start（由 tools/build-content.mjs 为预渲染页生成，勿手改） -->
+<meta name="description" content="基于近三年 20 条动态、860 次点赞与 161 位独立点赞者，考察点赞的时间分布、内容差异和核心受众，并以全历史数据作补充分析。">
+<title>朋友圈点赞的三年 · x1shang</title>
+<link rel="canonical" href="https://x1shang.top/academic/moments-likes-three-years/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="x1shang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="朋友圈点赞的三年">
+<meta property="og:description" content="基于近三年 20 条动态、860 次点赞与 161 位独立点赞者，考察点赞的时间分布、内容差异和核心受众，并以全历史数据作补充分析。">
+<meta property="og:url" content="https://x1shang.top/academic/moments-likes-three-years/">
+<meta property="og:image" content="https://x1shang.top/assets/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-11-02">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="朋友圈点赞的三年">
+<meta name="twitter:description" content="基于近三年 20 条动态、860 次点赞与 161 位独立点赞者，考察点赞的时间分布、内容差异和核心受众，并以全历史数据作补充分析。">
+<meta name="twitter:image" content="https://x1shang.top/assets/og-cover.jpg">
+<!-- build:head:end -->
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="../../feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Atom" href="../../atom.xml">
+<link rel="stylesheet" href="../../style.css?v=a504af24">
+<script src="../../translations.js?v=c9d67c33"></script>
+<script src="../../language.js?v=3ac7922e"></script>
+<script src="../../theme.js?v=d1776925"></script>
+</head>
+<body class="reading">
+<a class="skip" href="#content">跳到正文</a><div class="pointer-light" aria-hidden="true"></div>
+
+<header class="hero" id="hero">
+ <div class="landscape"><img class="mountain" src="../../assets/mountain.jpg" alt="蓝天下的雪山与云海"><h1>x1shang</h1><img class="foreground" src="../../assets/mountain.jpg" alt="" aria-hidden="true"></div>
+ <div class="hero-top"><a href="#home" class="wordmark">x1 /</a><span>A PERSONAL SPACE</span><a href="#content" class="explore">向下探索 ↘</a></div>
+ <div class="hero-caption">山有轮廓，思绪没有。<span>THOUGHTS BEYOND THE HORIZON</span></div>
+ <aside class="identity glass">
+  <span class="card-label">HELLO, WORLD <span>↗</span></span>
+  <strong>x1shang<span class="status-dot"></span></strong>
+  <p class="bio">major in computer science at SJTU, passionate about AI + physics</p>
+  <p class="mail"><a href="mailto:ciallo@x1shang.top">ciallo@x1shang.top</a></p>
+  <div class="card-links">
+   <a class="card-icon" href="https://space.bilibili.com/695603904" target="_blank" rel="noopener noreferrer" title="b 站主页" aria-label="b 站主页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="15" width="36" height="23" rx="4"/><path d="M17 15l-5-7"/><path d="M31 15l5-7"/><circle cx="18" cy="26" r="1.9" fill="currentColor" stroke="none"/><circle cx="30" cy="26" r="1.9" fill="currentColor" stroke="none"/></svg>
+    <span>b 站</span>
+   </a>
+   <a class="card-icon" id="profile-github" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    <span>GitHub</span>
+   </a>
+   <a class="card-icon" href="https://navi.x1shang.top" target="_blank" rel="noopener noreferrer" title="导航页" aria-label="导航页">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 24l34-15-9 33-8-12z"/><path d="M24 30l17-21"/></svg>
+    <span>导航页</span>
+   </a>
+  </div>
+ </aside>
+ <a href="#content" class="scroll-cue" aria-label="向下进入正文">↓</a>
+ <span class="sky-credit">@STAR素材(CC0)</span>
+</header>
+
+<div class="site-layout" id="content">
+ <aside class="sidebar"><a class="site-name" href="#home">x1shang<span>个人索引 / PERSONAL INDEX</span></a><nav aria-label="主导航" id="navigation"></nav><div class="sidebar-bottom">因为山就在那里。<span id="local-clock"></span></div></aside>
+ <main id="main" tabindex="-1"><article class="prose" data-prerendered="/academic/moments-likes-three-years/"><h1>朋友圈点赞的三年</h1><p>数据截止 2026-11-02。文中人名均为化名。</p>
+<p><a href="../../assets/papers/moments-likes-analysis/source.zip" target="_blank" rel="noopener noreferrer">下载 TeX 源码与化名数据（ZIP）</a></p>
+<h2>摘要</h2>
+<p>目的：考察近三年朋友圈点赞的时间分布、内容类型差异与核心点赞者。方法：以本机微信数据库为数据源，选取 2023-11-01 至 2026-10-31 的 20 条本人动态，提取 860 次他人点赞、110 条他人评论和 161 位独立点赞者；采用描述统计、20,000 次 bootstrap 区间、Spearman 相关与 Kruskal–Wallis 检验；另以 46 条全历史动态作趋势拟合与阶段补充，不用于主结论。结果：46.6% 的赞在 1 小时内、74.5% 在 6 小时内、92.6% 在 24 小时内到达，中位半衰期为 1.15 小时；长文/月报平均 58.5 赞，城市/影像 48.7，旅行/自然 42.0，校园/成长 40.7，技术/项目 35.8，类别差异不显著（<span class="math-inline">$p=0.431$</span>）；前四位点赞者各 18/20，前 10% 点赞者贡献 31.3%，Gini 系数为 0.466。结论：点赞集中在发布后一天内；内容类型差异仅具描述意义；核心点赞圈规模小且稳定；发布时间影响点赞速度，而非最终总量。全历史补充分析显示，八年点赞数呈显著线性上升（<span class="math-inline">$\beta=5.40$</span> 赞/年，95% CI 4.29–6.52，<span class="math-inline">$R^2=0.671$</span>），学校阶段队列与两次大考前后呈现不同的参与结构。</p>
+<p><strong>关键词：</strong>朋友圈；点赞；时间动力学；内容类型；社会网络；描述性统计</p>
+<h2>1 数据与方法</h2>
+<h3>1.1 数据来源与样本</h3>
+<p>数据来自本机微信 4.1.15.56 的 SQLCipher 数据库 <code>sns.db</code>，读取时间为 2026-11-02。数据库中共有 47 条发布者为本账号的动态；其中 1 条为 2023-12-31 16:46 的重复空帖（1 图、无正文、无互动），剔除后余 46 条。另有 4 次自赞被剔除。</p>
+<p>主分析限定最近 36 个月（2023-11-01 至 2026-10-31），共 20 条动态，获得 860 次他人点赞、110 条他人评论（不含本人回复）和 161 位独立点赞者。其余 26 条早期动态仅用于第 3 节的趋势拟合与阶段补充。联系人是否仍在好友列表不影响纳入；已删除联系人的历史点赞仍保留在样本中。</p>
+<h3>1.2 变量与指标</h3>
+<p>点赞数按 wxid 去重，自赞不计；评论数为他人评论，不含本人回复。点赞延迟定义为点赞时间减去发布时间；半衰期定义为累计赞数首次达到该帖最终赞数 50% 的时间；首小时占比定义为发布后 1 小时内的赞数占最终赞数的比例。</p>
+<p>主样本按正文主题分为五类：长文/月报、城市/影像、技术/项目、旅行/自然、校园/成长。编码为人工单编码，优先依据正文主题；图文并茂时以文字主题为准。学校阶段（小学、初中、高中、大学）仅用于第 3 节的补充分析，由群聊成员关系推断：群名含相应阶段关键词者归入该阶段；一人可属于多个阶段，补充分析中的“关系”取最早阶段。</p>
+<h3>1.3 统计方法</h3>
+<p>均值区间使用 20,000 次 percentile bootstrap；连续关联使用 Spearman 秩相关；类别差异使用 Kruskal–Wallis 检验。全历史趋势使用最小二乘线性回归（点赞数对小数年份），报告斜率、95% 置信区间与 <span class="math-inline">$R^2$</span>。所有检验为双侧，未做多重比较校正；样本量小，<span class="math-inline">$p$</span> 值仅作辅助，结论为描述性，不作因果推断。</p>
+<h2>2 结果</h2>
+<h3>2.1 总量与轨迹</h3>
+<p>近三年 20 条动态共获得 860 次他人点赞，均值 <strong>43.0</strong>，中位 <strong>41.0</strong>，范围 <strong>18–69</strong>。年度均值分别为：2023 年 2 条 47.0，2024 年 6 条 34.7，2025 年 6 条 43.7，2026 年 6 条 49.3。2024 年出现回落，2025–2026 年回升；三年样本并不支持“逐年单调上升”的判断。</p>
+<p>单条峰值是 2026-04-16 的 18 岁生日帖 <strong>69 赞</strong>（28 条评论）；其次是 2025-06-13 的《长白山》<strong>63 赞</strong>；2026-09-11 的《骑行外滩》和 2026-10-31 的《十月月报》各 <strong>61 赞</strong>。最低为 2026-10-11 的建站帖 <strong>18 赞</strong>。</p>
+<figure>
+<figcaption>表 1：近三年主样本的年度点赞与评论。评论不含本人回复。</figcaption>
+<div class="table-scroll"><table><thead><tr><th>年份</th><th>条数</th><th>总赞</th><th>均值</th><th>中位</th><th>评论</th></tr></thead><tbody><tr><td>2023</td><td>2</td><td>94</td><td>47.0</td><td>47.0</td><td>12</td></tr><tr><td>2024</td><td>6</td><td>208</td><td>34.7</td><td>34.0</td><td>13</td></tr><tr><td>2025</td><td>6</td><td>262</td><td>43.7</td><td>45.0</td><td>19</td></tr><tr><td>2026</td><td>6</td><td>296</td><td>49.3</td><td>54.5</td><td>66</td></tr></tbody></table></div>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/fig1_main_timeline.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/fig1_main_timeline.png" alt="fig1_main_timeline" loading="lazy" decoding="async"></a></p>
+<figcaption>图 1：近三年的点赞轨迹与受众增长。A：20 条动态的逐条点赞；灰带=高中/大学；红色虚线=高考月。B：每帖独立点赞者中的新/老面孔与累计独立点赞者。</figcaption>
+</figure>
+<h3>2.2 时间动力学</h3>
+<p>860 次点赞中，46.6% 在发布后 1 小时内到达，74.5% 在 6 小时内，92.6% 在 24 小时内，96.7% 在 72 小时内。点赞延迟中位数为 <strong>1.22 小时</strong>，半衰期中位数为 <strong>1.15 小时</strong>。一条动态的点赞主要在发布后一天内完成。</p>
+<p>发布小时与半衰期呈负相关：越晚发布，半衰期越短（<span class="math-inline">$\rho=-0.67$</span>，<span class="math-inline">$p=0.001$</span>）。但总赞与发布小时几乎无关（<span class="math-inline">$\rho=0.13$</span>，<span class="math-inline">$p=0.58$</span>）。由此可见，发布时间主要改变点赞到达的速度，而不是最终规模。</p>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/fig2_main_temporal.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/fig2_main_temporal.png" alt="fig2_main_temporal" loading="lazy" decoding="async"></a></p>
+<figcaption>图 2：点赞的时间动力学。A：20 条动态的点赞累积曲线（中位数与 IQR）；B：发布时间与半衰期，颜色=学校阶段，点大小=点赞数。</figcaption>
+</figure>
+<h3>2.3 内容类型</h3>
+<p>五类动态的均值分别为：长文/月报 <strong>58.5</strong>（<span class="math-inline">$n=2$</span>）、城市/影像 <strong>48.7</strong>（<span class="math-inline">$n=3$</span>）、旅行/自然 <strong>42.0</strong>（<span class="math-inline">$n=5$</span>）、校园/成长 <strong>40.7</strong>（<span class="math-inline">$n=6$</span>）、技术/项目 <strong>35.8</strong>（<span class="math-inline">$n=4$</span>）。Kruskal–Wallis 检验 <span class="math-inline">$p=0.431$</span>，类别差异不显著；上述排序仅作描述，不能据此推断内容类型的普遍效应。</p>
+<p>评论维度与点赞并不一致。技术/项目的评论/赞比为 19%，校园/成长 18%，长文/月报 12%，城市/影像 11%，旅行/自然 4%。技术/项目与校园/成长更偏“讨论型”，长文/月报更偏“认可型”，旅行/自然更偏“欣赏型”。</p>
+<figure>
+<figcaption>表 2：近三年五类内容的点赞与评论。评论/赞为组内汇总。</figcaption>
+<div class="table-scroll"><table><thead><tr><th>类型</th><th>n</th><th>均值</th><th>中位</th><th>评论均值</th><th>评论/赞</th></tr></thead><tbody><tr><td>长文 / 月报</td><td>2</td><td>58.5</td><td>58.5</td><td>7.0</td><td>12%</td></tr><tr><td>城市 / 影像</td><td>3</td><td>48.7</td><td>48.0</td><td>5.3</td><td>11%</td></tr><tr><td>旅行 / 自然</td><td>5</td><td>42.0</td><td>36.0</td><td>1.8</td><td>4%</td></tr><tr><td>校园 / 成长</td><td>6</td><td>40.7</td><td>38.5</td><td>7.3</td><td>18%</td></tr><tr><td>技术 / 项目</td><td>4</td><td>35.8</td><td>38.5</td><td>6.8</td><td>19%</td></tr></tbody></table></div>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/fig3_main_categories.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/fig3_main_categories.png" alt="fig3_main_categories" loading="lazy" decoding="async"></a></p>
+<figcaption>图 3：近三年的内容类型与互动。A：五类动态的点赞分布（均值、中位数与 95% bootstrap CI）；B：点赞与评论的关系。</figcaption>
+</figure>
+<h3>2.4 核心点赞者</h3>
+<p>161 位点赞者共贡献 860 次赞。前四位各点赞 18/20 条动态（90%），随后四位各 17/20 条（85%）；前 10 人贡献 20.0% 的赞。点赞次数最多的 15 位见表&nbsp;3。</p>
+<p>“经常”不等于“迅速”。前 15 位的中位点赞延迟从约 0.3 小时到 7 小时不等；高频点赞者内部存在明显的速度差异。表&nbsp;3 同时给出延迟中位数。</p>
+<figure>
+<figcaption>表 3：近三年点赞次数最多的 15 位。延迟中位为小时。</figcaption>
+<div class="table-scroll"><table><thead><tr><th>#</th><th>姓名</th><th>点赞数</th><th>/20</th><th>延迟中位（h）</th></tr></thead><tbody><tr><td>1</td><td>ZZD</td><td>18</td><td>90%</td><td>0.56</td></tr><tr><td>2</td><td>ZAK</td><td>18</td><td>90%</td><td>1.34</td></tr><tr><td>3</td><td>XAZ</td><td>18</td><td>90%</td><td>0.66</td></tr><tr><td>4</td><td>MNZ</td><td>18</td><td>90%</td><td>0.62</td></tr><tr><td>5</td><td>TYS</td><td>17</td><td>85%</td><td>0.41</td></tr><tr><td>6</td><td>MUZ</td><td>17</td><td>85%</td><td>1.40</td></tr><tr><td>7</td><td>XLY</td><td>17</td><td>85%</td><td>1.20</td></tr><tr><td>8</td><td>HIZ</td><td>17</td><td>85%</td><td>0.91</td></tr><tr><td>9</td><td>TIX</td><td>16</td><td>80%</td><td>0.29</td></tr><tr><td>10</td><td>XYZ</td><td>16</td><td>80%</td><td>2.04</td></tr><tr><td>11</td><td>HZ</td><td>15</td><td>75%</td><td>0.92</td></tr><tr><td>12</td><td>ZSI</td><td>14</td><td>70%</td><td>1.22</td></tr><tr><td>13</td><td>MDY</td><td>14</td><td>70%</td><td>7.20</td></tr><tr><td>14</td><td>XQZ</td><td>14</td><td>70%</td><td>0.32</td></tr><tr><td>15</td><td>UGL</td><td>14</td><td>70%</td><td>0.53</td></tr></tbody></table></div>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/fig4_main_likers_anon.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/fig4_main_likers_anon.png" alt="fig4_main_likers_anon" loading="lazy" decoding="async"></a></p>
+<figcaption>图 4：近三年核心点赞者。A：点赞次数最多的 18 位；B：其点赞延迟中位数；颜色=最早关系阶段。</figcaption>
+</figure>
+<h3>2.5 集中度</h3>
+<p>点赞分布呈“稳定核心 + 大长尾”结构。前 10% 点赞者（17 人）贡献 31.3%，前 20%（33 人）贡献 51.2%，Gini 系数为 <strong>0.466</strong>。核心并非少数人垄断，但前 8 位的点赞覆盖率达到 85%–90%，明显高于长尾。图&nbsp;5 为相应的洛伦兹曲线。</p>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/fig5_main_lorenz.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/fig5_main_lorenz.png" alt="fig5_main_lorenz" loading="lazy" decoding="async"></a></p>
+<figcaption>图 5：近三年点赞集中度。洛伦兹曲线按点赞次数从多到少排序；虚线=完全平均。</figcaption>
+</figure>
+<h2>3 补充分析：全历史趋势、阶段与两次大考</h2>
+<p>本节使用全部 46 条动态，仅提供纵向背景，不改变第 2 节基于近 36 个月的结论。点赞数随年份系统增长，故以线性拟合描述趋势，并报告斜率、置信区间与拟合优度。</p>
+<h3>3.1 长期趋势</h3>
+<p>46 条动态的点赞数随年份显著上升：线性拟合斜率为 <strong>+5.40 赞/年</strong>（95% CI 4.29–6.52），<span class="math-inline">$R^2=0.671$</span>，<span class="math-inline">$p&lt;0.001$</span>。这一趋势与受众规模、年龄和平台使用习惯的变化一致，不能直接解释为内容质量的提升。</p>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/figS1_trend.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/figS1_trend.png" alt="figS1_trend" loading="lazy" decoding="async"></a></p>
+<figcaption>图 S1：八年点赞趋势的线性拟合。点为单条动态；黑线=线性拟合；灰带=95% 置信带。</figcaption>
+</figure>
+<h3>3.2 首赞、末赞与学校阶段</h3>
+<p>按最早关系阶段分组，小学 32 人，184 次赞（13.9%），2026 年仍活跃 22%；初中 38 人，445 次（33.5%），活跃 63%；高中 64 人，449 次（33.8%），活跃 78%；大学 9 人，21 次（1.6%），活跃 100%；其他/未知 49 人，229 次（17.2%），活跃 55%。小学与初中合计 629 次，占全部点赞的 <strong>47.4%</strong>。</p>
+<p>首赞/末赞的阶段构成呈现清晰的队列特征：小学好友 78% 的首赞发生在小学，末赞分散到小学 28%、初中 19%、高中 31%、大学 22%；初中好友 79% 首赞在初中，末赞 50% 在高中、42% 在大学；高中好友 97% 首赞在高中，末赞 42% 在高中、58% 在大学；大学好友 100% 首末均在大学。小学是起点，初中是持续时间最长的桥梁，高中与大学是当前的主要来源。</p>
+<figure>
+<figcaption>表 4：全历史点赞者按最早关系阶段的描述统计。2026 活跃=最后一次点赞在 2026 年。</figcaption>
+<div class="table-scroll"><table><thead><tr><th>阶段</th><th>n</th><th>总赞</th><th>人均</th><th>中位</th><th>2026 活跃</th><th>首赞中位</th><th>末赞中位</th></tr></thead><tbody><tr><td>小学</td><td>32</td><td>184</td><td>5.8</td><td>3.5</td><td>22%</td><td>2019-05-21</td><td>2024-02-04</td></tr><tr><td>初中</td><td>38</td><td>445</td><td>11.7</td><td>9.0</td><td>63%</td><td>2022-02-06</td><td>2026-04-16</td></tr><tr><td>高中</td><td>64</td><td>449</td><td>7.0</td><td>5.0</td><td>78%</td><td>2023-12-31</td><td>2026-09-12</td></tr><tr><td>大学</td><td>9</td><td>21</td><td>2.3</td><td>2.0</td><td>100%</td><td>2026-09-11</td><td>2026-10-11</td></tr><tr><td>其他/未知</td><td>49</td><td>229</td><td>4.7</td><td>4.0</td><td>55%</td><td>2022-01-26</td><td>2026-04-16</td></tr></tbody></table></div>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/figS2_lifelines_anon.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/figS2_lifelines_anon.png" alt="figS2_lifelines_anon" loading="lazy" decoding="async"></a></p>
+<figcaption>图 S2：首赞到末赞的生命线。点赞次数最多的 30 位；空心=首赞，实心=末赞；颜色=最早关系阶段。</figcaption>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/figS3_stage_flow.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/figS3_stage_flow.png" alt="figS3_stage_flow" loading="lazy" decoding="async"></a></p>
+<figcaption>图 S3：学校阶段与首赞/末赞构成。A：首赞阶段构成；B：末赞阶段构成；行=最早关系阶段。</figcaption>
+</figure>
+<h3>3.3 中考与高考</h3>
+<p>2023 中考年：考前（1–6 月）0 条；考后（7–12 月）4 条，145 赞，均值 36.2，评论 27。2026 高考年：考前 1 条（4 月 16 日生日帖，69 赞、28 评论）；考后 5 条，227 赞，均值 45.4，评论 38。两年 6 月均为 0 条，考试月本身完全静默。</p>
+<p>纵向看，2022 年 9 条，均值 27.0，评论 53；2023 年 4 条，均值 36.2，评论 27；2025 年 6 条，均值 43.7，评论 19；2026 年 6 条，均值 49.3，评论 66。2026 年的评论量明显上升；这既可能反映讨论意愿增强，也可能与高考后受众结构变化有关。</p>
+<p>受众结构亦发生变化。2023 年考后帖的点赞者中，高中 47.6%、初中 37.9%、小学 9.0%、其他 5.5%；2026 年考后帖中，高中 44.5%、初中 20.7%、其他 20.7%、大学 9.3%、小学 4.8%。初中占比减半，大学与其他新面孔补入。</p>
+<figure>
+<figcaption>表 5：中考/高考前后的发帖与互动。6 月为考试月。</figcaption>
+<div class="table-scroll"><table><thead><tr><th>窗口</th><th>n</th><th>总赞</th><th>均值</th><th>评论</th></tr></thead><tbody><tr><td>2023 考前（1–6 月）</td><td>0</td><td>0</td><td>—</td><td>0</td></tr><tr><td>2023 考后（7–12 月）</td><td>4</td><td>145</td><td>36.2</td><td>27</td></tr><tr><td>2026 考前（1–6 月）</td><td>1</td><td>69</td><td>69.0</td><td>28</td></tr><tr><td>2026 考后（7–12 月）</td><td>5</td><td>227</td><td>45.4</td><td>38</td></tr><tr><td>2022 全年</td><td>9</td><td>243</td><td>27.0</td><td>53</td></tr><tr><td>2025 全年</td><td>6</td><td>262</td><td>43.7</td><td>19</td></tr></tbody></table></div>
+</figure>
+<figure>
+<p><a href="../../assets/papers/moments-likes-analysis/figS4_exams.png" target="_blank" rel="noopener noreferrer"><img src="../../assets/papers/moments-likes-analysis/figS4_exams.png" alt="figS4_exams" loading="lazy" decoding="async"></a></p>
+<figcaption>图 S4：两次大考：2023 中考年与 2026 高考年。柱=当月总赞；数字=当月发布条数；粉色=6 月考试月。</figcaption>
+</figure>
+<h2>4 讨论</h2>
+<p>近三年的点赞量稳定在较高水平，但并非逐年上升：2024 年回落，2025–2026 年恢复。单条动态的点赞高度前置，近半数在 1 小时内到达，九成以上在 24 小时内完成。这一分布意味着，发布后的第一天是点赞形成的主要窗口；晚发主要让赞来得更快，而不改变最终规模。</p>
+<p>内容类型之间的均值差异在统计上不显著，且样本量小。长文/月报的平均点赞最高，但仅 2 条；技术/项目的平均点赞最低，却有较高的评论/赞比。将点赞与评论合并看，内容类型更像“认可型”与“讨论型”的差异，而不是简单的“更受欢迎”与“更不受欢迎”。</p>
+<p>核心点赞圈规模小、持续性强。前 8 位点赞者覆盖 85%–90% 的动态，前 10% 点赞者贡献约三成点赞。核心成员以初中、高中阶段的关系为主，但这属于相关性描述；样本未包含关系强度、互动频率等变量，不能据此判断因果机制。</p>
+<p>全历史补充分析显示，八年点赞数的线性上升（+5.40 赞/年）与受众规模变化一致；学校阶段队列呈现“小学起点、初中桥梁、高中与大学当前来源”的结构。两次大考前后均出现 6 月静默、考后恢复的模式；2026 年的评论量更高、大学与其他受众占比更大。上述补充结果用于提供纵向背景，不改变近三年主样本的结论。</p>
+<h2>5 局限</h2>
+<ol>
+<li>主样本仅 20 条动态，类别样本量为 2–6 条，置信区间较宽；所有 <span class="math-inline">$p$</span> 值未做多重比较校正。</li>
+<li>数据来自单账号、单机缓存，可能遗漏未被客户端缓存的早期动态；近期帖子的点赞数仍可能继续增长。</li>
+<li>缺少曝光量、阅读量与好友规模等分母，无法区分“内容效应”与“到达效应”。</li>
+<li>内容类型为人工单编码；跨主题动态按主要篇幅归类，换一种编码规则可能改变边界。</li>
+<li>学校阶段由群聊成员关系推断，143/192 位点赞者可归类；一人可属于多个阶段，本文取最早阶段，可能存在误分类。</li>
+<li>已删除联系人仅保留本地可见记录；若删除时连点赞记录一并清除，本文无法恢复。</li>
+<li>观察性数据不能支持因果推断；时间、内容、受众与平台机制相互交织。</li>
+</ol>
+<h2>附录 A：主样本 20 条动态的逐条指标</h2>
+<p><strong>表 A1.</strong> 主样本 20 条动态的点赞、评论、首小时点赞、半衰期与形式。赞/评论均不含本人；评论不含本人回复；半衰期单位为小时。 </p>
+<div class="table-scroll"><table><thead><tr><th>#</th><th>日期</th><th>阶段</th><th>类型</th><th>赞</th><th>评论</th><th>首小时</th><th>半衰期</th><th>形式</th></tr></thead><tbody><tr><td>27</td><td>2023-12-22</td><td>高中</td><td>技术 / 项目</td><td>38</td><td>5</td><td>23</td><td>0.9</td><td>96字·无图</td></tr><tr><td>28</td><td>2023-12-31</td><td>高中</td><td>长文 / 月报</td><td>56</td><td>7</td><td>29</td><td>0.9</td><td>1524字·3图</td></tr><tr><td>30</td><td>2024-03-10</td><td>高中</td><td>旅行 / 自然</td><td>36</td><td>3</td><td>15</td><td>1.4</td><td>39字·3图</td></tr><tr><td>31</td><td>2024-08-13</td><td>高中</td><td>旅行 / 自然</td><td>46</td><td>2</td><td>23</td><td>0.9</td><td>24字·9图</td></tr><tr><td>32</td><td>2024-08-17</td><td>高中</td><td>校园 / 成长</td><td>27</td><td>2</td><td>9</td><td>2.9</td><td>123字·4图</td></tr><tr><td>33</td><td>2024-08-26</td><td>高中</td><td>校园 / 成长</td><td>34</td><td>5</td><td>18</td><td>0.7</td><td>209字·9图</td></tr><tr><td>34</td><td>2024-09-02</td><td>高中</td><td>旅行 / 自然</td><td>31</td><td>0</td><td>4</td><td>10.5</td><td>9字·9图</td></tr><tr><td>35</td><td>2024-09-09</td><td>高中</td><td>旅行 / 自然</td><td>34</td><td>1</td><td>5</td><td>9.6</td><td>137字·9图</td></tr><tr><td>36</td><td>2025-02-04</td><td>高中</td><td>校园 / 成长</td><td>24</td><td>0</td><td>7</td><td>2.7</td><td>9字·3图</td></tr><tr><td>37</td><td>2025-04-09</td><td>高中</td><td>技术 / 项目</td><td>48</td><td>7</td><td>20</td><td>1.3</td><td>133字·9图·链接</td></tr><tr><td>38</td><td>2025-04-11</td><td>高中</td><td>城市 / 影像</td><td>37</td><td>0</td><td>16</td><td>1.1</td><td>60字·9图</td></tr><tr><td>39</td><td>2025-05-14</td><td>高中</td><td>校园 / 成长</td><td>47</td><td>1</td><td>22</td><td>1.3</td><td>70字·1图</td></tr><tr><td>40</td><td>2025-05-19</td><td>高中</td><td>校园 / 成长</td><td>43</td><td>8</td><td>20</td><td>1.7</td><td>0字·1图</td></tr><tr><td>41</td><td>2025-06-13</td><td>高中</td><td>旅行 / 自然</td><td>63</td><td>3</td><td>30</td><td>1.2</td><td>90字·6图</td></tr><tr><td>42</td><td>2026-04-16</td><td>高中</td><td>校园 / 成长</td><td>69</td><td>28</td><td>27</td><td>4.7</td><td>77字·4图</td></tr><tr><td>43</td><td>2026-07-23</td><td>高中</td><td>城市 / 影像</td><td>48</td><td>8</td><td>23</td><td>1.0</td><td>11字·9图</td></tr><tr><td>44</td><td>2026-09-11</td><td>大学</td><td>城市 / 影像</td><td>61</td><td>8</td><td>41</td><td>0.5</td><td>74字·9图</td></tr><tr><td>45</td><td>2026-09-26</td><td>大学</td><td>技术 / 项目</td><td>39</td><td>7</td><td>23</td><td>0.9</td><td>684字·无图·链接</td></tr><tr><td>46</td><td>2026-10-11</td><td>大学</td><td>技术 / 项目</td><td>18</td><td>8</td><td>10</td><td>0.6</td><td>120字·无图·链接</td></tr><tr><td>47</td><td>2026-10-31</td><td>大学</td><td>长文 / 月报</td><td>61</td><td>7</td><td>36</td><td>0.6</td><td>1395字·6图·链接</td></tr></tbody></table></div>
+<p> 注：#29 为 2023-12-31 16:46 的重复空帖，已剔除；4 次自赞已从对应帖子中剔除。形式列中的“字”为正文 Unicode 字符数，“图”为图片数，“链接”表示正文含 http(s) URL。</p>
+<h2>附录 B：全历史点赞次数 Top 15 的首赞与末赞</h2>
+<p><strong>表 B1.</strong> 全历史点赞次数最多的 15 位及其首赞/末赞。首/末赞按动作时间排序；帖子日期可能早于动作时间。关系=最早阶段。 </p>
+<div class="table-scroll"><table><thead><tr><th>#</th><th>姓名</th><th>总赞</th><th>首赞</th><th>阶段</th><th>末赞</th><th>阶段</th><th>关系</th></tr></thead><tbody><tr><td>1</td><td>UP</td><td>33</td><td>#2<br>2018-06</td><td>小学</td><td>#47<br>2026-10</td><td>大学</td><td>小学</td></tr><tr><td>2</td><td>ZZD</td><td>32</td><td>#13<br>2021-05</td><td>初中</td><td>#47<br>2026-10</td><td>大学</td><td>初中</td></tr><tr><td>3</td><td>MUZ</td><td>29</td><td>#14<br>2021-05</td><td>初中</td><td>#47<br>2026-10</td><td>大学</td><td>初中</td></tr><tr><td>4</td><td>ZSI</td><td>28</td><td>#13<br>2021-05</td><td>初中</td><td>#44<br>2026-09</td><td>大学</td><td>初中</td></tr><tr><td>5</td><td>XAZ</td><td>25</td><td>#20<br>2022-05</td><td>初中</td><td>#47<br>2026-10</td><td>大学</td><td>初中</td></tr><tr><td>6</td><td>TYZ</td><td>24</td><td>#13<br>2021-05</td><td>初中</td><td>#42<br>2026-04</td><td>高中</td><td>初中</td></tr><tr><td>7</td><td>MZY</td><td>23</td><td>#14<br>2021-05</td><td>初中</td><td>#42<br>2026-04</td><td>高中</td><td>初中</td></tr><tr><td>8</td><td>MIX</td><td>22</td><td>#15<br>2021-06</td><td>初中</td><td>#47<br>2026-10</td><td>大学</td><td>初中</td></tr><tr><td>9</td><td>MSK</td><td>20</td><td>#10<br>2020-03</td><td>小学</td><td>#47<br>2026-10</td><td>大学</td><td>小学</td></tr><tr><td>10</td><td>UGL</td><td>20</td><td>#21<br>2022-07</td><td>初中</td><td>#47<br>2026-10</td><td>大学</td><td>初中</td></tr><tr><td>11</td><td>TIX</td><td>19</td><td>#31<br>2024-08</td><td>高中</td><td>#47<br>2026-10</td><td>大学</td><td>高中</td></tr><tr><td>12</td><td>AKK</td><td>19</td><td>#16<br>2022-01</td><td>初中</td><td>#42<br>2026-04</td><td>高中</td><td>初中</td></tr><tr><td>13</td><td>TYS</td><td>18</td><td>#26<br>2023-10</td><td>高中</td><td>#47<br>2026-10</td><td>大学</td><td>高中</td></tr><tr><td>14</td><td>ZAK</td><td>18</td><td>#27<br>2023-12</td><td>高中</td><td>#47<br>2026-10</td><td>大学</td><td>高中</td></tr><tr><td>15</td><td>MNZ</td><td>18</td><td>#27<br>2023-12</td><td>高中</td><td>#47<br>2026-10</td><td>大学</td><td>高中</td></tr></tbody></table></div>
+<h2>附录 C：编码规则</h2>
+<ul>
+<li><strong>长文/月报</strong>：年度总结、站点月报、以完整叙事为主的长文。</li>
+<li><strong>城市/影像</strong>：城市摄影、骑行、季节影像，文字多为短句或图注。</li>
+<li><strong>技术/项目</strong>：软件发布、项目/站点更新、开发月报。</li>
+<li><strong>旅行/自然</strong>：登山、旅行、自然风景。</li>
+<li><strong>校园/成长</strong>：课程实验、校园建筑、演出/活动、考试与成长反思。</li>
+</ul>
+<p>编码为人工单编码，优先看正文主题；图文并茂时以文字主题为准。跨主题动态按主要篇幅归类。学校阶段由群聊名称中的小学、初中、高中、大学相关关键词推断；多阶段时取最早阶段。</p></article></main>
+</div>
+
+<footer><span>© <span id="year"></span> x1shang</span><span>文字、代码，与生活的切片。</span><a href="#home">回到山间 ↑</a></footer>
+
+<section id="player" class="player glass" aria-label="音乐播放器" hidden>
+ <img id="now-cover" class="now-cover" alt="" referrerpolicy="no-referrer" hidden>
+ <div class="player-transport" role="group" aria-label="播放控制">
+  <button type="button" id="prev-track" class="player-btn" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6z"/><path d="M19 5.5v13L8.6 12z"/></svg></button>
+  <button type="button" id="play-toggle" class="player-play" aria-label="播放" title="播放"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.4v13.2L19 12z"/></svg></button>
+  <button type="button" id="next-track" class="player-btn" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5h2.4v13H16z"/><path d="M5 5.5v13L15.4 12z"/></svg></button>
+ </div>
+ <div class="player-copy"><strong id="now-title"></strong><span id="now-lyric">等待播放</span></div>
+ <span id="time">0:00 / 0:00</span>
+ <input id="seek" type="range" min="0" max="100" value="0" aria-label="播放进度">
+ <button type="button" id="play-mode" class="player-btn" aria-label="播放模式：顺序播放（点击切换）" title="播放模式：顺序播放（点击切换）"></button>
+ <span id="play-mode-tip" class="player-mode-tip" role="status" aria-live="polite"></span>
+ <button type="button" id="close-player" class="player-btn player-close" aria-label="停止并关闭" title="停止并关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z"/></svg></button>
+</section>
+<audio id="audio" preload="metadata"></audio>
+
+<dialog id="photo-dialog"><button id="close-photo" aria-label="关闭照片">×</button><figure><img id="large-photo" alt=""><figcaption id="photo-caption"></figcaption></figure></dialog>
+
+<!-- 常驻底栏：命令行样式的全站检索 -->
+<form class="dock" id="dock" role="search" aria-label="全站检索">
+ <div class="dock-line">
+  <button type="button" class="dock-prompt" id="command-toggle" aria-label="进入命令模式" aria-pressed="false">&gt;</button>
+  <input id="dock-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="全站检索：标题 / 正文 / 标签 / 照片 / 音乐 / 友链…" aria-label="全站检索" aria-expanded="false" aria-controls="dock-results" role="combobox">
+  <span class="dock-hint" id="dock-hint" aria-label="Tips">/ 命令模式 · ↑↓ 选择 · Enter 打开</span>
+  <button type="button" id="theme-toggle" aria-label="切换暗色模式" aria-pressed="false" title="切换主题；命令 theme system 跟随系统">☾</button>
+  <button type="button" id="language-toggle" aria-label="Switch to English" title="Switch to English" lang="en">EN</button>
+ </div>
+ <div class="dock-results" id="dock-results" role="listbox" aria-label="检索结果" hidden></div>
+</form>
+
+<script src="../../content.js?v=ebb77046"></script>
+<script src="../../content.auto.js?v=05ac7a03"></script>
+<script src="../../render.js?v=3638a688"></script>
+<script src="../../terminal.js?v=958556a3"></script>
+<script src="../../app.js?v=703ca6f1"></script>
+<!-- GoatCounter：文章 / 断言 / 论文的「热度」= 访客总量，就是靠它按真实路径记账的。
+     去 goatcounter.com 注册一个免费站点，把短代码填到下面；不填的话热度恒为 0（排序退化成按时间）。
+     注意脚本地址用的是 static.goatcounter.com 而不是官方文档里的 gc.zgo.at：
+     实测 gc.zgo.at / static.zgo.at 在国内 DNS 不解析（连 GoatCounter 后台自己的 JS 都加载不出来），
+     而 static.goatcounter.com 是同一个 count.js 的可达镜像（2026-10-11 实测 200 / 9213 B）。 -->
+<script data-goatcounter="https://x1shang.goatcounter.com/count" async src="//static.goatcounter.com/count.js"></script>
+<!-- 自建统计（Phase 2，计划 §5.2 第 6 步）：beacon 由自己的 Worker 托管（stat.x1shang.top = Workers + D1），
+     精确计数、无采样、数据在自己库里。**与上面的 GoatCounter 双跑 2 周**（§6.1），退役前两者都留着。
+     口径是「页面浏览量（PV）」不是「访客数（UV）」，双跑期数值有差异是正常的。
+     这一行写在 index.html 就够：预渲染页（articles/*/index.html）是拿 index.html 当模板生成的（tools/build-content.mjs）。 -->
+<script defer src="https://stat.x1shang.top/s.js"></script>
+</body></html>

@@ -2,10 +2,10 @@
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
   "metric": "visits",
-  "updated": "2026-11-06T10:54:24.672Z",
+  "updated": "2026-11-06T20:56:01.163Z",
   "days": 30,
   "total": 440,
-  "allTime": 440,
+  "allTime": 441,
   "series": [
     {
       "d": "2026-10-08",
@@ -129,7 +129,7 @@
     }
   ],
   "pages": {
-    "/": 310,
+    "/": 311,
     "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A": 13,
     "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB": 12,
     "/academic/test-paper": 11,

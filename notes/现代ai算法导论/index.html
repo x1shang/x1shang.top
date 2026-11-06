@@ -75,13 +75,106 @@
 <li>要素：状态，动作，转移，代价，目标</li>
 <li>举例：CSP（类似数独的约束问题），概率推理，机器学习</li>
 </ul></li>
+</ul>
+<p>本节常见符号：</p>
+<table>
+<thead>
+<tr><th>符号</th><th>解释</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="math-inline">$x_i,y_i,\hat y_i$</span></td><td>第 <span class="math-inline">$i$</span> 条样本的输入、正确答案、模型预测</td></tr>
+<tr><td><span class="math-inline">$n,d$</span></td><td>样本数量、每条样本有多少个输入特征</td></tr>
+<tr><td><span class="math-inline">$\theta$</span></td><td>可训练参数矩阵(向量)；可以包含权重 <span class="math-inline">$w,W$</span> 和偏置 <span class="math-inline">$b$</span></td></tr>
+<tr><td><span class="math-inline">$f_\theta(x)$</span></td><td>用参数 <span class="math-inline">$\theta$</span> 的模型处理输入 <span class="math-inline">$x$</span></td></tr>
+<tr><td><span class="math-inline">$\|x-c\|_2^2$</span></td><td>平方距离</td></tr>
+<tr><td><span class="math-inline">$\arg\min_\theta J(\theta)$</span></td><td>找出让 <span class="math-inline">$J$</span> 最小的参数；结果是参数，不是最小损失值</td></tr>
+<tr><td><span class="math-inline">$\mathbb E$</span></td><td>按发生概率加权的平均</td></tr>
+<tr><td><span class="math-inline">$\eta$</span></td><td>学习率，控制每次更新幅度</td></tr>
+<tr><td><span class="math-inline">$\leftarrow$</span></td><td>程序赋值</td></tr>
+</tbody>
+</table>
+<h2>1.0 训练一个模型：损失、泛化</h2>
+<p><strong>Loss&amp;Generalization</strong></p>
+<div class="math-block">$
+\text{损失：}J(\theta)=\frac1n\sum_{i=1}^n\ell\bigl(y_i,f_\theta(x_i)\bigr).
+$</div>
+<p><span class="math-inline">$\ell$</span> 就是损失函数，常见以下几种：</p>
+<table>
+<thead>
+<tr><th>损失</th><th>公式</th><th>解释</th></tr>
+</thead>
+<tbody>
+<tr><td>平方损失</td><td><span class="math-inline">$(\hat y-y)^2$</span></td><td>大错误罚得特别重。和除以n就得到MSE均方误差。</td></tr>
+<tr><td>绝对损失</td><td><span class="math-inline">$\lvert  \hat y-y\rvert$</span></td><td>错多少罚多少，不让正负错误抵消</td></tr>
+<tr><td>零一损失</td><td><span class="math-inline">$\mathbf1[\hat y\ne y]$</span></td><td>分类错了记 1，对了记 0；不表示“差一点”和“差很多”</td></tr>
+<tr><td>对数损失</td><td><span class="math-inline">$-\log p_y$</span></td><td><span class="math-inline">$p_y$</span> 是模型给正确类别的概率；给正确答案的概率越小，惩罚越大</td></tr>
+</tbody>
+</table>
+<div class="math-block">$
+\text{泛化：}R(\theta)=\mathbb E_{(X,Y)\sim P}\bigl[\ell(Y,f_\theta(X))\bigr].
+$</div>
+<p>显然泛化指模型在没见过的新数据上，<strong>仍然能做好任务的能力</strong>。</p>
+<p>可能出现的问题：</p>
+<ul>
+<li><strong>欠拟合</strong>：规则太简单，或训练不足，练习题和新题都做不好。</li>
+<li><strong>过拟合</strong>：学到了训练数据的偶然细节，练习题表现很好，新题明显变差。模型更复杂会增加这种可能性，但并非必然过拟合。</li>
+</ul>
+<p>因此，我们通常把已有数据分开使用：</p>
+<ul>
+<li><strong>训练集</strong>：用于调整模型参数。</li>
+<li><strong>验证集</strong>：用于比较模型、调整训练方式或结构。</li>
+<li><strong>测试集</strong>：在模型确定后，用于评估它面对未参与训练和选择的数据时的表现。</li>
+</ul>
+<p><strong>评估我们的模型：</strong></p>
+<table>
+<thead>
+<tr><th>指标</th><th>公式</th><th>解释</th></tr>
+</thead>
+<tbody>
+<tr><td>MAE</td><td><span class="math-inline">$\frac1n\sum_i\lvert e_i\rvert$</span></td><td>平均错多少，单位与答案相同</td></tr>
+<tr><td>MSE</td><td><span class="math-inline">$\frac1n\sum_i e_i^2$</span></td><td>平均平方误差，更强调大错误</td></tr>
+<tr><td>RMSE</td><td><span class="math-inline">$\sqrt{\mathrm{MSE}}$</span></td><td>把平方单位还原，仍然强调大错误</td></tr>
+<tr><td>平均有符号误差</td><td><span class="math-inline">$\frac1n\sum_i e_i$</span></td><td>看整体偏高还是偏低；正负抵消，所以不是总体准确度</td></tr>
+<tr><td>MAPE</td><td><span class="math-inline">$\frac{100\%}{n}\sum_i\lvert e_i/y_i\rvert$</span></td><td>平均相对误差；<span class="math-inline">$y_i=0$</span> 时该式不可用，接近 0 也很敏感</td></tr>
+<tr><td><span class="math-inline">$R^2$</span></td><td><span class="math-inline">$1-\frac{\sum_i e_i^2}{\sum_i(y_i-\bar y)^2}$</span></td><td>和“总猜本组答案的均值”相比改善多少；可小于 0，分母为 0 时此式无定义</td></tr>
+</tbody>
+</table>
+<h1>第二讲 MachineLearning &amp; NeuralNetwork (MLNN)</h1>
+<p><strong>取舍</strong>：限于篇幅，以概念为主，对于具体的神经网络设计等涉及较少。</p>
+<ul>
 <li>机器学习
 <ul>
-<li>无监督学习：k-means(聚类)</li>
-<li>监督学习：回归、分类</li>
+<li>无监督学习：主要用于发现数据的规律
+<ul>
+<li>聚类(Clustering)</li>
+<li>降维(Dimentionality Reduction)</li>
+<li>异常检测(Anomaly Detection)</li>
+</ul></li>
+<li>监督学习：学习产生一个模型(函数)
+<ul>
+<li>回归(Regression, 样本连续)</li>
+<li>分类(Classification 样本离散)</li>
+</ul></li>
+<li>强化学习 (ReinforcementLearning)：奖励与惩罚-&gt;最像人类</li>
+<li>多任务学习：同时处理多个任务的数据</li>
+<li><strong>深度学习</strong>：<strong>通过神经网络拟合复杂函数，并借助大量样本和优化来学习参数</strong></li>
+<li><strong>神经架构搜索</strong>(NeuralArchitectureSearch, NAS)
+<ul>
+<li>参数学习：学习连接上的参数</li>
+<li>架构学习：学习网络应该如何连接(层、模块、组合)
+<ul>
+<li><strong>进化搜索</strong>：生成网络<span class="math-inline">$\to$</span>分别训练<span class="math-inline">$\to$</span>筛选结构<span class="math-inline">$\to$</span>调整结构，D.C. al Fine</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>神经网络
+<ul>
+<li>CNN</li>
+<li>RNN</li>
+<li>...</li>
 </ul></li>
 </ul>
-<h2>K-means</h2>
+<h2>2.1 K-means</h2>
 <div class="math-block">$
 \phi(\{x_i\},\{a_i\},\{c_k\}) = \sum_i \operatorname{dist}(x_i,c_{a_i})
 $</div>
@@ -104,24 +197,24 @@ $</div>
 <p>其中 <span class="math-inline">$n$</span> 是数据点的数量，<span class="math-inline">$\min$</span> 表示寻找使目标值尽可能小的分类方式和中心位置。</p>
 <p>如果 <span class="math-inline">$x_i=(x_{i1},x_{i2})$</span>，中心 <span class="math-inline">$c_{a_i}=(c_1,c_2)$</span>，那么平方欧氏距离是：</p>
 <div class="math-block">$
- \left\|x_i-c_{a_i}\right\|_2^2 = (x_{i1}-c_1)^2+(x_{i2}-c_2)^2 
+\left\|x_i-c_{a_i}\right\|_2^2 = (x_{i1}-c_1)^2+(x_{i2}-c_2)^2
 $</div>
 <p>例如点 <span class="math-inline">$(2,3)$</span> 到中心 <span class="math-inline">$(1,1)$</span> 的平方距离是：</p>
 <div class="math-block">$
- (2-1)^2+(3-1)^2=5 
+(2-1)^2+(3-1)^2=5
 $</div>
 <h3>这个公式怎么用？</h3>
 <p>通过反复交替执行两步，来降低上面的目标值：</p>
 <p><strong>第一步：固定中心，重新分组。</strong></p>
 <p>每个点被分给离它最近的中心：</p>
 <div class="math-block">$
- a_i=\underset{k\in\{1,\ldots,K\}}{\arg\min} \left\|x_i-c_k\right\|_2^2 
+a_i=\underset{k\in\{1,\ldots,K\}}{\arg\min} \left\|x_i-c_k\right\|_2^2
 $</div>
 <p>这里的 <span class="math-inline">$\arg\min$</span> 表示“使距离最小的那个 <span class="math-inline">$k$</span>”。例如，一个点离第 2 个中心最近，就令 <span class="math-inline">$a_i=2$</span>。</p>
 <p><strong>第二步：固定分组，重新计算中心。</strong></p>
 <p>对每个类别，把分到这一类的所有点取平均：</p>
 <div class="math-block">$
- c_k= \frac{1}{|C_k|} \sum_{i\in C_k}x_i, \qquad C_k=\{i:a_i=k\} 
+c_k= \frac{1}{|C_k|} \sum_{i\in C_k}x_i, \qquad C_k=\{i:a_i=k\}
 $</div>
 <p>然后重复“<strong>分给最近的中心 → 重新计算平均值</strong>”，直到点的类别不再变化。 这两步各自都不会让平方距离总和变大：第一步让每个点选择最近的中心，第二步让每类的中心移动到该类点的平均位置。不过，最终结果<strong>不一定是全局最优</strong>；初始中心选得不同，结果也可能不同。</p>
 <pre><code class="lang-python">import random
@@ -178,43 +271,86 @@ def kmeans(points, k, max_iter=300, random_state=None):
         previous_labels = labels
 
     return centers</code></pre>
-<h2>线性回归（linear Regression）：最小二乘法</h2>
+<h2>2.2 线性回归与最小二乘法</h2>
+<p><strong>Regression</strong></p>
 <p>模型学习到一个拟合函数，设计奖惩函数，根据近似程度做出反馈。 假设模型得到函数：</p>
 <div class="math-block">$
- \hat y=\theta_1x+\theta_2 
+\hat y=\theta_1x+\theta_2
 $</div>
 <p>假设我们有 <span class="math-inline">$n$</span> 组历史数据：</p>
 <div class="math-block">$
- (x_1,y_1),(x_2,y_2),\ldots,(x_n,y_n) 
+(x_1,y_1),(x_2,y_2),\ldots,(x_n,y_n)
 $</div>
 <p>对于第 <span class="math-inline">$i$</span> 组数据，预测误差是：</p>
 <div class="math-block">$
- \hat y_i-y_i 
+\hat y_i-y_i
 $</div>
 <p>损失：</p>
 <div class="math-block">$
- L(\theta_1,\theta_2) = \sum_{i=1}^{n} (\theta_1x_i+\theta_2-y_i)^2 
+L(\theta_1,\theta_2) = \sum_{i=1}^{n} (\theta_1x_i+\theta_2-y_i)^2
 $</div>
-<p>这里是平方损失惩罚，除此之外，常见的还有以下几种：</p>
-<table>
-<thead>
-<tr><th>损失</th><th>公式</th><th>解释</th></tr>
-</thead>
-<tbody>
-<tr><td>平方损失</td><td><span class="math-inline">$(\hat y-y)^2$</span></td><td>大错误罚得特别重。和除以n就得到MSE均方误差。</td></tr>
-<tr><td>绝对损失</td><td><span class="math-inline">$\lvert  \hat y-y\rvert$</span></td><td>错多少罚多少，不让正负错误抵消</td></tr>
-<tr><td>零一损失</td><td><span class="math-inline">$\mathbf1[\hat y\ne y]$</span></td><td>分类错了记 1，对了记 0；不表示“差一点”和“差很多”</td></tr>
-<tr><td>对数损失</td><td><span class="math-inline">$-\log p_y$</span></td><td><span class="math-inline">$p_y$</span> 是模型给正确类别的概率；给正确答案的概率越小，惩罚越大</td></tr>
-</tbody>
-</table>
-<p>使得损失最小的过程就是最小二乘法：</p>
+<p>使得损失最小的过程就是<em>最小二乘法</em>：</p>
 <div class="math-block">$
- \boxed{ \min_{\theta} L(\theta) = \min_{\theta} \sum_{i=1}^{n}(f_i^{T}\theta-y_i)^2 } 
+\boxed{ \min_{\theta} L(\theta) = \min_{\theta} \sum_{i=1}^{n}(f_i^{T}\theta-y_i)^2 }
 $</div>
 <p>求最小二乘解： 对原函数求导：<span class="math-inline">$\nabla L(\theta)=0$</span> 矩阵可逆的情况下：一种闭式解</p>
 <div class="math-block">$
- \boxed{\theta=(X^TX)^{-1}X^Ty} 
+\boxed{\theta=(X^TX)^{-1}X^Ty}
 $</div>
+<h2>2.3 分类与线性分类器</h2>
+<p><strong>Classification&amp;LinearClassifiers</strong></p>
+<p>训练数据可以写成<span class="math-inline">$(f_1,y_1),(f_2,y_2),\ldots,(f_n,y_n)$</span> 这里：</p>
+<ul>
+<li><span class="math-inline">$f_i$</span> 是第 <span class="math-inline">$i$</span> 个样本的<strong>特征</strong>，即用来判断的信息。例如邮件的特征可以包括有没有某些词、链接数量等。</li>
+<li><span class="math-inline">$y_i$</span> 是这个样本的<strong>标签</strong>，例如“垃圾邮件”或“正常邮件”。</li>
+<li><span class="math-inline">$n$</span> 是训练样本的数量。</li>
+</ul>
+<p>学习算法利用这些带标签的数据，得到一个分类模型。将来遇到一封<strong>没有见过的新邮件</strong>时，模型根据它的特征预测标签。</p>
+<p>对于最简单的二分类情况（正常邮件/垃圾邮件），标签显然可以简记为<span class="math-inline">$\{-1,1\}$</span>,此时使用<strong>线性分类器</strong> （<span class="math-inline">$\theta$</span>是权重向量，f是输入的特征向量）</p>
+<div class="math-block">$
+h(f)=\theta^Tf+\underset{\text{偏置}}{b}
+$</div>
+<p><span class="math-inline">$h(f)$</span>的正负就代表了数据点的类别。 同样的，任务就是通过机器学习找到最佳的<span class="math-inline">$\theta$</span>和<span class="math-inline">$b$</span></p>
+<h2>2.4 神经网络</h2>
+<p><strong>NeuralNetwork</strong></p>
+<p>可是我们会遇到线性分类器无法处理的情况 <img src="../../assets/notes/modern-ai-introduction/linear-separability.png" alt="线性可分与线性不可分的示例" loading="lazy"></p>
+<p>对于后两个图的情况，我们就需要应用非线性变换去解决。神经网络通过多层计算和非线性激活函数，适合学习非线性的复杂模型。</p>
+<p>仍然以这个分类举例，一个神经元可以是：</p>
+<div class="math-block">$
+\begin{aligned}
+\text{output}=&amp;\underset{\text{激活函数}}{g}\left(\underset{\text{预激活值}}{h(f)}\right)\\
+\text{其中，预激活值可以表达为 }z=&amp;h(f)=Wx+b
+\end{aligned}
+$</div>
+<ul>
+<li>g是激活函数，例如正负值做区分。但是它更经常用来引入非线性，例如它还有以下这些种类 <img src="../../assets/notes/modern-ai-introduction/activation-functions.png" alt="常见激活函数及其图像" loading="lazy"></li>
+<li>进一步，神经网络由输入层、隐藏层、输出层组成。</li>
+</ul>
+<h3>卷积神经网(CNN)</h3>
+<p><strong>ConvolutionalNeuralNetwork</strong></p>
+<ul>
+<li>局部连接(滤波器)+参数共享</li>
+<li>2012年，FeiFei Li创办的ILSVRC大赛中AlexNet凭借着一张极其精巧的CNN使得图片识别模型能力得到大幅提升。</li>
+</ul>
+<h3>循环神经网(RNN)</h3>
+<p><strong>RecurrentNeuralNetwork</strong></p>
+<ul>
+<li>拥有“缓存”，关注顺序，传递状态</li>
+<li>RNN 必须一步步往前算，长距离信息容易衰减、也没法并行；LLM所用的<strong><em>Transformer</em></strong> 网络用自注意力让任意两个位置直接相连，代价是计算量随长度平方增长。</li>
+</ul>
+<p>例如句子“我昨天去图书馆借了一本书。”被RNN视为一个序列，要理解后面的“书”，前面的“图书馆”“借”都可能有帮助。处理时间序列时也是一样：预测下一个时刻，可能需要参考之前发生过什么。</p>
+<p>RNN 的思路是：每处理一个新输入，同时参考前一步留下的<strong>隐藏状态</strong>。</p>
+<p>一个简化公式是：</p>
+<div class="math-block">$
+\boxed{h_t=g(W_xx_t+W_hh_{t-1}+b)}
+$</div>
+<p>其中：</p>
+<ul>
+<li><span class="math-inline">$x_t$</span>：第 <span class="math-inline">$t$</span> 步的新输入，例如当前的词。</li>
+<li><span class="math-inline">$h_{t-1}$</span>：上一步的隐藏状态，携带之前序列的信息。</li>
+<li><span class="math-inline">$h_t$</span>：结合当前输入和之前状态后得到的新状态。</li>
+<li><span class="math-inline">$W_x,W_h,b$</span>：需要训练的参数。</li>
+</ul>
 <hr>
 <p>© 2026 x1shang。除另有注明外，本笔记中的原创内容采用 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hans" target="_blank" rel="noopener noreferrer">知识共享署名 4.0 国际许可协议（CC BY 4.0）</a>授权。转载或改编时，请合理署名、附上原文及协议链接，并标明修改情况。第三方材料的权利归其各自权利人所有。</p></article></main>
 </div>
@@ -252,7 +388,7 @@ $</div>
 </form>
 
 <script src="../../content.js?v=ebb77046"></script>
-<script src="../../content.auto.js?v=05ac7a03"></script>
+<script src="../../content.auto.js?v=337b325f"></script>
 <script src="../../render.js?v=3638a688"></script>
 <script src="../../terminal.js?v=958556a3"></script>
 <script src="../../app.js?v=703ca6f1"></script>

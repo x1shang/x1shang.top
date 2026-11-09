@@ -41,20 +41,6 @@
  <div class="landscape"><img class="mountain" src="assets/mountain.jpg" alt="蓝天下的雪山与云海"><h1>x1shang</h1><img class="foreground" src="assets/mountain.jpg" alt="" aria-hidden="true"></div>
  <div class="hero-top"><a href="#home" class="wordmark">x1 /</a><span>A PERSONAL SPACE</span><a href="#content" class="explore">向下探索 ↘</a></div>
  <div class="hero-caption">山有轮廓，思绪没有。<span>THOUGHTS BEYOND THE HORIZON</span></div>
-<!-- home-only:start -->
-<!-- 11.11 · 悼念（姥爷忌日）：首页灰度 + 换标语，北京时间 00:00 上线 / 23:59 下线。
-     由 .github/workflows/memorial-1111.yml 自动开关（tools/memorial.mjs 写入）；
-     整段包在 home-only 里，tools/build-content.mjs 生成子页时会剔除，子页面不受影响。 -->
-<style>
-/* 灰度逐块加在 body 的直接子元素上：不能加在 html / body 上，
-   否则 position:fixed 的底栏与播放器会被拽成随页面滚动 */
-body:not(.reading)>*{filter:grayscale(1)}
-/* 原标语让位给悼念文案；子页面、以及首页里打开的文章/论文阅读视图都带 body.reading，不显示悼念文案 */
-body:not(.reading) .hero .hero-caption:not(.memorial){display:none}
-body.reading .hero-caption.memorial{display:none}
-</style>
-<div class="hero-caption memorial">谨致哀思，永怀不忘<span>In loving memory of my grandfather</span></div>
-<!-- home-only:end -->
  <aside class="identity glass">
   <span class="card-label">HELLO, WORLD <span>↗</span></span>
   <strong>x1shang<span class="status-dot"></span></strong>

@@ -40,7 +40,7 @@ body:not(.reading)>*{filter:grayscale(1)}
 body:not(.reading) .hero .hero-caption:not(.memorial){display:none}
 body.reading .hero-caption.memorial{display:none}
 </style>
-<div class="hero-caption memorial">谨致哀思，永怀不忘<span>In loving memories of my grandfather</span></div>
+<div class="hero-caption memorial">谨致哀思，永怀不忘<span>In loving memory of my grandfather</span></div>
 ${END}`;
 
 /* 插在原标语那一行之后（原标语必须留着：撤下时它就是最终态） */

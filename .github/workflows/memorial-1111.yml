@@ -1,6 +1,6 @@
 name: memorial-1111
 
-# 11.11（姥爷忌日）悼念模式：首页灰度 + hero 标语换成「谨致哀思，永怀不忘 / In loving memories of my grandfather」。
+# 11.11（姥爷忌日）悼念模式：首页灰度 + hero 标语换成「谨致哀思，永怀不忘 / In loving memory of my grandfather」。
 # 北京时间 00:00 上线、23:59 下线；**只改首页 index.html，子页面不动**。
 #
 # 时区（核对：中国标准时间 UTC+8，全年无夏令时，所以是固定换算，不会漂）：

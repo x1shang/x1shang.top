@@ -1,8 +1,8 @@
 {
   "source": "selfhosted",
-  "exported": "2026-11-02T12:34:29.002Z",
+  "exported": "2026-11-09T12:59:01.098Z",
   "schema": "hits(day TEXT, path TEXT, n INTEGER)",
-  "rows": 64,
+  "rows": 95,
   "data": [
     {
       "day": "2026-10-16",
@@ -267,7 +267,12 @@
     {
       "day": "2026-11-02",
       "path": "/",
-      "n": 37
+      "n": 40
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/academic/moments-likes-three-years",
+      "n": 2
     },
     {
       "day": "2026-11-02",
@@ -322,6 +327,156 @@
     {
       "day": "2026-11-02",
       "path": "/articles/september-report",
+      "n": 1
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/assertions/midnight",
+      "n": 1
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/assertions/testingai",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/",
+      "n": 29
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/academic/moments-likes-three-years",
+      "n": 7
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%8F%91%E4%B8%80%E7%82%B9%E5%85%89%E7%85%A7%E4%B8%80%E6%AE%B5%E8%B7%AF",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%9B%9E%E7%94%98-%E4%BA%8C%E7%A8%BF",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E8%BF%99-%E6%89%8D%E6%98%AF%E6%9C%80%E4%BD%93%E9%9D%A2%E7%9A%84",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E9%82%A3%E4%BA%9B%E6%B8%A9%E6%9A%96%E7%9A%84%E5%8D%B0%E8%AE%B0",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E9%82%A3%E4%BA%9B%E7%BE%8E%E4%B8%BD%E7%9A%84%E6%A1%83%E8%8A%B1",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/october-report",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/assertions/testingai",
+      "n": 2
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/",
+      "n": 11
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/academic/moments-likes-three-years",
+      "n": 3
+    },
+    {
+      "day": "2026-11-05",
+      "path": "/",
+      "n": 2
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/",
+      "n": 6
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/academic/moments-likes-three-years",
+      "n": 1
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/notes/%E7%8E%B0%E4%BB%A3ai%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA",
+      "n": 1
+    },
+    {
+      "day": "2026-11-07",
+      "path": "/",
+      "n": 6
+    },
+    {
+      "day": "2026-11-07",
+      "path": "/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0",
+      "n": 1
+    },
+    {
+      "day": "2026-11-08",
+      "path": "/",
+      "n": 8
+    },
+    {
+      "day": "2026-11-08",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/",
+      "n": 11
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/academic/two-points-to-the-goal",
+      "n": 5
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 2
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/assertions/shenxincheng",
       "n": 1
     }
   ],
@@ -565,7 +720,12 @@
     {
       "day": "2026-11-02",
       "path": "/",
-      "n": 21
+      "n": 24
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/academic/moments-likes-three-years",
+      "n": 1
     },
     {
       "day": "2026-11-02",
@@ -620,6 +780,156 @@
     {
       "day": "2026-11-02",
       "path": "/articles/september-report",
+      "n": 1
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/assertions/midnight",
+      "n": 1
+    },
+    {
+      "day": "2026-11-02",
+      "path": "/assertions/testingai",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/",
+      "n": 9
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/academic/moments-likes-three-years",
+      "n": 2
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%8F%91%E4%B8%80%E7%82%B9%E5%85%89%E7%85%A7%E4%B8%80%E6%AE%B5%E8%B7%AF",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%9B%9E%E7%94%98-%E4%BA%8C%E7%A8%BF",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E5%A4%A7%E5%8C%97%E7%BA%BF%E8%87%AA%E9%A9%BE",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E8%BF%99-%E6%89%8D%E6%98%AF%E6%9C%80%E4%BD%93%E9%9D%A2%E7%9A%84",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E9%82%A3%E4%BA%9B%E6%B8%A9%E6%9A%96%E7%9A%84%E5%8D%B0%E8%AE%B0",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/%E9%82%A3%E4%BA%9B%E7%BE%8E%E4%B8%BD%E7%9A%84%E6%A1%83%E8%8A%B1",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/articles/october-report",
+      "n": 1
+    },
+    {
+      "day": "2026-11-03",
+      "path": "/assertions/testingai",
+      "n": 2
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/",
+      "n": 8
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-04",
+      "path": "/academic/moments-likes-three-years",
+      "n": 3
+    },
+    {
+      "day": "2026-11-05",
+      "path": "/",
+      "n": 2
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/",
+      "n": 5
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/academic/moments-likes-three-years",
+      "n": 1
+    },
+    {
+      "day": "2026-11-06",
+      "path": "/notes/%E7%8E%B0%E4%BB%A3ai%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA",
+      "n": 1
+    },
+    {
+      "day": "2026-11-07",
+      "path": "/",
+      "n": 5
+    },
+    {
+      "day": "2026-11-07",
+      "path": "/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0",
+      "n": 1
+    },
+    {
+      "day": "2026-11-08",
+      "path": "/",
+      "n": 6
+    },
+    {
+      "day": "2026-11-08",
+      "path": "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81",
+      "n": 1
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/",
+      "n": 5
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/academic/two-points-to-the-goal",
+      "n": 3
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A",
+      "n": 1
+    },
+    {
+      "day": "2026-11-09",
+      "path": "/assertions/shenxincheng",
       "n": 1
     }
   ],

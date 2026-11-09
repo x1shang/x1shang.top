@@ -55,10 +55,24 @@ jobs:
         with:
           node-version: '20'
 
+      # 先按「是谁触发的」定目标状态：零点那次一定 on、23:59 那次一定 off。
+      # 不靠脚本里的时间窗口来区分这两次——万一定时任务早跑几秒，窗口判定会把它当成「还不用下线」，
+      # 结果灰度顶到第二天中午；直接认 cron 字符串就不会有这种含糊。
+      - name: 判定本次要开还是关
+        id: plan
+        run: |
+          case "${{ github.event.schedule }}" in
+            "0 16 10 11 *")  state=on ;;    # 11-11 00:00 CST
+            "59 15 11 11 *") state=off ;;   # 11-11 23:59 CST
+            *)               state="${{ github.event.inputs.state || 'auto' }}" ;;  # 每日守护 / 手动
+          esac
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          echo "本次目标：$state"
+
       - name: 按北京时间判断并应用（幂等）
         id: toggle
         env:
-          STATE: ${{ github.event.inputs.state || 'auto' }}
+          STATE: ${{ steps.plan.outputs.state }}
         run: node tools/memorial.mjs --state "$STATE"
 
       - name: 有变化就提交（推 main 即触发 Pages 重建）

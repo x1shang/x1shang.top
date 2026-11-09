@@ -29,8 +29,9 @@ on:
       state:
         description: 'auto = 按北京时间判断（11.11 开，其余关）｜on = 强制上线｜off = 强制下线'
         type: choice
-        options: [auto, on, off]
-        default: auto
+        # 三个值都要加引号：YAML 会把裸 on / off 当成布尔值（GitHub 的 dispatch 接口会拒收）
+        options: ['auto', 'on', 'off']
+        default: 'auto'
 
 permissions:
   contents: write

@@ -7,11 +7,13 @@ name: memorial-1111
 #   11-11 00:00 CST = 11-10 16:00 UTC  →  cron '0 16 10 11 *'
 #   11-11 23:59 CST = 11-11 15:59 UTC  →  cron '59 15 11 11 *'
 #
-# 两个 cron 只是「触发器」，开/关由 tools/memorial.mjs 按北京时间判断（窗口 = 11-11 00:00 ≤ now < 23:59）：
-#   · 窗口内 → 在 index.html 插入 <!-- home-only:start -->…<!-- home-only:end --> 区块（灰度 + 悼念文案）
-#   · 窗口外 → 删掉这个区块
-# 于是重跑、被 GitHub 延后几分钟、手动触发，结果都一致（幂等），也不会出现「忘了下线」。
-# 守护 cron 每天 12:00 CST 再兜一次底：万一 23:59 那次失败/被跳过，第二天中午一定把灰度收掉。
+# 怎么判定开还是关：
+#   · 零点那次 cron → 一律 on；23:59 那次 cron → 一律 off（按触发它的 cron 字符串认，不含糊）
+#   · 每天 12:00 的守护 cron、以及手动触发 → 交给 tools/memorial.mjs 按北京时间判断
+#                                           （窗口 = 11-11 00:00 ≤ now < 23:59）
+# on = 在 index.html 插入 <!-- home-only:start -->…<!-- home-only:end --> 区块（灰度 + 悼念文案）；
+# off = 删掉这个区块。所以重跑、被 GitHub 延后几分钟、手动触发，结果都一致（幂等），
+# 也不会出现「忘了下线」：守护 cron 每天中午在窗口外会把漏下的灰度收掉。
 #
 # 子页面为什么不受影响：区块整段包在 home-only 里，tools/build-content.mjs 以 index.html 为模板
 # 生成预渲染页时会整段剔除（CSS 也另有一道 body:not(.reading) 的闸）。

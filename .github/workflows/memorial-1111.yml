@@ -1,0 +1,78 @@
+name: memorial-1111
+
+# 11.11（姥爷忌日）悼念模式：首页灰度 + hero 标语换成「谨致哀思，永怀不忘 / In loving memories of my grandfather」。
+# 北京时间 00:00 上线、23:59 下线；**只改首页 index.html，子页面不动**。
+#
+# 时区（核对：中国标准时间 UTC+8，全年无夏令时，所以是固定换算，不会漂）：
+#   11-11 00:00 CST = 11-10 16:00 UTC  →  cron '0 16 10 11 *'
+#   11-11 23:59 CST = 11-11 15:59 UTC  →  cron '59 15 11 11 *'
+#
+# 两个 cron 只是「触发器」，开/关由 tools/memorial.mjs 按北京时间判断（窗口 = 11-11 00:00 ≤ now < 23:59）：
+#   · 窗口内 → 在 index.html 插入 <!-- home-only:start -->…<!-- home-only:end --> 区块（灰度 + 悼念文案）
+#   · 窗口外 → 删掉这个区块
+# 于是重跑、被 GitHub 延后几分钟、手动触发，结果都一致（幂等），也不会出现「忘了下线」。
+# 守护 cron 每天 12:00 CST 再兜一次底：万一 23:59 那次失败/被跳过，第二天中午一定把灰度收掉。
+#
+# 子页面为什么不受影响：区块整段包在 home-only 里，tools/build-content.mjs 以 index.html 为模板
+# 生成预渲染页时会整段剔除（CSS 也另有一道 body:not(.reading) 的闸）。
+#
+# 提前预览：Actions → memorial-1111 → Run workflow → state=on；看完再跑一次 state=off（或 state=auto）。
+# 本地预览：node tools/memorial.mjs --state on / --state off（不带 --state 就是按日期自动判断）。
+
+on:
+  schedule:
+    - cron: '0 16 10 11 *'   # 11-11 00:00 (UTC+8)：上线
+    - cron: '59 15 11 11 *'  # 11-11 23:59 (UTC+8)：下线
+    - cron: '0 4 * * *'      # 每天 12:00 (UTC+8)：窗口外自愈（该下线就下线，不该上线就不动）
+  workflow_dispatch:
+    inputs:
+      state:
+        description: 'auto = 按北京时间判断（11.11 开，其余关）｜on = 强制上线｜off = 强制下线'
+        type: choice
+        options: [auto, on, off]
+        default: auto
+
+permissions:
+  contents: write
+
+concurrency:
+  group: memorial-1111
+  cancel-in-progress: false
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 按北京时间判断并应用（幂等）
+        id: toggle
+        env:
+          STATE: ${{ github.event.inputs.state || 'auto' }}
+        run: node tools/memorial.mjs --state "$STATE"
+
+      - name: 有变化就提交（推 main 即触发 Pages 重建）
+        if: steps.toggle.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "index.html 没有实际变化，不提交"
+            exit 0
+          fi
+          git commit -m "chore(memorial): 11.11 悼念首页 ${{ steps.toggle.outputs.mode }} @ $(date -u +%Y-%m-%dT%H:%MZ)"
+          # 和 stats 定时任务撞车时自动重试一次（两边改的不是同一批文件，rebase 安全）
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "第 $i 次推送失败，拉取后重试" >&2
+            git pull --rebase --autostash
+          done
+          echo "::error::三次推送都失败"
+          exit 1

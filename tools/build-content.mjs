@@ -482,7 +482,12 @@ if (indexHtml !== indexRaw) {
   await writeFile(indexFile, indexHtml, 'utf8');
   log('✅ index.html 静态资源版本戳已刷新（?v=内容哈希）');
 }
-const template = indexHtml;
+/* 首页专属区块：<!-- home-only:start -->…<!-- home-only:end -->
+   以 index.html 当模板生成子页时整段剔掉。首页上的一次性 / 季节性改动（例如 11.11 的灰度悼念，
+   由 tools/memorial.mjs 写入）不能跟着模板漏进每一个子页面。 */
+const HOME_ONLY_BLOCK = /[ \t]*<!-- home-only:start[^>]*-->[\s\S]*?<!-- home-only:end[^>]*-->[ \t]*\r?\n?/g;
+const template = indexHtml.replace(HOME_ONLY_BLOCK, '');
+if (/home-only:start/.test(template)) log('⚠️  index.html 的 home-only 区块没闭合（缺 home-only:end），子页可能会带上首页专属内容。');
 if (!HEAD_BLOCK.test(template)) log('⚠️  index.html 里找不到 build:head 标记：预渲染页会沿用整站卡片。');
 
 async function writeShell(kindKey, it) {

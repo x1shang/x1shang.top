@@ -22,6 +22,7 @@
 | `check-site.mjs` | 导航页上线前体检：内联 script 语法 + 本地引用是否存在 | `npm run check:site` |
 | `check-layout.mjs` | 导航页磁贴排版校验（无重叠 / 不越界 / 铺满）：喂它一份 headless 导出的 DOM | `node tools/check-layout.mjs dump.html` |
 | `build-index.mjs` | 扫目录生成导航页的 `site/all.html` 清单页（**不会**动手写的 `index.html`） | `npm run index` |
+| `memorial.mjs` | 11.11 悼念模式开关：首页灰度 + hero 标语换成「谨致哀思，永怀不忘」，只往 `index.html` 插入/删除一段 `home-only` 区块（子页由 `build-content.mjs` 剔除，不受影响），幂等可重跑。线上由 `.github/workflows/memorial-1111.yml` 在北京时间 11.11 00:00 / 23:59 自动开关 | `npm run memorial`（按北京时间自动判断）/ `node tools/memorial.mjs --state on\|off` |
 | `deploy-x1shang.ps1` | 个人站一键：重建 → 提交 → 推送（走本地代理 127.0.0.1:10809） | `npm run deploy` |
 | `stat-worker/` | **自建统计的后端**（Phase 2）：一个 Cloudflare Worker（`/s.js` `/c` `/api/stats` `/api/export`）+ D1 表结构 + wrangler 配置。部署与验收步骤见它自己的 `README.md` | `cd tools/stat-worker; npx wrangler@latest deploy` |
 

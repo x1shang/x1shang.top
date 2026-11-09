@@ -13,6 +13,7 @@
     "repos": "node tools/fetch-repos.mjs",
     "netease": "node tools/fetch-netease.mjs --all --refresh",
     "index": "node tools/build-index.mjs",
+    "memorial": "node tools/memorial.mjs",
     "check:site": "node tools/check-site.mjs",
     "layout": "node tools/check-layout.mjs",
     "https": "node tools/enable-https.cjs",

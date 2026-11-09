@@ -16,6 +16,9 @@ name: memorial-1111
 # 子页面为什么不受影响：区块整段包在 home-only 里，tools/build-content.mjs 以 index.html 为模板
 # 生成预渲染页时会整段剔除（CSS 也另有一道 body:not(.reading) 的闸）。
 #
+# 最后一步不是摆设：推送只代表「让 Pages 去部署」，Pages 构建本身会失败/卡住（2026-11-09 实测整批 errored）。
+# 所以流程会盯到本次 HEAD 真的 built（必要时 POST 重建），改过内容却没部署上去就让任务变红。
+#
 # 提前预览：Actions → memorial-1111 → Run workflow → state=on；看完再跑一次 state=off（或 state=auto）。
 # 本地预览：node tools/memorial.mjs --state on / --state off（不带 --state 就是按日期自动判断）。
 
@@ -35,6 +38,7 @@ on:
 
 permissions:
   contents: write
+  pages: write      # 只用来读构建状态 / 必要时 POST 一次重建（2026-11-09 真踩到 Pages 构建服务抽风）
 
 concurrency:
   group: memorial-1111
@@ -43,7 +47,7 @@ concurrency:
 jobs:
   toggle:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -77,3 +81,48 @@ jobs:
           done
           echo "::error::三次推送都失败"
           exit 1
+
+      # 推送只是「让 Pages 去部署」，不等于「已经上线」：GitHub 的 Pages 构建偶发失败/卡住
+      # （2026-11-09 18:55 CST 就整批 errored）。这一步盯到本次 HEAD 真的 built 为止，
+      # 看到 errored 就 POST 一次重建；改了内容却等不到部署 → 让任务变红，别让 11.11 静悄悄没上线。
+      - name: 确认 Pages 真的部署了这一版（失败就补触发构建）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGED: ${{ steps.toggle.outputs.changed }}
+        run: |
+          set -uo pipefail
+          repo="${{ github.repository }}"
+          sha=$(git rev-parse HEAD)
+          echo "HEAD=$sha（本次是否改了内容：${CHANGED}）"
+          api() { gh api "$@" 2>/dev/null; }
+          rebuild() {
+            echo "→ 申请重建 Pages"
+            if api -X POST "repos/$repo/pages/builds" >/dev/null; then echo "  已排队"; else echo "  申请失败"; fi
+          }
+          # 构建出来的 commit 可能比 HEAD 新（比如 stats 机器人抢先推了一笔）：只要 HEAD 是它的祖先就算数
+          confirms() {
+            [ -z "$1" ] && return 1
+            [ "$1" = "$sha" ] && return 0
+            st=$(api "repos/$repo/compare/$sha...$1" --jq '.status')
+            [ "$st" = "identical" ] || [ "$st" = "ahead" ]
+          }
+          tried=0
+          for i in $(seq 1 45); do
+            json=$(api "repos/$repo/pages/builds/latest")
+            status=$(printf '%s' "$json" | jq -r '.status // "unknown"')
+            built=$(printf '%s' "$json" | jq -r '.commit // ""')
+            echo "[$i/45] Pages：$status ${built:0:7}"
+            if [ "$status" = "built" ] && confirms "$built"; then
+              echo "✅ Pages 已部署 ${sha:0:7}"
+              exit 0
+            fi
+            if [ "$status" = "errored" ] && [ "$tried" -lt 2 ]; then
+              tried=$((tried + 1)); rebuild; sleep 20; continue
+            fi
+            sleep 10
+          done
+          if [ "$CHANGED" = "true" ]; then
+            echo "::error::等了 7 分半，Pages 仍未部署 ${sha:0:7}——线上可能还是旧版；Pages 恢复后手动 Run workflow 一次即可"
+            exit 1
+          fi
+          echo "::warning::Pages 当前构建状态不理想（${status:-unknown}），本次内容没变，下次定时任务会再确认"

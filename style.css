@@ -215,7 +215,8 @@ body.reading .site-name{font-size:19px}
 .prose .table-scroll table{width:auto;min-width:100%;margin:0;font-size:13px}
 .prose .table-scroll th,.prose .table-scroll td{padding:6px 9px;vertical-align:middle}
 .prose ol.tex-bib{list-style:none;padding-left:0;counter-reset:texbib;font-size:14.5px}
-.prose ol.tex-bib li{counter-increment:texbib;position:relative;padding-left:2.4em;margin:.55em 0}
+/* 文献里的裸 URL（doi / nasa.gov）比 390px 屏还长，不让它断行会把整页顶宽 */
+.prose ol.tex-bib li{counter-increment:texbib;position:relative;padding-left:2.4em;margin:.55em 0;overflow-wrap:anywhere}
 .prose ol.tex-bib li::before{content:"[" counter(texbib) "]";position:absolute;left:0;color:var(--muted)}
 
 /* ---------------------------------------------------------- 摄影 */

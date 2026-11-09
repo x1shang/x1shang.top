@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 <title>x1shang</title><link href="https://x1shang.top/"/><id>https://x1shang.top/</id>
-<updated>2026-11-05T16:00:00.000Z</updated>
+<updated>2026-11-08T16:00:00.000Z</updated>
+<entry><title>Two Points to the Goal: A Noise-Conditioned Mixture Density Network for Probabilistic Penalty Kick Prediction</title><link href="https://x1shang.top/academic/two-points-to-the-goal/"/><id>https://x1shang.top/academic/two-points-to-the-goal/</id><updated>2026-11-08T16:00:00.000Z</updated><summary>从罚球点到球门的两次早期观测，估计足球穿过门面时的位置并量化不确定度。我们在重力、二次阻力与马格努斯升力下积分弹道，用 122.5 万条仿真轨迹（含 Asai 弧线球等实测锚点）训练条件于测量噪声的残差混合密度网络：5 mm 坐标噪声下众数为 (Y, Z) = (2.67, 1.79) m，50% 与 95% 区域面积 0.106 与 0.619 m²，门框内概率 97.7%。在 109,108 条留出弹道上中位误差 0.266 m，名义 50% 与 95% 区间的实测覆盖为 50.1% 与 95.1%。</summary></entry>
 <entry><title>为了让你们成为某种特定的样子，它（基础教育）从范围广阔的材料中作了非常狭窄的筛选。而筛选的过程本身，就包含了许多预先设定的价值判断。如果一开始就把这些判断放在前面，是会有问题的。</title><link href="https://x1shang.top/assertions/shenxincheng/"/><id>https://x1shang.top/assertions/shenxincheng/</id><updated>2026-11-05T16:00:00.000Z</updated><summary>为了让你们成为某种特定的样子，它（基础教育）从范围广阔的材料中作了非常狭窄的筛选。而筛选的过程本身，就包含了许多预先设定的价值判断。如果一开始就把这些判断放在前面，是会有问题的。
 
 这个世界其实非常广阔。

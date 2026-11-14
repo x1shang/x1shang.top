@@ -191,6 +191,11 @@ body.reading .site-name{font-size:19px}
 .prose pre{background:var(--cloud-2);border:1px solid var(--cloud-line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.7;margin:1.4em 0}
 .prose pre code{background:none;border:0;padding:0;font-size:13px}
 .prose img{max-width:100%;border-radius:10px;display:block;margin:1.5em auto}
+/* 裂图兜底占位图（img-fallback.js 打的 .is-broken-image）：
+   420×400 的原图，别被 .photo 的 object-fit:cover 裁掉半句话；
+   暗色主题下直接反色 —— 一块浅灰糊在深色正文里太扎眼，反色比多带一张深色图省事。 */
+img.is-broken-image{object-fit:contain;background:transparent}
+[data-theme="dark"] img.is-broken-image{filter:invert(1) brightness(1.18)}
 .prose hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
 .prose table{border-collapse:collapse;width:100%;font-size:14px;margin:1.5em 0}
 .prose th,.prose td{border:1px solid var(--line);padding:7px 10px;text-align:left}

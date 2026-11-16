@@ -2,18 +2,14 @@
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
   "metric": "visits",
-  "updated": "2026-11-15T10:55:23.357Z",
+  "updated": "2026-11-16T11:20:34.043Z",
   "days": 30,
-  "total": 303,
-  "allTime": 504,
+  "total": 300,
+  "allTime": 511,
   "series": [
     {
-      "d": "2026-10-17",
-      "n": 8
-    },
-    {
       "d": "2026-10-18",
-      "n": 7
+      "n": 5
     },
     {
       "d": "2026-10-19",
@@ -126,10 +122,14 @@
     {
       "d": "2026-11-15",
       "n": 13
+    },
+    {
+      "d": "2026-11-16",
+      "n": 7
     }
   ],
   "pages": {
-    "/": 355,
+    "/": 360,
     "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A": 14,
     "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB": 13,
     "/academic/test-paper": 11,
@@ -141,12 +141,12 @@
     "/articles/%E9%82%A3%E4%BA%9B%E6%B8%A9%E6%9A%96%E7%9A%84%E5%8D%B0%E8%AE%B0": 6,
     "/articles/september-report": 6,
     "/articles/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E5%86%99%E8%AE%B0%E5%8F%99%E6%96%87-%E4%BD%9C%E6%96%87%E4%B8%AD%E7%9A%84%E6%9C%89%E7%94%A8%E4%B8%8E%E6%97%A0%E7%94%A8": 5,
+    "/articles/%E6%9C%89%E8%8A%82%E7%9A%84%E7%AB%B9%E7%AC%9B": 5,
+    "/articles/%E5%8F%91%E4%B8%80%E7%82%B9%E5%85%89%E7%85%A7%E4%B8%80%E6%AE%B5%E8%B7%AF": 5,
     "/assertions/midnight": 4,
     "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81": 4,
-    "/articles/%E6%9C%89%E8%8A%82%E7%9A%84%E7%AB%B9%E7%AC%9B": 4,
     "/articles/%E5%9B%9E%E7%94%98-%E4%BA%8C%E7%A8%BF": 4,
     "/articles/%E8%BF%99-%E6%89%8D%E6%98%AF%E6%9C%80%E4%BD%93%E9%9D%A2%E7%9A%84": 4,
-    "/articles/%E5%8F%91%E4%B8%80%E7%82%B9%E5%85%89%E7%85%A7%E4%B8%80%E6%AE%B5%E8%B7%AF": 4,
     "/assertions/shenxincheng": 3,
     "/academic/two-points-to-the-goal": 3,
     "/articles/october-report%2F": 3,

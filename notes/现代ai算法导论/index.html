@@ -94,7 +94,7 @@
 <tr><td><span class="math-inline">$\leftarrow$</span></td><td>程序赋值</td></tr>
 </tbody>
 </table>
-<h2>1.0 训练一个模型：损失、泛化</h2>
+<h2>1.0 损失、泛化</h2>
 <p><strong>Loss&amp;Generalization</strong></p>
 <div class="math-block">$
 \text{损失：}J(\theta)=\frac1n\sum_{i=1}^n\ell\bigl(y_i,f_\theta(x_i)\bigr).
@@ -140,7 +140,8 @@ $</div>
 <tr><td><span class="math-inline">$R^2$</span></td><td><span class="math-inline">$1-\frac{\sum_i e_i^2}{\sum_i(y_i-\bar y)^2}$</span></td><td>和“总猜本组答案的均值”相比改善多少；可小于 0，分母为 0 时此式无定义</td></tr>
 </tbody>
 </table>
-<h1>第二讲 MachineLearning &amp; NeuralNetwork (MLNN)</h1>
+<h1>第二讲  机器学习与神经网络</h1>
+<p><strong>MachineLearning &amp; NeuralNetwork (MLNN)</strong></p>
 <p><strong>取舍</strong>：限于篇幅，以概念为主，对于具体的神经网络设计等涉及较少。</p>
 <ul>
 <li>机器学习
@@ -352,6 +353,338 @@ $</div>
 <li><span class="math-inline">$h_t$</span>：结合当前输入和之前状态后得到的新状态。</li>
 <li><span class="math-inline">$W_x,W_h,b$</span>：需要训练的参数。</li>
 </ul>
+<h1>第三讲 优化与反向传播</h1>
+<p><strong>Optimization &amp; Backpropagation</strong></p>
+<ul>
+<li>构建神经网络如何优化参数、训练模型？
+<ul>
+<li>最小化损失
+<ul>
+<li>最小化的过程：<strong>梯度下降</strong> &amp; SGD</li>
+<li>衡量损失在各参数的比重：<strong>反向传播</strong></li>
+</ul></li>
+</ul></li>
+</ul>
+<h2>3.5 梯度下降</h2>
+<p><strong>Gradient Descent</strong></p>
+<div class="math-block">$
+\boxed{\theta_{t+1}=\theta_t-\eta\nabla_\theta J(\theta_t)}
+$</div>
+<p><strong>学习率<span class="math-inline">$\eta$</span>的作用：</strong> 太小可能下降得很慢；太大可能跨过低点，在两侧反复震荡，甚至越走越远。负梯度反映的是<strong>当前位置附近</strong>的下降方向，不能保证走很大一步后损失仍然减小。</p>
+<h2>3.6 随机梯度下降与小批量</h2>
+<p><strong>Stochastic Gradient Descent, SGD</strong></p>
+<p>def convex:</p>
+<div class="math-block">$
+J(\lambda u+(1-\lambda)v)\leq\lambda J(u)+(1-\lambda)J(v),\qquad 0\leq\lambda\leq1
+$</div>
+<p>在适当的光滑性和学习率等条件下，梯度下降对凸优化问题有收敛保证；具体保证和收敛速度还依赖这些条件，并不是任意凸函数、任意学习率都可以。</p>
+<p>神经网络的损失函数通常是<strong>非凸的</strong>，可能有多个局部低点或其他使优化变慢的位置。梯度下降及其变体在实际中仍然常常有效，但一般不能保证找到全局最优解。</p>
+<p>如果训练集非常大，每更新一次都用全部样本计算梯度，计算成本会很高。SGD 的思路是：每次随机取一条或一小批样本，用这部分数据计算梯度，作为整体梯度的近似。</p>
+<p>设当前选中的小批量为 <span class="math-inline">$B$</span>，包含 <span class="math-inline">$|B|$</span> 条样本：</p>
+<div class="math-block">$
+g_B=\frac{1}{|B|}\sum_{i\in B}\nabla_\theta\ell\bigl(y_i,f_\theta(x_i)\bigr),
+\qquad
+\boxed{\theta\leftarrow\theta-\eta g_B}
+$</div>
+<p>这里 <span class="math-inline">$g_B$</span> 是<strong>当前批次的平均梯度</strong>；<span class="math-inline">$\ell$</span> 是单条样本的损失。每次换一批数据，再计算并更新。</p>
+<table>
+<thead>
+<tr><th>方法</th><th>每次更新使用的数据</th><th>特点</th></tr>
+</thead>
+<tbody>
+<tr><td>批量梯度下降</td><td>全部训练样本</td><td>每步使用完整梯度，数据多时计算成本高</td></tr>
+<tr><td>单样本 SGD</td><td>一条样本</td><td>每步计算较少，但更新方向波动较大</td></tr>
+<tr><td>小批量 SGD</td><td>一小批样本</td><td>在计算效率和梯度波动之间折中</td></tr>
+</tbody>
+</table>
+<p>小批量梯度只是近似，因此<strong>某一次更新不一定让整个训练集的损失下降</strong>；通常要看较长时间的变化趋势。</p>
+<p>一轮 <strong>epoch</strong> 指遍历一次训练集；一次 <strong>step</strong> 指更新一次参数。例如 1000 条样本、每批 100 条，则一轮有 10 次参数更新。</p>
+<pre><code class="lang-text">初始化参数 theta
+重复若干轮：
+    打乱训练样本
+    对每个小批量 B：
+        计算 B 上的平均损失及其梯度 g_B
+        theta = theta - 学习率 * g_B</code></pre>
+<h2>3.7 反向传播与梯度流</h2>
+<p><strong>Backpropagation &amp; Gradient Flow</strong></p>
+<p>训练模型需要计算损失，计算损失需要知道所有参数的比重，反向传播就是计算比重的过程，本质上就是求解梯度。在真实计算中，往往使用链式法则<strong>分拆</strong>与<strong>合并</strong>以简便计算过程。</p>
+<div class="math-block">$
+\frac{\partial f}{\partial x}
+=\underbrace{\frac{\partial f}{\partial q}}_{\text{上游梯度}}
+\times
+\underbrace{\frac{\partial q}{\partial x}}_{\text{局部梯度}}
+$</div>
+<ul>
+<li><strong>局部梯度</strong>：当前这个小运算的输出对输入的变化率。</li>
+<li><strong>上游梯度</strong>：最终结果对当前运算输出的变化率，从后面的计算传回来。</li>
+<li>如果一个变量通过<strong>多条路径</strong>影响最终结果，需要把各条路径的梯度贡献<strong>相加</strong>。</li>
+</ul>
+<h3>常见节点的反向传播规则</h3>
+<p>设 <span class="math-inline">$g$</span> 是传到当前节点输出的上游梯度：</p>
+<table>
+<thead>
+<tr><th>名称</th><th>前向计算</th><th>反向传播</th><th>理解</th></tr>
+</thead>
+<tbody>
+<tr><td><em>add gate</em></td><td><span class="math-inline">$q=a+b$</span></td><td><span class="math-inline">$a$</span>、<span class="math-inline">$b$</span> 各收到 <span class="math-inline">$g$</span></td><td>任一输入增加 1，和就增加 1</td></tr>
+<tr><td><em>mul gate</em></td><td><span class="math-inline">$q=ab$</span></td><td><span class="math-inline">$a$</span> 收到 <span class="math-inline">$gb$</span>；<span class="math-inline">$b$</span> 收到 <span class="math-inline">$ga$</span></td><td>对一个数求导时，乘上另一个数</td></tr>
+<tr><td><em>copy gate</em></td><td>同一个值进入多条分支</td><td>各分支传回的梯度相加</td><td>每条路径都可能影响结果</td></tr>
+<tr><td><em>max gate</em></td><td><span class="math-inline">$q=\max(a,b)$</span>，且 <span class="math-inline">$a\ne b$</span></td><td>较大者收到 <span class="math-inline">$g$</span>，较小者收到 0</td><td>局部变化时，输出由较大者决定</td></tr>
+</tbody>
+</table>
+<p>最大值相等时可能不可微，此时需要特别约定； 上面的例子算的是 <span class="math-inline">$f$</span> 对 <span class="math-inline">$x,y,z$</span> 的梯度。实际训练需要的是<strong>损失 <span class="math-inline">$J$</span> 对参数的梯度</strong>，因此还要把损失函数作为计算图的最后一部分。：</p>
+<div class="math-block">$
+\text{例如 }J=(f-y_{\text{target}})^2,\qquad
+\frac{\partial J}{\partial w}
+=2(f-y_{\text{target}})\frac{\partial f}{\partial w}
+$</div>
+<p><span class="math-inline">$w$</span> 是模型中的某个参数。前一部分体现预测误差，后一部分体现参数对预测的影响，两者相乘得到参数对损失的影响。</p>
+<h3>训练过程</h3>
+<p>每一次小批量训练，可以按下面的顺序理解：</p>
+<ol>
+<li><strong>前向传播</strong>：输入数据，用当前参数算出预测，并保存需要的中间结果。</li>
+<li><strong>计算损失</strong>：比较预测和答案，得到当前批次的损失。</li>
+<li><strong>反向传播</strong>：从损失出发，沿计算图倒着使用链式法则，求出各参数的梯度。</li>
+<li><strong>更新参数(gradient descent)</strong>：优化器使用梯度和学习率，调整参数。</li>
+<li>换一批数据，重复以上过程。</li>
+</ol>
+<pre><code class="lang-text">for 每个小批量 (x, y):
+    清除上一次更新留下的梯度
+    prediction = 模型前向计算(x)
+    loss = 计算损失(prediction, y)
+    对 loss 执行反向传播，得到各参数的梯度
+    参数 = 参数 - 学习率 * 梯度</code></pre>
+<pre><code class="lang-python">import numpy as np
+from numpy.random import randn
+
+# define the network
+N, D_in, H, D_out = 64, 1000, 100, 10
+x, y = randn(N, D_in), randn(N, D_out)
+w1, w2 = randn(D_in, H), randn(H, D_out)
+
+for t in range(2000):
+    # forward pass
+    h = 1 / (1 + np.exp(-x.dot(w1)))
+    y_pred = h.dot(w2)
+    loss = np.square(y_pred - y).sum() # loss calculation
+    print(t, loss)
+
+    # backpropagation
+    grad_y_pred = 2.0 * (y_pred - y)
+    grad_w2 = h.T.dot(grad_y_pred)
+    grad_h = grad_y_pred.dot(w2.T)
+    grad_w1 = x.T.dot(grad_h * h * (1 - h))
+
+    # gradient descent
+    w1 -= 1e-4 * grad_w1
+    w2 -= 1e-4 * grad_w2</code></pre>
+<h1>第四讲 马尔可夫决策过程</h1>
+<p><strong>Markov Decision Process (MDP)</strong></p>
+<p>本讲用已知的转移概率和奖励求最优策略。下一讲讨论如何从交互样本中学习。</p>
+<p>下文页码对应第四讲课件《Lec4-MDP》。</p>
+<ul>
+<li>强化学习的建模：MDP
+<ul>
+<li>马尔可夫性</li>
+<li>折扣回报、状态价值、状态–动作价值、策略和动作</li>
+</ul></li>
+<li>在MDP框架下寻找策略：
+<ul>
+<li>Bellman方程与Bellman更新</li>
+<li>VI (值迭代)</li>
+<li>PI (策略迭代)
+<ul>
+<li>策略评估</li>
+<li>策略抽取</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>常见符号</strong></p>
+<table>
+<thead>
+<tr><th>符号</th><th>含义</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="math-inline">$s\in S,\ a\in A$</span></td><td>状态与动作</td></tr>
+<tr><td><span class="math-inline">$P(s&#39;\mid s,a)$</span></td><td>转移概率，也记作 <span class="math-inline">$T(s,a,s&#39;)$</span></td></tr>
+<tr><td><span class="math-inline">$R(s,a,s&#39;)$</span></td><td>转移的即时奖励，有时简写为 <span class="math-inline">$R(s,a)$</span> 或 <span class="math-inline">$R(s&#39;)$</span></td></tr>
+<tr><td><span class="math-inline">$\gamma$</span></td><td>折扣因子</td></tr>
+<tr><td><span class="math-inline">$\pi,\ \pi^*$</span></td><td>策略、最优策略</td></tr>
+</tbody>
+</table>
+<h2>4.8 MDP 的基本模型与策略</h2>
+<h3>MDP 的定义与马尔可夫性</h3>
+<p><strong>示例：网格世界（Grid World）</strong></p>
+<blockquote>
+<p>在 <span class="math-inline">$3\times4$</span> 的网格里，第 2 行第 2 列是墙，右上和右侧中间分别是 <span class="math-inline">$+1$</span> 和 <span class="math-inline">$-1$</span> 出口。选择向上时，实际尝试向上、向左、向右移动的概率分别为 <span class="math-inline">$0.8$</span>、<span class="math-inline">$0.1$</span>、<span class="math-inline">$0.1$</span>。撞墙或越界则留在原格。普通移动获得每步奖励（living reward），执行退出动作时获得出口奖励。（课件第 8–9 页）</p>
+<p>固定动作噪声为 <span class="math-inline">$0.2$</span>，改变每步奖励会改变最优策略。（课件第 15 页）</p>
+<table>
+<thead>
+<tr><th>每步奖励</th><th>策略特点</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="math-inline">$0$</span></td><td>借边界或绕路避开 <span class="math-inline">$-1$</span></td></tr>
+<tr><td><span class="math-inline">$-0.03$</span></td><td>沿较安全的路线前往 <span class="math-inline">$+1$</span></td></tr>
+<tr><td><span class="math-inline">$-0.4$</span></td><td>底行走离 <span class="math-inline">$-1$</span> 更近的捷径前往 <span class="math-inline">$+1$</span></td></tr>
+<tr><td><span class="math-inline">$-2.0$</span></td><td>中下区域可选 <span class="math-inline">$-1$</span> 尽快结束，顶行仍走向 <span class="math-inline">$+1$</span></td></tr>
+</tbody>
+</table>
+</blockquote>
+<p><strong>示例：赛车（Racing）</strong></p>
+<blockquote>
+<p>赛车根据当前的温度状态选择慢开（Slow）或快开（Fast）。过热时回合结束。（课件第 16–17 页）</p>
+<table>
+<thead>
+<tr><th>状态</th><th>动作</th><th>下一状态（概率，即时奖励）</th></tr>
+</thead>
+<tbody>
+<tr><td>Cool</td><td>Slow</td><td>Cool（<span class="math-inline">$1.0,\,+1$</span>）</td></tr>
+<tr><td>Cool</td><td>Fast</td><td>Cool（<span class="math-inline">$0.5,\,+2$</span>）或 Warm（<span class="math-inline">$0.5,\,+2$</span>）</td></tr>
+<tr><td>Warm</td><td>Slow</td><td>Cool（<span class="math-inline">$0.5,\,+1$</span>）或 Warm（<span class="math-inline">$0.5,\,+1$</span>）</td></tr>
+<tr><td>Warm</td><td>Fast</td><td>Overheated（<span class="math-inline">$1.0,\,-10$</span>）</td></tr>
+</tbody>
+</table>
+</blockquote>
+<p><strong>共同结构</strong>。两个例子都可以用 MDP 建模，由状态集合 <span class="math-inline">$S$</span>、动作集合 <span class="math-inline">$A$</span>、转移概率 <span class="math-inline">$P$</span>、奖励函数 <span class="math-inline">$R$</span> 和起始状态 <span class="math-inline">$s_0$</span> 组成，也可以设终止状态。</p>
+<ul>
+<li><strong>状态与动作</strong>。智能体观察当前状态 <span class="math-inline">$s$</span>（所在格子或赛车温度），从该状态可用的动作中选一个 <span class="math-inline">$a$</span>。</li>
+<li><strong>概率转移</strong>。动作选定后，环境按 <span class="math-inline">$P(s&#39;\mid s,a)$</span> 决定下一状态。选择向上仍可能侧滑，冷车快开也可能升温。所有可能的下一状态的概率之和为 <span class="math-inline">$1$</span>。若某个结果的概率为 <span class="math-inline">$1$</span>，这一步就是确定的。</li>
+<li><strong>即时奖励</strong>。一次转移 <span class="math-inline">$(s,a,s&#39;)$</span> 带来奖励 <span class="math-inline">$R(s,a,s&#39;)$</span>，例如退出网格获得 <span class="math-inline">$+1$</span>，赛车过热得到 <span class="math-inline">$-10$</span>。各步奖励按折扣累加成回报。</li>
+</ul>
+<p>一步交互记为 <span class="math-inline">$(s_t,a_t,r_{t+1},s_{t+1})$</span>，其中 <span class="math-inline">$r_{t+1}=R(s_t,a_t,s_{t+1})$</span>。</p>
+<p><strong>马尔可夫性</strong>。给定当前状态和动作后，更早的历史不影响下一状态的概率分布。</p>
+<div class="math-block">$
+P(S_{t+1}=s&#39;\mid S_0,A_0,\ldots,S_t,A_t)
+=P(S_{t+1}=s&#39;\mid S_t,A_t)
+$</div>
+<h3>策略（Policy）</h3>
+<p>确定性策略 <span class="math-inline">$\pi:S\to A$</span> 为每个可行动的状态指定动作。最优策略 <span class="math-inline">$\pi^*$</span> 最大化期望折扣回报。</p>
+<h3>搜索树视角与折扣回报</h3>
+<p>搜索树中，<span class="math-inline">$s$</span> 是状态节点，<span class="math-inline">$(s,a)$</span> 是选定动作后的节点（q-state），<span class="math-inline">$(s,a,s&#39;)$</span> 是标有转移概率和即时奖励的分支。</p>
+<p>从时刻 <span class="math-inline">$t$</span> 开始的<strong>折扣回报</strong>为</p>
+<div class="math-block">$
+G_t=\sum_{k=0}^{\infty}\gamma^k r_{t+k+1}.
+$</div>
+<p>无限视野下，若 <span class="math-inline">$0\le\gamma&lt;1$</span> 且每步奖励满足 <span class="math-inline">$\lvert r_t\rvert\le R_{\max}$</span>，则 <span class="math-inline">$\lvert G_t\rvert\le R_{\max}/(1-\gamma)$</span>。</p>
+<h2>4.9 价值函数与 Bellman 方程</h2>
+<p><span class="math-inline">$V(s)$</span> 和 <span class="math-inline">$Q(s,a)$</span> 分别表示状态价值和状态–动作价值。下表中每个值都是<strong>期望折扣回报</strong>。</p>
+<table>
+<thead>
+<tr><th>符号</th><th>第一步</th><th>后续动作</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="math-inline">$V^\pi(s)$</span></td><td>按 <span class="math-inline">$\pi$</span> 选择</td><td>按 <span class="math-inline">$\pi$</span> 选择</td></tr>
+<tr><td><span class="math-inline">$Q^\pi(s,a)$</span></td><td>指定为 <span class="math-inline">$a$</span></td><td>按 <span class="math-inline">$\pi$</span> 选择</td></tr>
+<tr><td><span class="math-inline">$V^*(s)$</span></td><td>最优选择</td><td>最优选择</td></tr>
+<tr><td><span class="math-inline">$Q^*(s,a)$</span></td><td>指定为 <span class="math-inline">$a$</span></td><td>最优选择</td></tr>
+</tbody>
+</table>
+<p>因此 <span class="math-inline">$V^\pi(s)=Q^\pi(s,\pi(s))$</span>。最优价值满足 <strong>Bellman 最优性方程</strong>。</p>
+<div class="math-block">$
+\begin{aligned}
+Q^*(s,a)&amp;=\sum_{s&#39;}P(s&#39;\mid s,a)\bigl[R(s,a,s&#39;)+\gamma V^*(s&#39;)\bigr],\\
+V^*(s)&amp;=\max_a Q^*(s,a)\\
+      &amp;=\max_a\sum_{s&#39;}P(s&#39;\mid s,a)\bigl[R(s,a,s&#39;)+\gamma V^*(s&#39;)\bigr].
+\end{aligned}
+$</div>
+<h2>4.10 值迭代</h2>
+<p>从 <span class="math-inline">$V_0(s)=0$</span> 开始，用上一轮的值同步更新各非终止状态，直到变化量小于设定阈值。终止状态的值为 <span class="math-inline">$0$</span>。</p>
+<div class="math-block">$
+V_{k+1}(s)\leftarrow
+\max_a\sum_{s&#39;}P(s&#39;\mid s,a)\bigl[R(s,a,s&#39;)+\gamma V_k(s&#39;)\bigr]
+$</div>
+<p>有限 MDP 中，每轮复杂度为 <span class="math-inline">$O(\lvert S\rvert^2\lvert A\rvert)$</span>。当 <span class="math-inline">$\gamma&lt;1$</span> 时，<span class="math-inline">$V_k$</span> 收敛到唯一的 <span class="math-inline">$V^*$</span>。</p>
+<p><strong>网格世界的值迭代</strong>。第 <span class="math-inline">$k$</span> 轮格子里的数字是 <span class="math-inline">$V_k(s)$</span>，即只考虑接下来 <span class="math-inline">$k$</span> 步的最优状态价值。箭头是根据当前估计选出的动作。比较 <span class="math-inline">$k=12$</span> 和 <span class="math-inline">$k=100$</span> 两轮，箭头相同，部分格子的数值仍有变化。（课件第 28–41 页）</p>
+<h2>4.11 策略评估、策略抽取与策略迭代</h2>
+<h3>策略评估（Policy Evaluation）</h3>
+<p>给定策略 <span class="math-inline">$\pi$</span>，求它的状态价值 <span class="math-inline">$V^\pi$</span>。</p>
+<div class="math-block">$
+V^\pi(s)=\sum_{s&#39;}P(s&#39;\mid s,\pi(s))\bigl[R(s,\pi(s),s&#39;)+\gamma V^\pi(s&#39;)\bigr]
+$</div>
+<p>可用上式迭代更新，每轮 <span class="math-inline">$O(\lvert S\rvert^2)$</span>，也可直接解线性方程组 <span class="math-inline">$(I-\gamma P_\pi)V^\pi=b_\pi$</span>，其中 <span class="math-inline">$P_\pi$</span> 是按策略行动时的转移矩阵，<span class="math-inline">$b_\pi$</span> 是各状态的期望即时奖励。</p>
+<p><strong>走廊例子</strong>。上方出口为 <span class="math-inline">$+100$</span>，两侧出口为 <span class="math-inline">$-10$</span>。噪声为 <span class="math-inline">$0.2$</span>，<span class="math-inline">$\gamma=0.9$</span>，每步奖励为 <span class="math-inline">$0$</span>。（课件第 51–52 页）</p>
+<table>
+<thead>
+<tr><th>固定策略</th><th>上格</th><th>中格</th><th>下格</th></tr>
+</thead>
+<tbody>
+<tr><td>一直向右</td><td><span class="math-inline">$1.09$</span></td><td><span class="math-inline">$-7.88$</span></td><td><span class="math-inline">$-8.69$</span></td></tr>
+<tr><td>一直向上</td><td><span class="math-inline">$70.20$</span></td><td><span class="math-inline">$48.74$</span></td><td><span class="math-inline">$33.30$</span></td></tr>
+</tbody>
+</table>
+<h3>策略抽取（Policy Extraction）</h3>
+<p>已知 <span class="math-inline">$V^*$</span> 时，用模型做<strong>一步前瞻</strong>。已有 <span class="math-inline">$Q^*$</span> 时，可直接比较动作的价值。</p>
+<div class="math-block">$
+\pi^*(s)\in\arg\max_a Q^*(s,a)
+=\arg\max_a\sum_{s&#39;}P(s&#39;\mid s,a)\bigl[R(s,a,s&#39;)+\gamma V^*(s&#39;)\bigr]
+$</div>
+<h3>策略迭代（Policy Iteration, PI）</h3>
+<p>先评估当前策略 <span class="math-inline">$\pi_i$</span> 得到 <span class="math-inline">$V^{\pi_i}$</span>，再做一步前瞻改进策略。</p>
+<div class="math-block">$
+\pi_{i+1}(s)\in\arg\max_a\sum_{s&#39;}P(s&#39;\mid s,a)
+\bigl[R(s,a,s&#39;)+\gamma V^{\pi_i}(s&#39;)\bigr]
+$</div>
+<p>并列时优先保留原动作。若改进后策略不变，<span class="math-inline">$V^{\pi_i}$</span> 就满足 Bellman 最优性方程，因此 <span class="math-inline">$\pi_i$</span> 已最优。走廊例子中，从“一直向右”出发，改进一次便得到“一直向上”。（课件第 60–61 页）</p>
+<table>
+<thead>
+<tr><th>算法</th><th>每轮操作</th><th>开销</th></tr>
+</thead>
+<tbody>
+<tr><td>值迭代（VI）</td><td>更新一次状态价值</td><td>每轮 <span class="math-inline">$O(\lvert S\rvert^2\lvert A\rvert)$</span>，通常需要更多轮</td></tr>
+<tr><td>策略迭代（PI）</td><td>完整评估策略，再改进一次</td><td>每轮需解方程或迭代评估至收敛，通常需要较少轮</td></tr>
+</tbody>
+</table>
+<p><strong>赛车例子的 Python 实现</strong>。用值迭代求 <span class="math-inline">$V^*$</span> 的近似值，再用一步前瞻抽取策略。</p>
+<pre><code class="lang-python"># mdp[state][action] = [(prob, next_state, reward), ...]
+racing_mdp = {
+    &quot;Cool&quot;: {
+        &quot;Slow&quot;: [(1.0, &quot;Cool&quot;, 1)],
+        &quot;Fast&quot;: [(0.5, &quot;Cool&quot;, 2), (0.5, &quot;Warm&quot;, 2)],
+    },
+    &quot;Warm&quot;: {
+        &quot;Slow&quot;: [(0.5, &quot;Cool&quot;, 1), (0.5, &quot;Warm&quot;, 1)],
+        &quot;Fast&quot;: [(1.0, &quot;Overheated&quot;, -10)],
+    },
+    &quot;Overheated&quot;: {},
+}
+
+
+def value_iteration(mdp, gamma=0.9, eps=1e-6):
+    &quot;&quot;&quot;对有限 MDP 执行值迭代，并抽取最优策略。&quot;&quot;&quot;
+    V = {s: 0.0 for s in mdp}
+
+    while True:
+        V_new = {}
+        delta = 0.0
+        for s, actions in mdp.items():
+            if not actions:
+                V_new[s] = 0.0
+                continue
+            V_new[s] = max(
+                sum(p * (r + gamma * V[s_next]) for p, s_next, r in transitions)
+                for transitions in actions.values()
+            )
+            delta = max(delta, abs(V_new[s] - V[s]))
+        V = V_new
+        if delta &lt; eps:
+            break
+
+    # policy extraction (one-step lookahead)
+    pi = {}
+    for s, actions in mdp.items():
+        if actions:
+            pi[s] = max(
+                actions,
+                key=lambda a: sum(
+                    p * (r + gamma * V[s_next]) for p, s_next, r in actions[a]
+                ),
+            )
+    return V, pi
+
+
+V_star, pi_star = value_iteration(racing_mdp, gamma=0.9)
+# V_star ≈ {&#39;Cool&#39;: 15.5, &#39;Warm&#39;: 14.5, &#39;Overheated&#39;: 0.0}
+# pi_star = {&#39;Cool&#39;: &#39;Fast&#39;, &#39;Warm&#39;: &#39;Slow&#39;}</code></pre>
 <hr>
 <p>© 2026 x1shang。除另有注明外，本笔记中的原创内容采用 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hans" target="_blank" rel="noopener noreferrer">知识共享署名 4.0 国际许可协议（CC BY 4.0）</a>授权。转载或改编时，请合理署名、附上原文及协议链接，并标明修改情况。第三方材料的权利归其各自权利人所有。</p></article></main>
 </div>
@@ -389,7 +722,7 @@ $</div>
 </form>
 
 <script src="../../content.js?v=ebb77046"></script>
-<script src="../../content.auto.js?v=6a755aac"></script>
+<script src="../../content.auto.js?v=b83c8d90"></script>
 <script src="../../render.js?v=3638a688"></script>
 <script src="../../terminal.js?v=958556a3"></script>
 <script src="../../app.js?v=703ca6f1"></script>

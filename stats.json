@@ -2,15 +2,11 @@
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
   "metric": "visits",
-  "updated": "2026-11-23T12:44:37.250Z",
+  "updated": "2026-11-24T02:16:20.225Z",
   "days": 30,
-  "total": 292,
+  "total": 291,
   "allTime": 544,
   "series": [
-    {
-      "d": "2026-10-25",
-      "n": 1
-    },
     {
       "d": "2026-10-26",
       "n": 6
@@ -126,6 +122,10 @@
     {
       "d": "2026-11-23",
       "n": 5
+    },
+    {
+      "d": "2026-11-24",
+      "n": 0
     }
   ],
   "pages": {

@@ -2,15 +2,11 @@
   "source": "goatcounter-api",
   "site": "https://x1shang.goatcounter.com/",
   "metric": "visits",
-  "updated": "2026-11-24T13:44:28.375Z",
+  "updated": "2026-11-25T12:58:00.004Z",
   "days": 30,
-  "total": 292,
-  "allTime": 545,
+  "total": 291,
+  "allTime": 550,
   "series": [
-    {
-      "d": "2026-10-26",
-      "n": 6
-    },
     {
       "d": "2026-10-27",
       "n": 2
@@ -126,10 +122,14 @@
     {
       "d": "2026-11-24",
       "n": 1
+    },
+    {
+      "d": "2026-11-25",
+      "n": 5
     }
   ],
   "pages": {
-    "/": 387,
+    "/": 391,
     "/articles/%E5%88%B0%E4%B8%8A%E6%B5%B7%E5%8E%BB": 16,
     "/articles/%E7%BB%93%E5%AE%9E%E5%9C%B0%E6%B4%BB%E5%9C%A8%E8%BF%99%E7%89%87%E5%9C%9F%E5%9C%B0%E4%B8%8A": 14,
     "/academic/test-paper": 11,
@@ -137,8 +137,8 @@
     "/academic/%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81%E9%A2%84%E6%B5%8B%E7%BB%BC%E8%BF%B0": 9,
     "/articles/october-report": 8,
     "/assertions/testingai": 8,
+    "/academic/moments-likes-three-years": 7,
     "/articles/%E9%82%A3%E4%BA%9B%E6%B8%A9%E6%9A%96%E7%9A%84%E5%8D%B0%E8%AE%B0": 7,
-    "/academic/moments-likes-three-years": 6,
     "/articles/september-report": 6,
     "/academic/%E6%B9%BF%E7%90%83%E8%9E%8D%E5%8C%96%E5%B1%82%E9%9D%A2%E7%A7%AF%E5%88%A4%E6%96%AD%E9%99%8D%E6%B0%B4%E7%9B%B8%E6%80%81": 5,
     "/articles/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E5%86%99%E8%AE%B0%E5%8F%99%E6%96%87-%E4%BD%9C%E6%96%87%E4%B8%AD%E7%9A%84%E6%9C%89%E7%94%A8%E4%B8%8E%E6%97%A0%E7%94%A8": 5,

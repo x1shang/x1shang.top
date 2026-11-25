@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-11-25T09:34:51.919Z",
+ "generated": "2026-11-25T09:48:04.019Z",
  "recent": "2026-11-09",
  "site": {
   "name": "x1shang",
@@ -1093,22 +1093,6 @@ window.AUTO = {
  ],
  "tracks": [
   {
-   "id": "2108年的新闻联播",
-   "src": "assets/music/2108年的新闻联播.mp3",
-   "title": "2108年的新闻联播",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 971,
-   "netease": "",
-   "bytes": 2372484
-  },
-  {
    "id": "march-green-forest",
    "src": "assets/music/March Green Forest.mp3",
    "title": "March Green Forest",
@@ -1123,22 +1107,6 @@ window.AUTO = {
    "heat": 968,
    "netease": "",
    "bytes": 4141632
-  },
-  {
-   "id": "outerwilds-traveler-s-encore-尤克里里",
-   "src": "assets/music/OuterWilds_Traveler's Encore(尤克里里).mp3",
-   "title": "OuterWilds_Traveler's Encore(尤克里里)",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 866,
-   "netease": "",
-   "bytes": 4833219
   },
   {
    "id": "spectre",
@@ -1175,8 +1143,8 @@ window.AUTO = {
   {
    "id": "velocity-疾速-robert-sheldon-同名候选参考版",
    "src": "assets/music/Velocity 疾速（Robert Sheldon · 同名候选参考版）.mp3",
-   "title": "Velocity 疾速（Robert Sheldon · 同名候选参考版）",
-   "artist": "",
+   "title": "Velocity 疾速",
+   "artist": "Robert Sheldon",
    "date": "2026-11-25",
    "lyrics": "",
    "tags": [
@@ -1269,54 +1237,6 @@ window.AUTO = {
    "bytes": 3744654
   },
   {
-   "id": "千本樱-古筝",
-   "src": "assets/music/千本樱(古筝).mp3",
-   "title": "千本樱(古筝)",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 890,
-   "netease": "",
-   "bytes": 5324300
-  },
-  {
-   "id": "卡农-可视化",
-   "src": "assets/music/卡农(可视化).mp3",
-   "title": "卡农(可视化)",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 896,
-   "netease": "",
-   "bytes": 5904236
-  },
-  {
-   "id": "向着雨的出口",
-   "src": "assets/music/向着雨的出口.mp3",
-   "title": "向着雨的出口",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 868,
-   "netease": "",
-   "bytes": 2174476
-  },
-  {
    "id": "御风少年",
    "src": "assets/music/御风少年.mp3",
    "title": "御风少年",
@@ -1367,8 +1287,8 @@ window.AUTO = {
   {
    "id": "李子柒如愿",
    "src": "assets/music/李子柒如愿.mp3",
-   "title": "李子柒如愿",
-   "artist": "",
+   "title": "如愿",
+   "artist": "李子柒",
    "date": "2026-11-25",
    "lyrics": "",
    "tags": [
@@ -1379,22 +1299,6 @@ window.AUTO = {
    "heat": 898,
    "netease": "",
    "bytes": 3360531
-  },
-  {
-   "id": "糊成一坨",
-   "src": "assets/music/糊成一坨.mp3",
-   "title": "糊成一坨",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 987,
-   "netease": "",
-   "bytes": 1875591
   },
   {
    "id": "紫罗兰的永恒花园-true-sincerely-animenz-arr",
@@ -1411,22 +1315,6 @@ window.AUTO = {
    "heat": 911,
    "netease": "",
    "bytes": 10362819
-  },
-  {
-   "id": "编曲接力-全员巨神",
-   "src": "assets/music/编曲接力_全员巨神！.mp3",
-   "title": "编曲接力_全员巨神！",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 994,
-   "netease": "",
-   "bytes": 11595276
   },
   {
    "id": "莫扎特-g小调第40号交响曲-第一乐章",
@@ -1461,25 +1349,9 @@ window.AUTO = {
    "bytes": 5133105
   },
   {
-   "id": "钟-la-campanella-郎朗现场版",
-   "src": "assets/music/钟_La_Campanella(郎朗现场版).mp3",
-   "title": "钟_La_Campanella(郎朗现场版)",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 876,
-   "netease": "",
-   "bytes": 5388060
-  },
-  {
    "id": "雷霆",
    "src": "assets/music/雷霆.mp3",
-   "title": "雷霆",
+   "title": "Thunderstruck",
    "artist": "",
    "date": "2026-11-25",
    "lyrics": "",
@@ -2963,7 +2835,7 @@ window.AUTO = {
   "papers": 4,
   "notes": 1,
   "photos": 37,
-  "tracks": 93,
+  "tracks": 85,
   "friends": 10
  }
 };

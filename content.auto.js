@@ -21,7 +21,7 @@ window.AUTO = {
   "本网站源码由MIT协议开源哦",
   "世界很大，生活更大，我们这不是又相见了嘛"
  ],
- "generated": "2026-11-25T09:48:04.019Z",
+ "generated": "2026-11-25T09:49:58.037Z",
  "recent": "2026-11-09",
  "site": {
   "name": "x1shang",
@@ -1109,6 +1109,22 @@ window.AUTO = {
    "bytes": 4141632
   },
   {
+   "id": "outerwilds-traveler-s-encore-尤克里里",
+   "src": "assets/music/OuterWilds_Traveler's Encore(尤克里里).mp3",
+   "title": "OuterWilds_Traveler's Encore(尤克里里)",
+   "artist": "",
+   "date": "2026-11-25",
+   "lyrics": "",
+   "tags": [
+    "音乐",
+    "我喜欢的音乐"
+   ],
+   "test": false,
+   "heat": 866,
+   "netease": "",
+   "bytes": 4833219
+  },
+  {
    "id": "spectre",
    "src": "assets/music/Spectre.mp3",
    "title": "Spectre",
@@ -1155,22 +1171,6 @@ window.AUTO = {
    "heat": 967,
    "netease": "",
    "bytes": 5400433
-  },
-  {
-   "id": "viva-la-vida-violin",
-   "src": "assets/music/viva la vida violin.mp3",
-   "title": "viva la vida violin",
-   "artist": "",
-   "date": "2026-11-25",
-   "lyrics": "",
-   "tags": [
-    "音乐",
-    "我喜欢的音乐"
-   ],
-   "test": false,
-   "heat": 867,
-   "netease": "",
-   "bytes": 5077725
   },
   {
    "id": "云海鸣-爱之光",
